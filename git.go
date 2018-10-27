@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 type Git struct {
@@ -59,6 +60,24 @@ func (g *Git) Commit(msg string) error {
 	out, err := g.Exec("commit", "-m", msg)
 	if err != nil {
 		return errors.Wrapf(err, "Cannot commit changes to repository at '%s': %s", g.root, out)
+	}
+	return nil
+}
+
+func (g *Git) TrackingRemote() (string, string, error) {
+	s, err := g.Exec("rev-parse", "--abbrev-ref", "--symbolic", "@{u}")
+	if err != nil {
+		return "", "", errors.Wrapf(err, "Cannot retrieve remote name: %s", s)
+	}
+	// e.g. origin/master
+	ss := strings.Split(s, "/")
+	return ss[0], ss[1], nil
+}
+
+func (g *Git) Push(remote, branch string) error {
+	out, err := g.Exec("push", remote, branch)
+	if err != nil {
+		return errors.Wrapf(err, "Cannot push changes to %s/%s at '%s': %s", remote, branch, g.root, out)
 	}
 	return nil
 }

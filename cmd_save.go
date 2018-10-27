@@ -41,5 +41,11 @@ func (cmd *SaveCmd) Do() error {
 		return err
 	}
 
+	if remote, branch, err := git.TrackingRemote(); err == nil && remote == "origin" {
+		if err := git.Push(remote, branch); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
