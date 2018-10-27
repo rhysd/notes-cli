@@ -16,7 +16,7 @@ func ParseSubcmd(args []string) (Subcmd, error) {
 	cli := kingpin.New("notes", "Simple note taking tool for command line with your favorite editor")
 	noColor := cli.Flag("no-color", "Disable color output").Bool()
 
-	cli.Version("0.0.0")
+	cli.Version("0.1.0")
 	cli.Author("rhysd <https://github.com/rhysd>")
 	cli.HelpFlag.Short('h')
 
