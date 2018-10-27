@@ -32,6 +32,21 @@ creates note file at `<HOME>/notes-cli/blog/how-to-handle-files.md` where `<HOME
 [XDG Data directory][xdg-dirs] by default and can be specified by `$NOTES_CLI_HOME` environment
 variable.
 
+Directory structure is something like:
+
+```
+<HOME>
+├── category1
+│   ├── note1.md
+│   ├── note2.md
+│   └── note3.md
+├── category2
+│   ├── note4.md
+│   └── note5.md
+└── category3
+    └── note6.md
+```
+
 If you set your favorite editor by `$NOTES_CLI_EDITOR` environment variable, it opens the newly
 created note file with your favorite editor. You can seamlessly edit the file.
 
