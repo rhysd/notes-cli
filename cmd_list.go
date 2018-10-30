@@ -25,6 +25,7 @@ type ListCmd struct {
 	Full          bool
 	Category      string
 	Tag           string
+	Relative      bool
 	Out           io.Writer
 }
 
@@ -32,6 +33,7 @@ func (cmd *ListCmd) defineListCLI(c *kingpin.CmdClause) {
 	c.Flag("full", "Show full information of note instead of path").Short('f').BoolVar(&cmd.Full)
 	c.Flag("category", "Filter category name by regular expression").Short('c').StringVar(&cmd.Category)
 	c.Flag("tag", "Filter tag name by regular expression").Short('t').StringVar(&cmd.Tag)
+	c.Flag("relative", "Show relative paths from $NOTES_CLI_HOME directory").Short('r').BoolVar(&cmd.Relative)
 }
 
 func (cmd *ListCmd) defineCLI(app *kingpin.Application) {
@@ -97,7 +99,11 @@ func (cmd *ListCmd) doCategories(cats []string) error {
 	if !cmd.Full {
 		var b bytes.Buffer
 		for _, note := range notes {
-			b.WriteString(note.FilePath() + "\n")
+			if cmd.Relative {
+				b.WriteString(note.RelFilePath() + "\n")
+			} else {
+				b.WriteString(note.FilePath() + "\n")
+			}
 		}
 		_, err := cmd.Out.Write(b.Bytes())
 		return err

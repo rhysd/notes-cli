@@ -52,6 +52,10 @@ func (note *Note) FilePath() string {
 	return filepath.Join(note.Config.HomePath, note.Category, note.File)
 }
 
+func (note *Note) RelFilePath() string {
+	return filepath.Join(note.Category, note.File)
+}
+
 func (note *Note) Create() error {
 	var b bytes.Buffer
 
