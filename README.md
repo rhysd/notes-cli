@@ -145,6 +145,36 @@ Commands:
 
 ```
 
+### How to integrate with Vim
+
+Please write following code in your `.vimrc`.
+
+```vim
+function! s:notes_selection_done(selected) abort
+    silent! autocmd! plugin-notes-cli
+    let home = substitute(system('notes config home'), '\n$', '', '')
+    let sep = has('win32') ? '\' : '/'
+    let path = home . sep . a:selected
+    execute 'split' '+setf\ markdown' path
+    echom 'Note opened: ' . a:selected
+endfunction
+function! s:notes_open(args) abort
+    execute 'terminal ++close bash -c "notes list -r | peco"'
+    augroup plugin-notes-cli
+        autocmd!
+        autocmd BufWinLeave <buffer> call <SID>notes_selection_done(getline(1))
+    augroup END
+endfunction
+
+command! -nargs=* Notes call <SID>notes_open(<q-args>)
+```
+
+`:Notes [args]` command will be available. `args` is passed to `notes list` command.
+So you can easily filter paths by categories (`-c`) or tags (`-t`). It shows the list of paths with
+`peco` command.
+
+After you choose one note from the list with `peco`, it automatically opens the note in new buffer.
+
 ## FAQ
 
 ### I want to specify `/path/to/dir` as home
