@@ -71,7 +71,7 @@ func (cmd *NewCmd) Do() error {
 
 	if err := note.Open(); err != nil {
 		if !cmd.NoInline {
-			fmt.Fprintln(os.Stderr, err.Error())
+			fmt.Fprintf(os.Stderr, "Note: %s\n", err)
 		}
 		fd := os.Stdin.Fd()
 		if !cmd.NoInline && (isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd)) {

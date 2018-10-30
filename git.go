@@ -13,18 +13,19 @@ type Git struct {
 	root string
 }
 
-func (g *Git) Command(subcmd string, args ...string) *exec.Cmd {
+func (git *Git) canonRoot() string {
+	return canonPath(git.root)
+}
+
+func (git *Git) Command(subcmd string, args ...string) *exec.Cmd {
 	// e.g. 'git diff --cached' -> 'git -C /path/to/repo diff --cached'
-	a := append([]string{"-C", g.root, subcmd}, args...)
-	cmd := exec.Command(g.bin, a...)
+	a := append([]string{"-C", git.root, subcmd}, args...)
+	cmd := exec.Command(git.bin, a...)
 	return cmd
 }
 
-func (g *Git) Exec(subcmd string, args ...string) (string, error) {
-	b, err := g.Command(subcmd, args...).CombinedOutput()
-	if err != nil {
-		return string(b), err
-	}
+func (git *Git) Exec(subcmd string, args ...string) (string, error) {
+	b, err := git.Command(subcmd, args...).CombinedOutput()
 
 	// Chop last newline
 	l := len(b)
@@ -32,43 +33,49 @@ func (g *Git) Exec(subcmd string, args ...string) (string, error) {
 		b = b[:l-1]
 	}
 
-	return string(b), nil
+	// Make output in oneline in error cases
+	if err != nil {
+		for i := range b {
+			if b[i] == '\n' {
+				b[i] = ' '
+			}
+		}
+	}
+
+	return string(b), err
 }
 
-func (g *Git) Init() error {
-	if s, err := os.Stat(filepath.Join(g.root, ".git")); err == nil && s.IsDir() {
+func (git *Git) Init() error {
+	if s, err := os.Stat(filepath.Join(git.root, ".git")); err == nil && s.IsDir() {
 		// Repository was already created
 		return nil
 	}
 
-	out, err := g.Exec("init")
+	out, err := git.Exec("init")
 	if err != nil {
-		return errors.Wrapf(err, "Cannot init Git repository at '%s': %s", g.root, out)
+		return errors.Wrapf(err, "Cannot init Git repository at '%s': %s", git.canonRoot(), out)
 	}
 	return nil
 }
 
-func (g *Git) AddAll() error {
-	out, err := g.Exec("add", "-A")
+func (git *Git) AddAll() error {
+	out, err := git.Exec("add", "-A")
 	if err != nil {
-		return errors.Wrapf(err, "Cannot add changes to index tree at '%s': %s", g.root, out)
+		return errors.Wrapf(err, "Cannot add changes to index tree at '%s': %s", git.canonRoot(), out)
 	}
 	return nil
 }
 
-func (g *Git) Commit(msg string) error {
-	out, err := g.Exec("commit", "-m", msg)
+func (git *Git) Commit(msg string) error {
+	out, err := git.Exec("commit", "-m", msg)
 	if err != nil {
-		if out == "" {
-			return errors.Errorf("Cannot commit changes to '%s'. Is there no change?", g.root)
-		}
-		return errors.Wrapf(err, "Cannot commit changes to repository at '%s': %s", g.root, out)
+		return errors.Wrapf(err, "Cannot commit changes to repository at '%s': %s", git.canonRoot(), out)
 	}
 	return nil
 }
 
-func (g *Git) TrackingRemote() (string, string, error) {
-	s, err := g.Exec("rev-parse", "--abbrev-ref", "--symbolic", "@{u}")
+func (git *Git) TrackingRemote() (string, string, error) {
+	s, err := git.Exec("rev-parse", "--abbrev-ref", "--symbolic", "@{u}")
 	if err != nil {
 		return "", "", errors.Wrapf(err, "Cannot retrieve remote name: %s", s)
 	}
@@ -77,10 +84,10 @@ func (g *Git) TrackingRemote() (string, string, error) {
 	return ss[0], ss[1], nil
 }
 
-func (g *Git) Push(remote, branch string) error {
-	out, err := g.Exec("push", remote, branch)
+func (git *Git) Push(remote, branch string) error {
+	out, err := git.Exec("push", remote, branch)
 	if err != nil {
-		return errors.Wrapf(err, "Cannot push changes to %s/%s at '%s': %s", remote, branch, g.root, out)
+		return errors.Wrapf(err, "Cannot push changes to %s/%s at '%s': %s", remote, branch, git.canonRoot(), out)
 	}
 	return nil
 }

@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -18,22 +17,6 @@ import (
 var (
 	reTitleBar = regexp.MustCompile("^=+$")
 )
-
-func canonPath(path string) string {
-	u, err := user.Current()
-	if err != nil {
-		return path // Give up
-	}
-	if !strings.HasPrefix(path, u.HomeDir) {
-		return path
-	}
-	canon := strings.TrimPrefix(path, u.HomeDir)
-	sep := string(filepath.Separator)
-	if !strings.HasPrefix(canon, sep) {
-		canon = sep + canon
-	}
-	return "~" + canon
-}
 
 type Note struct {
 	Config   *Config
@@ -87,7 +70,7 @@ func (note *Note) Create() error {
 
 func (note *Note) Open() error {
 	if note.Config.EditorPath == "" {
-		return errors.New("Note: To open note in editor, please set $NOTES_CLI_EDITOR environment variable")
+		return errors.New("Editor is not set. To open note in editor, please set $NOTES_CLI_EDITOR")
 	}
 	c := exec.Command(note.Config.EditorPath, note.FilePath())
 	c.Stdout = os.Stdout
@@ -162,6 +145,9 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 				return nil, errors.Wrapf(err, "Cannot parse created date time as RFC3339 format: %s", line)
 			}
 			note.Created = t
+		}
+		if note.Category != "" && note.Tags != nil && !note.Created.IsZero() {
+			break
 		}
 	}
 	if err := s.Err(); err != nil {
