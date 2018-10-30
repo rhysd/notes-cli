@@ -17,6 +17,7 @@ import (
 var (
 	yellow = color.New(color.FgYellow)
 	bold   = color.New(color.Bold)
+	green  = color.New(color.FgGreen)
 )
 
 type ListCmd struct {
@@ -26,6 +27,7 @@ type ListCmd struct {
 	Category      string
 	Tag           string
 	Relative      bool
+	Oneline       bool
 	Out           io.Writer
 }
 
@@ -34,6 +36,7 @@ func (cmd *ListCmd) defineListCLI(c *kingpin.CmdClause) {
 	c.Flag("category", "Filter category name by regular expression").Short('c').StringVar(&cmd.Category)
 	c.Flag("tag", "Filter tag name by regular expression").Short('t').StringVar(&cmd.Tag)
 	c.Flag("relative", "Show relative paths from $NOTES_CLI_HOME directory").Short('r').BoolVar(&cmd.Relative)
+	c.Flag("oneline", "Show oneline information of note instead of path").Short('o').BoolVar(&cmd.Oneline)
 }
 
 func (cmd *ListCmd) defineCLI(app *kingpin.Application) {
@@ -56,6 +59,95 @@ func (cmd *ListCmd) printNoteFull(note *Note) {
 	yellow.Fprint(cmd.Out, "Created: ")
 	fmt.Fprintln(cmd.Out, note.Created.Format(time.RFC3339))
 	bold.Fprintf(cmd.Out, "\n%s\n\n", note.Title)
+}
+
+func (cmd *ListCmd) writeTable(colors []*color.Color, table [][]string) error {
+	if len(table) == 0 {
+		return nil
+	}
+
+	lenCols := len(colors)
+
+	maxLen := make([]int, lenCols)
+	for i := 0; i < lenCols; i++ {
+		max := len(table[0][i])
+		for _, d := range table[1:] {
+			l := len(d[i])
+			if l > max {
+				max = l
+			}
+		}
+		maxLen[i] = max
+	}
+
+	for _, data := range table {
+		for i := 0; i < lenCols; i++ {
+			last := i == lenCols-1
+			c := colors[i]
+			d := data[i]
+			max := maxLen[i]
+			pad := strings.Repeat(" ", max-len(d))
+
+			sep := " "
+			if last {
+				sep = "\n"
+			}
+
+			s := d + pad + sep
+
+			var err error
+			if c == nil {
+				_, err = fmt.Fprint(cmd.Out, s)
+			} else {
+				_, err = c.Fprint(cmd.Out, s)
+			}
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (cmd *ListCmd) printOnelineNotes(notes []*Note) error {
+	colors := []*color.Color{bold, yellow, green, nil}
+	data := make([][]string, 0, len(notes))
+
+	for _, note := range notes {
+		count := 0
+		body := strings.Builder{}
+		body.Grow(73)
+		if err := note.ReadBodyLines(func(line string) (bool, error) {
+			stop := false
+
+			len := len(line)
+			if count+len > 70 {
+				line = line[:count+len-70] + "..."
+				stop = true
+			}
+
+			if line != "" {
+				body.WriteString(line)
+				body.WriteByte(byte(' '))
+				len++
+			}
+
+			count += len
+			return stop, nil
+		}); err != nil {
+			return err
+		}
+
+		data = append(data, []string{
+			note.RelFilePath(),
+			note.Category,
+			strings.Join(note.Tags, ","),
+			body.String(),
+		})
+	}
+
+	return cmd.writeTable(colors, data)
 }
 
 func (cmd *ListCmd) doCategories(cats []string) error {
@@ -96,24 +188,27 @@ func (cmd *ListCmd) doCategories(cats []string) error {
 		}
 	}
 
-	if !cmd.Full {
-		var b bytes.Buffer
+	if cmd.Full {
 		for _, note := range notes {
-			if cmd.Relative {
-				b.WriteString(note.RelFilePath() + "\n")
-			} else {
-				b.WriteString(note.FilePath() + "\n")
-			}
+			cmd.printNoteFull(note)
 		}
-		_, err := cmd.Out.Write(b.Bytes())
-		return err
+		return nil
 	}
 
+	if cmd.Oneline {
+		return cmd.printOnelineNotes(notes)
+	}
+
+	var b bytes.Buffer
 	for _, note := range notes {
-		cmd.printNoteFull(note)
+		if cmd.Relative {
+			b.WriteString(note.RelFilePath() + "\n")
+		} else {
+			b.WriteString(note.FilePath() + "\n")
+		}
 	}
-
-	return nil
+	_, err := cmd.Out.Write(b.Bytes())
+	return err
 }
 
 func (cmd *ListCmd) Do() error {
