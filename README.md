@@ -106,7 +106,7 @@ Finally you can save your notes as revision of Git repository.
 $ notes save
 ```
 
-It adds all changes in notes and automatically caretes commit.
+It adds all changes in notes and automatically creates commit.
 When `origin` is set as tracking remote, it pushes the changes to the remote.
 
 This is just a basic usage. Please see `--help` for more details.
