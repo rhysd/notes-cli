@@ -154,26 +154,51 @@ function! s:notes_selection_done(selected) abort
     silent! autocmd! plugin-notes-cli
     let home = substitute(system('notes config home'), '\n$', '', '')
     let sep = has('win32') ? '\' : '/'
-    let path = home . sep . a:selected
+    let path = home . sep . split(a:selected, ' ')[0]
     execute 'split' '+setf\ markdown' path
     echom 'Note opened: ' . a:selected
 endfunction
 function! s:notes_open(args) abort
-    execute 'terminal ++close bash -c "notes list -r | peco"'
+    execute 'terminal ++close bash -c "notes list --oneline | peco"'
     augroup plugin-notes-cli
         autocmd!
         autocmd BufWinLeave <buffer> call <SID>notes_selection_done(getline(1))
     augroup END
 endfunction
+command! -nargs=* NotesOpen call <SID>notes_open(<q-args>)
 
-command! -nargs=* Notes call <SID>notes_open(<q-args>)
+function! s:notes_new(...) abort
+    if has_key(a:, 1)
+        let cat = a:1
+    else
+        let cat = input('category?: ')
+    endif
+    if has_key(a:, 2)
+        let name = a:2
+    else
+        let name = input('filename?: ')
+    endif
+    let tags = get(a:, 3, '')
+    let cmd = printf('%s new --no-inline-input %s %s %s', s:notes_bin, cat, name, tags)
+    let out = system(cmd)
+    if v:shell_error
+        echohl ErrorMsg | echomsg string(cmd) . ' failed: ' . out | echohl None
+        return
+    endif
+    let path = split(out)[-1]
+    execute 'edit!' path
+    normal! Go
+endfunction
+command! -nargs=* NotesNew call <SID>notes_new(<f-args>)
 ```
 
-`:Notes [args]` command will be available. `args` is passed to `notes list` command.
-So you can easily filter paths by categories (`-c`) or tags (`-t`). It shows the list of paths with
-`peco` command.
-
-After you choose one note from the list with `peco`, it automatically opens the note in new buffer.
+- `:NotesOpen [args]`: `args` is passed to `notes list` command. So you can easily
+  filter paths by categories (`-c`) or tags (`-t`). By running the command, it
+  shows notes where each note is described per line. You can search the list
+  incrementally with `peco` command. The chosen note is opened in a new buffer.
+- `:NotesNew [args]`: `args` is the same as `notes new` but category and file name
+  can be empty. In the case, Vim ask you to input them after starting the command.
+  It creates a new note and opens it with a new buffer.
 
 ## FAQ
 
