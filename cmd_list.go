@@ -115,35 +115,16 @@ func (cmd *ListCmd) printOnelineNotes(notes []*Note) error {
 	data := make([][]string, 0, len(notes))
 
 	for _, note := range notes {
-		count := 0
-		body := strings.Builder{}
-		body.Grow(73)
-		if err := note.ReadBodyLines(func(line string) (bool, error) {
-			stop := false
-
-			len := len(line)
-			if count+len > 70 {
-				line = line[:count+len-70] + "..."
-				stop = true
-			}
-
-			if line != "" {
-				body.WriteString(line)
-				body.WriteByte(byte(' '))
-				len++
-			}
-
-			count += len
-			return stop, nil
-		}); err != nil {
-			return err
+		title := note.Title
+		if len(title) > 73 {
+			title = title[:70] + "..."
 		}
 
 		data = append(data, []string{
 			note.RelFilePath(),
 			note.Category,
 			strings.Join(note.Tags, ","),
-			body.String(),
+			title,
 		})
 	}
 

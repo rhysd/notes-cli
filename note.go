@@ -97,54 +97,6 @@ func (note *Note) Open() error {
 	return errors.Wrap(c.Run(), "Editor command did not run successfully")
 }
 
-func (note *Note) ReadBodyLines(reader func(line string) (stop bool, err error)) error {
-	path := note.FilePath()
-	f, err := os.Open(path)
-	if err != nil {
-		return errors.Wrap(err, "Cannot open note file")
-	}
-	defer f.Close()
-
-	// Skip metadata
-	s := bufio.NewScanner(f)
-	sawCat, sawTags, sawCreated := false, false, false
-	for s.Scan() {
-		t := s.Text()
-		if strings.HasPrefix(t, "- Category: ") {
-			sawCat = true
-		} else if strings.HasPrefix(t, "- Tags:") {
-			sawTags = true
-		} else if strings.HasPrefix(t, "- Created:") {
-			sawCreated = true
-		}
-		if sawCat && sawTags && sawCreated {
-			break
-		}
-	}
-	if err := s.Err(); err != nil {
-		return errors.Wrap(err, "Cannot read metadata of note")
-	}
-	if !sawCat || !sawTags || !sawCreated {
-		return errors.Errorf("Some metadata is missing in %s", path)
-	}
-
-	for s.Scan() {
-		t := s.Text()
-		stop, err := reader(t)
-		if err != nil {
-			return err
-		}
-		if stop {
-			break
-		}
-	}
-	if err := s.Err(); err != nil {
-		return errors.Wrap(err, "Error while reading lines of body of note")
-	}
-
-	return nil
-}
-
 func NewNote(cat, tags, file, title string, cfg *Config) (*Note, error) {
 	if cat == "" {
 		return nil, errors.New("Category cannot be empty")

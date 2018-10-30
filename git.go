@@ -23,7 +23,7 @@ func (g *Git) Command(subcmd string, args ...string) *exec.Cmd {
 func (g *Git) Exec(subcmd string, args ...string) (string, error) {
 	b, err := g.Command(subcmd, args...).CombinedOutput()
 	if err != nil {
-		return "", err
+		return string(b), err
 	}
 
 	// Chop last newline
@@ -59,6 +59,9 @@ func (g *Git) AddAll() error {
 func (g *Git) Commit(msg string) error {
 	out, err := g.Exec("commit", "-m", msg)
 	if err != nil {
+		if out == "" {
+			return errors.Errorf("Cannot commit changes to '%s'. Is there no change?", g.root)
+		}
 		return errors.Wrapf(err, "Cannot commit changes to repository at '%s': %s", g.root, out)
 	}
 	return nil
