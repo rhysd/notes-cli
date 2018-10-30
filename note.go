@@ -65,12 +65,12 @@ func (note *Note) Create() error {
 		title = strings.TrimSuffix(note.File, filepath.Ext(note.File))
 	}
 	b.WriteString(title + "\n")
-	b.WriteString(strings.Repeat("=", len(title)) + "\n\n")
+	b.WriteString(strings.Repeat("=", len(title)) + "\n")
 
 	// Write metadata
 	fmt.Fprintf(&b, "- Category: %s\n", note.Category)
 	fmt.Fprintf(&b, "- Tags: %s\n", strings.Join(note.Tags, ", "))
-	fmt.Fprintf(&b, "- Created: %s\n<!-- Do not touch list above -->\n\n", note.Created.Format(time.RFC3339))
+	fmt.Fprintf(&b, "- Created: %s\n\n", note.Created.Format(time.RFC3339))
 
 	d := note.DirPath()
 	if err := os.MkdirAll(d, 0755); err != nil {

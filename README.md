@@ -138,7 +138,7 @@ Commands:
     List all tags
 
   save [<flags>]
-    Save memo data with Git
+    Save notes using Git
 
   config [<name>]
     Output config value to stdout

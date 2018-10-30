@@ -14,7 +14,7 @@ type SaveCmd struct {
 }
 
 func (cmd *SaveCmd) defineCLI(app *kingpin.Application) {
-	cmd.cli = app.Command("save", "Save memo data with Git")
+	cmd.cli = app.Command("save", "Save notes using Git")
 	cmd.cli.Flag("message", "Commit message on save").Short('m').StringVar(&cmd.Message)
 }
 

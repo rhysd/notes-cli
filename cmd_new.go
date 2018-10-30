@@ -31,7 +31,7 @@ func (cmd *NewCmd) matchesCmdline(cmdline string) bool {
 }
 
 func (cmd *NewCmd) fallbackInput(note *Note) error {
-	fmt.Fprintln(os.Stderr, "Input notes inline (Ctrl+D to stop):")
+	fmt.Fprintln(os.Stderr, "Input notes inline (Send EOF by Ctrl+D to stop):")
 	b, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		return errors.Wrap(err, "Cannot read from stdin")
@@ -70,7 +70,9 @@ func (cmd *NewCmd) Do() error {
 	}
 
 	if err := note.Open(); err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+		if !cmd.NoInline {
+			fmt.Fprintln(os.Stderr, err.Error())
+		}
 		fd := os.Stdin.Fd()
 		if !cmd.NoInline && (isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd)) {
 			return cmd.fallbackInput(note)
