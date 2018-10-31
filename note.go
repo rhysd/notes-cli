@@ -63,7 +63,7 @@ func (note *Note) Create() error {
 
 	p := filepath.Join(d, note.File)
 	if _, err := os.Stat(p); err == nil {
-		return errors.Errorf("Cannot create new note since file '%s' already exists. Please use 'edit' command to edit it", filepath.Join(note.Category, note.File))
+		return errors.Errorf("Cannot create new note since file '%s' already exists. Please edit it", note.RelFilePath())
 	}
 
 	return errors.Wrap(ioutil.WriteFile(p, b.Bytes(), 0644), "Cannot write note to file")
@@ -98,18 +98,15 @@ func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 			sawCat = true
 		} else if strings.HasPrefix(t, "- Tags:") {
 			sawTags = true
-		} else if strings.HasPrefix(t, "- Created:") {
+		} else if strings.HasPrefix(t, "- Created: ") {
 			sawCreated = true
 		}
 		if sawCat && sawTags && sawCreated {
 			break
 		}
 		if err != nil {
-			return "", errors.Wrap(err, "Cannot read metadata of note file")
+			return "", errors.Wrapf(err, "Cannot read metadata of note file. Some metadata may be missing in '%s'", note.RelFilePath())
 		}
-	}
-	if !sawCat || !sawTags || !sawCreated {
-		return "", errors.Errorf("Some metadata is missing in %s", path)
 	}
 
 	var buf bytes.Buffer
@@ -125,6 +122,12 @@ func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 			break
 		}
 	}
+
+	len := int64(buf.Len())
+	if len > maxBytes {
+		return string(buf.Bytes()[:maxBytes]), nil
+	}
+	maxBytes -= len
 
 	if _, err := io.CopyN(&buf, r, maxBytes); err != nil && err != io.EOF {
 		return "", err
@@ -152,7 +155,7 @@ func NewNote(cat, tags, file, title string, cfg *Config) (*Note, error) {
 	if !strings.HasSuffix(file, ".md") {
 		file += ".md"
 	}
-	return &Note{cfg, cat, ts, time.Now(), file, ""}, nil
+	return &Note{cfg, cat, ts, time.Now(), file, title}, nil
 }
 
 func LoadNote(path string, cfg *Config) (*Note, error) {
@@ -164,27 +167,29 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 
 	note := &Note{Config: cfg}
 
-	p, md := filepath.Split(path)
-	c := filepath.Base(p)
-	note.File = md
-	note.Category = c
+	note.File = filepath.Base(path)
 
 	s := bufio.NewScanner(f)
+	titleFound := false
 	for s.Scan() {
 		line := s.Text()
 		// First line is title
-		if note.Title == "" {
+		if !titleFound {
 			if reTitleBar.MatchString(line) {
-				note.Title = "(no title)"
+				if note.Title == "" {
+					note.Title = "(no title)"
+				}
+				titleFound = true
 			} else {
 				note.Title = line
 			}
 		} else if strings.HasPrefix(line, "- Category: ") {
-			if c := strings.TrimSpace(line[12:]); c != note.Category {
-				return nil, errors.Errorf("Category does not match between file path and file content; in path '%s' v.s. in file '%s'", note.Category, c)
+			note.Category = strings.TrimSpace(line[12:])
+			if c := filepath.Base(filepath.Dir(path)); c != note.Category {
+				return nil, errors.Errorf("Category does not match between file path and file content, in path '%s' v.s. in file '%s'", c, note.Category)
 			}
-		} else if strings.HasPrefix(line, "- Tags: ") {
-			tags := strings.Split(strings.TrimSpace(line[8:]), ",")
+		} else if strings.HasPrefix(line, "- Tags:") {
+			tags := strings.Split(strings.TrimSpace(line[7:]), ",")
 			note.Tags = make([]string, 0, len(tags))
 			for _, t := range tags {
 				t = strings.TrimSpace(t)
@@ -199,7 +204,7 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 			}
 			note.Created = t
 		}
-		if note.Category != "" && note.Tags != nil && !note.Created.IsZero() {
+		if note.Category != "" && note.Tags != nil && !note.Created.IsZero() && note.Title != "" {
 			break
 		}
 	}
@@ -207,7 +212,7 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 		return nil, errors.Wrapf(err, "Cannot read note file '%s'", canonPath(path))
 	}
 
-	if note.Title == "" {
+	if !titleFound {
 		return nil, errors.Errorf("No title found in note '%s'. Didn't you use '====' bar for h1 title?", canonPath(path))
 	}
 
@@ -237,6 +242,6 @@ func WalkNotes(path string, cfg *Config, pred func(path string, note *Note) erro
 
 			return pred(path, n)
 		}),
-		"Cannot read directory to traverse notes. Directory for category or note-cli home does not exist",
+		"Cannot read directory to traverse notes. Directory for category or note-cli home may not exist",
 	)
 }

@@ -26,6 +26,7 @@ func (cmd *TagsCmd) matchesCmdline(cmdline string) bool {
 func (cmd *TagsCmd) Do() error {
 	var b bytes.Buffer
 	saw := map[string]struct{}{}
+	// If cmd.Category is empty, it scans all notes in home
 	if err := WalkNotes(filepath.Join(cmd.Config.HomePath, cmd.Category), cmd.Config, func(path string, note *Note) error {
 		for _, tag := range note.Tags {
 			if _, ok := saw[tag]; !ok {
