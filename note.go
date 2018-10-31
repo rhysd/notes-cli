@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/pkg/errors"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -78,6 +79,58 @@ func (note *Note) Open() error {
 	c.Stdin = os.Stdin
 	c.Dir = note.DirPath()
 	return errors.Wrap(c.Run(), "Editor command did not run successfully")
+}
+
+func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
+	path := note.FilePath()
+	f, err := os.Open(path)
+	if err != nil {
+		return "", errors.Wrap(err, "Cannot open note file")
+	}
+	defer f.Close()
+
+	// Skip metadata
+	r := bufio.NewReader(f)
+	sawCat, sawTags, sawCreated := false, false, false
+	for {
+		t, err := r.ReadString('\n')
+		if strings.HasPrefix(t, "- Category: ") {
+			sawCat = true
+		} else if strings.HasPrefix(t, "- Tags:") {
+			sawTags = true
+		} else if strings.HasPrefix(t, "- Created:") {
+			sawCreated = true
+		}
+		if sawCat && sawTags && sawCreated {
+			break
+		}
+		if err != nil {
+			return "", errors.Wrap(err, "Cannot read metadata of note file")
+		}
+	}
+	if !sawCat || !sawTags || !sawCreated {
+		return "", errors.Errorf("Some metadata is missing in %s", path)
+	}
+
+	var buf bytes.Buffer
+
+	// Skip empty lines
+	for {
+		b, err := r.ReadBytes('\n')
+		if err != nil {
+			break
+		}
+		if len(b) > 1 {
+			buf.Write(b)
+			break
+		}
+	}
+
+	if _, err := io.CopyN(&buf, r, maxBytes); err != nil && err != io.EOF {
+		return "", err
+	}
+
+	return buf.String(), nil
 }
 
 func NewNote(cat, tags, file, title string, cfg *Config) (*Note, error) {

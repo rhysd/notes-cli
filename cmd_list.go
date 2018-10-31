@@ -51,14 +51,30 @@ func (cmd *ListCmd) matchesCmdline(cmdline string) bool {
 }
 
 func (cmd *ListCmd) printNoteFull(note *Note) {
-	yellow.Fprintln(cmd.Out, note.FilePath())
+	green.Fprintln(cmd.Out, note.FilePath())
 	yellow.Fprint(cmd.Out, "Category: ")
 	fmt.Fprintln(cmd.Out, note.Category)
-	yellow.Fprint(cmd.Out, "Tags: ")
+	yellow.Fprint(cmd.Out, "Tags:     ")
 	fmt.Fprintln(cmd.Out, strings.Join(note.Tags, ", "))
-	yellow.Fprint(cmd.Out, "Created: ")
+	yellow.Fprint(cmd.Out, "Created:  ")
 	fmt.Fprintln(cmd.Out, note.Created.Format(time.RFC3339))
-	bold.Fprintf(cmd.Out, "\n%s\n\n", note.Title)
+	if note.Title != "" {
+		bold.Fprintf(cmd.Out, "\n%s\n%s\n\n", note.Title, strings.Repeat("=", len(note.Title)))
+	}
+
+	body, err := note.ReadBodyN(200)
+	if err != nil || len(body) == 0 {
+		return
+	}
+
+	fmt.Fprint(cmd.Out, body)
+
+	// Adjust end of body. Ensure it ends with \n\n
+	if !strings.HasSuffix(body, "\n") {
+		fmt.Fprint(cmd.Out, "\n\n")
+	} else if !strings.HasSuffix(body, "\n\n") {
+		fmt.Fprintln(cmd.Out)
+	}
 }
 
 func (cmd *ListCmd) writeTable(colors []*color.Color, table [][]string) error {
