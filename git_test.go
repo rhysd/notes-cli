@@ -14,7 +14,7 @@ func TestGitExecSuccess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.HasPrefix(out, "On branch ") {
+	if !strings.HasPrefix(out, "On branch ") && !strings.HasPrefix(out, "HEAD detached at ") {
 		t.Fatal("Unexpected output:", out)
 	}
 }
@@ -57,6 +57,14 @@ func TestGitInitAddCommit(t *testing.T) {
 		t.Fatal(".git is not directory")
 	}
 
+	if out, err := g.Exec("config", "user.name", "You"); err != nil {
+		t.Fatal(out, err)
+	}
+
+	if out, err := g.Exec("config", "user.email", "you@example.com"); err != nil {
+		t.Fatal(out, err)
+	}
+
 	f, err := os.Create(filepath.Join(dir, "tmp.txt"))
 	if err != nil {
 		panic(err)
@@ -91,6 +99,14 @@ func TestGitInitAddCommit(t *testing.T) {
 }
 
 func TestGitTrackingRemote(t *testing.T) {
+	// This test cannot be run on CI since it use detached HEAD for clone
+	if _, ok := os.LookupEnv("TRAVIS"); ok {
+		return
+	}
+	if _, ok := os.LookupEnv("APPVEYOR"); ok {
+		return
+	}
+
 	g := NewGit(&Config{GitPath: "git", HomePath: "."})
 	re, br, err := g.TrackingRemote()
 	if err != nil {
