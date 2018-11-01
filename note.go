@@ -242,6 +242,6 @@ func WalkNotes(path string, cfg *Config, pred func(path string, note *Note) erro
 
 			return pred(path, n)
 		}),
-		"Cannot read directory to traverse notes. Directory for category or note-cli home may not exist",
+		"Error while traversing notes. If you're finding notes of specific category, directory for it may not exist",
 	)
 }

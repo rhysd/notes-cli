@@ -482,3 +482,13 @@ func TestWalkNotesPredReturnError(t *testing.T) {
 		t.Fatal("Unexpected error:", err)
 	}
 }
+
+func TestWalkNotesBrokenNote(t *testing.T) {
+	cfg := noteTestdataConfig()
+	err := WalkNotes(filepath.Join(cfg.HomePath, "fail"), cfg, func(p string, n *Note) error {
+		return nil // Do nothing
+	})
+	if err == nil {
+		t.Fatal("No error occurred")
+	}
+}
