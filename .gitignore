@@ -1,1 +1,4 @@
 /notes
+/test/note/**/have-*.md
+/cover.out
+/test-tmp-dir-*
