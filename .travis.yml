@@ -1,0 +1,8 @@
+language: go
+os:
+  - linux
+  - osx
+install:
+  - go get -t -d -v ./...
+script:
+  - go test -v ./...
