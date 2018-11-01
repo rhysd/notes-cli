@@ -6,13 +6,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-type Subcmd interface {
-	Do() error
-	defineCLI(*kingpin.Application)
-	matchesCmdline(string) bool
-}
-
-func ParseSubcmd(args []string) (Subcmd, error) {
+func ParseCmd(args []string) (Cmd, error) {
 	cli := kingpin.New("notes", "Simple note taking tool for command line with your favorite editor")
 	noColor := cli.Flag("no-color", "Disable color output").Bool()
 
@@ -26,7 +20,7 @@ func ParseSubcmd(args []string) (Subcmd, error) {
 	}
 
 	out := colorable.NewColorableStdout()
-	cmds := []Subcmd{
+	cmds := []Cmd{
 		&NewCmd{Config: c},
 		&ListCmd{Config: c, Out: out},
 		&CategoriesCmd{Config: c},

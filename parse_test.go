@@ -24,7 +24,7 @@ func TestParseArgs(t *testing.T) {
 	for _, tc := range []struct {
 		what string
 		args []string
-		want Subcmd
+		want Cmd
 	}{
 		{
 			what: "config command",
@@ -87,7 +87,7 @@ func TestParseArgs(t *testing.T) {
 		},
 	} {
 		t.Run(tc.what, func(t *testing.T) {
-			have, err := ParseSubcmd(tc.args)
+			have, err := ParseCmd(tc.args)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -105,7 +105,7 @@ func TestParseGlobalFlags(t *testing.T) {
 		color.NoColor = old
 	}()
 
-	if _, err := ParseSubcmd([]string{"--no-color", "config"}); err != nil {
+	if _, err := ParseCmd([]string{"--no-color", "config"}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -115,7 +115,7 @@ func TestParseGlobalFlags(t *testing.T) {
 }
 
 func TestParseFailure(t *testing.T) {
-	if _, err := ParseSubcmd([]string{"unknown-command"}); err == nil {
+	if _, err := ParseCmd([]string{"unknown-command"}); err == nil {
 		t.Fatal("Unknown command did not cause an error")
 	}
 }

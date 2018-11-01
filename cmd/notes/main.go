@@ -15,7 +15,7 @@ func exit(err error) {
 }
 
 func main() {
-	c, err := notes.ParseSubcmd(os.Args[1:])
+	c, err := notes.ParseCmd(os.Args[1:])
 	if err != nil {
 		exit(err)
 	}
