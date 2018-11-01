@@ -1,5 +1,7 @@
 A small CLI note taking tool with your favorite editor
 ======================================================
+[![Linux/Mac Build Status][travisci-badge]][travisci]
+[![Windows Build status][appveyor-badge]][appveyor]
 
 **This repository is an experimental until version reaches v1.0.0. Features may be changed in the future and tests are not sufficient.**
 
@@ -257,3 +259,7 @@ It's up to you.
 [fzf]: https://github.com/junegunn/fzf
 [peco]: https://github.com/peco/peco
 [xdg-dirs]: https://wiki.archlinux.org/index.php/XDG_Base_Directory
+[appveyor-badge]: https://ci.appveyor.com/api/projects/status/5pbcku1buw8gnqu9/branch/master?svg=true
+[appveyor]: https://ci.appveyor.com/project/rhysd/notes-cli
+[travisci-badge]: https://travis-ci.org/rhysd/notes-cli.svg?branch=master
+[travisci]: https://travis-ci.org/rhysd/notes-cli

@@ -389,7 +389,7 @@ func TestLoadNote(t *testing.T) {
 				t.Fatal("Created time was not loaded")
 			}
 
-			if have.Created != created {
+			if have.Created.Unix() != created.Unix() {
 				t.Fatal("Unexpected created datetime", have.Created.Format(time.RFC3339))
 			}
 		})
@@ -448,8 +448,8 @@ func TestWalkNotes(t *testing.T) {
 	cfg.HomePath = filepath.Join(cfg.HomePath, "walk")
 
 	want := map[string]struct{}{
-		"a/a.md": struct{}{},
-		"b/b.md": struct{}{},
+		filepath.FromSlash("a/a.md"): struct{}{},
+		filepath.FromSlash("b/b.md"): struct{}{},
 	}
 
 	have := map[string]struct{}{}
