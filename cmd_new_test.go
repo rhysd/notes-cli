@@ -1,7 +1,7 @@
 package notes
 
 import (
-	"github.com/rhysd/fakeio"
+	"github.com/rhysd/go-fakeio"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -176,7 +176,6 @@ func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
 	if stdout != p {
 		t.Error("Output is not path to the file:", stdout)
 	}
-
 }
 
 func TestNewCmdNoteAlreadyExists(t *testing.T) {

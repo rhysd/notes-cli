@@ -447,32 +447,51 @@ func TestWalkNotes(t *testing.T) {
 	cfg := noteTestdataConfig()
 	cfg.HomePath = filepath.Join(cfg.HomePath, "walk")
 
-	want := map[string]struct{}{
-		filepath.FromSlash("a/a.md"): struct{}{},
-		filepath.FromSlash("b/b.md"): struct{}{},
-	}
+	for _, tc := range []struct {
+		what string
+		cat  string
+		want []string
+	}{
+		{
+			what: "all categories",
+			cat:  "",
+			want: []string{"a/a.md", "b/b.md"},
+		},
+		{
+			what: "specific category",
+			cat:  "a",
+			want: []string{"a/a.md"},
+		},
+	} {
+		t.Run(tc.what, func(t *testing.T) {
+			want := map[string]struct{}{}
+			for _, w := range tc.want {
+				want[filepath.FromSlash(w)] = struct{}{}
+			}
 
-	have := map[string]struct{}{}
-	if err := WalkNotes(cfg.HomePath, cfg, func(p string, n *Note) error {
-		p2 := n.FilePath()
-		if p != p2 {
-			t.Fatalf("'%s' v.s. '%s'", p, p2)
-		}
-		have[n.RelFilePath()] = struct{}{}
-		return nil
-	}); err != nil {
-		t.Fatal(err)
-	}
+			have := map[string]struct{}{}
+			if err := WalkNotesNew(tc.cat, cfg, func(p string, n *Note) error {
+				p2 := n.FilePath()
+				if p != p2 {
+					t.Fatalf("'%s' v.s. '%s'", p, p2)
+				}
+				have[n.RelFilePath()] = struct{}{}
+				return nil
+			}); err != nil {
+				t.Fatal(err)
+			}
 
-	if !cmp.Equal(want, have) {
-		t.Fatal(cmp.Diff(want, have))
+			if !cmp.Equal(want, have) {
+				t.Fatal(cmp.Diff(want, have))
+			}
+		})
 	}
 }
 
 func TestWalkNotesPredReturnError(t *testing.T) {
 	cfg := noteTestdataConfig()
 	cfg.HomePath = filepath.Join(cfg.HomePath, "walk")
-	err := WalkNotes(cfg.HomePath, cfg, func(p string, n *Note) error {
+	err := WalkNotesNew("", cfg, func(p string, n *Note) error {
 		return errors.New("hello")
 	})
 	if err == nil {
@@ -483,12 +502,44 @@ func TestWalkNotesPredReturnError(t *testing.T) {
 	}
 }
 
+func TestWalkNotesWalkInvalidCategory(t *testing.T) {
+	cfg := noteTestdataConfig()
+	cfg.HomePath = filepath.Join(cfg.HomePath, "walk")
+	err := WalkNotesNew("not-existing-cat", cfg, func(p string, n *Note) error {
+		return nil
+	})
+	if err == nil {
+		t.Fatal("Error did not occur")
+	}
+	if !strings.Contains(err.Error(), "Category 'not-existing-cat' does not exist") {
+		t.Fatal("Unexpected error:", err)
+	}
+}
+
+func TestWalkNotesHomeDoesNotExist(t *testing.T) {
+	cfg := noteTestdataConfig()
+	cfg.HomePath = "/path/to/somewhere/unknown/home"
+	err := WalkNotesNew("", cfg, func(p string, n *Note) error {
+		return nil
+	})
+	if err == nil {
+		t.Fatal("Error did not occur")
+	}
+	if !strings.Contains(err.Error(), "Cannot read home") {
+		t.Fatal("Unexpected error:", err)
+	}
+}
+
 func TestWalkNotesBrokenNote(t *testing.T) {
 	cfg := noteTestdataConfig()
-	err := WalkNotes(filepath.Join(cfg.HomePath, "fail"), cfg, func(p string, n *Note) error {
+	cfg.HomePath = filepath.Join(cfg.HomePath, "walk-fail")
+	err := WalkNotesNew("", cfg, func(p string, n *Note) error {
 		return nil // Do nothing
 	})
 	if err == nil {
 		t.Fatal("No error occurred")
+	}
+	if !strings.Contains(err.Error(), "Missing metadata") {
+		t.Fatal("Unexpected error:", err)
 	}
 }

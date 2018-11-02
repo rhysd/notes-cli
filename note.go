@@ -223,32 +223,56 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 	return note, nil
 }
 
-func WalkNotes(path string, cfg *Config, pred func(path string, note *Note) error) error {
-	return errors.Wrap(
-		filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+func WalkNotesNew(cat string, cfg *Config, pred func(path string, note *Note) error) error {
+	fs, err := ioutil.ReadDir(cfg.HomePath)
+	if err != nil {
+		return errors.Wrap(err, "Cannot read home")
+	}
+
+	cats := make([]string, 0, len(fs))
+	for _, f := range fs {
+		n := f.Name()
+		if f.IsDir() && n != ".git" {
+			cats = append(cats, n)
+		}
+	}
+
+	if cat != "" {
+		found := false
+		for _, c := range cats {
+			if c == cat {
+				cats = []string{cat}
+				found = true
+				break
+			}
+		}
+		if !found {
+			return errors.Errorf("Category '%s' does not exist. All categories are %s", cat, strings.Join(cats, ", "))
+		}
+	}
+
+	for _, c := range cats {
+		dir := filepath.Join(cfg.HomePath, c)
+		es, err := ioutil.ReadDir(dir)
+		if err != nil {
+			return errors.Wrapf(err, "Cannot read directory for category '%s'", c)
+		}
+
+		for _, e := range es {
+			f := e.Name()
+			if e.IsDir() || !strings.HasSuffix(f, ".md") {
+				continue
+			}
+			p := filepath.Join(dir, f)
+			n, err := LoadNote(p, cfg)
 			if err != nil {
 				return err
 			}
-
-			if info.IsDir() {
-				if info.Name() == ".git" {
-					return filepath.SkipDir
-				}
-				return nil
-			}
-
-			if info.IsDir() || !strings.HasSuffix(path, ".md") {
-				// Skip
-				return nil
-			}
-
-			n, err := LoadNote(path, cfg)
-			if err != nil {
+			if err := pred(p, n); err != nil {
 				return err
 			}
+		}
+	}
 
-			return pred(path, n)
-		}),
-		"Error while traversing notes. If you're finding notes of specific category, directory for it may not exist",
-	)
+	return nil
 }

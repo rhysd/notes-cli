@@ -1,17 +1,19 @@
 package notes
 
 import (
-	"bytes"
+	"fmt"
 	"github.com/pkg/errors"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"io"
 	"io/ioutil"
-	"os"
+	"sort"
 	"strings"
 )
 
 type CategoriesCmd struct {
 	cli, cliAlias *kingpin.CmdClause
 	Config        *Config
+	Out           io.Writer
 }
 
 func (cmd *CategoriesCmd) defineCLI(app *kingpin.Application) {
@@ -29,17 +31,18 @@ func (cmd *CategoriesCmd) Do() error {
 		return errors.Wrap(err, "Cannot read notes-cli home")
 	}
 
-	var b bytes.Buffer
+	cats := []string{}
+
 	for _, f := range fs {
 		n := f.Name()
 		if !f.IsDir() || strings.HasPrefix(n, ".") {
 			continue
 		}
-		b.WriteString(n + "\n")
-	}
-	if _, err := os.Stdout.Write(b.Bytes()); err != nil {
-		return err
+		cats = append(cats, n)
 	}
 
-	return nil
+	sort.Strings(cats)
+
+	_, err = fmt.Fprintln(cmd.Out, strings.Join(cats, "\n"))
+	return err
 }

@@ -23,8 +23,8 @@ func ParseCmd(args []string) (Cmd, error) {
 	cmds := []Cmd{
 		&NewCmd{Config: c},
 		&ListCmd{Config: c, Out: colorable.NewColorableStdout()},
-		&CategoriesCmd{Config: c},
-		&TagsCmd{Config: c},
+		&CategoriesCmd{Config: c, Out: os.Stdout},
+		&TagsCmd{Config: c, Out: os.Stdout},
 		&SaveCmd{Config: c},
 		&ConfigCmd{Config: c, Out: os.Stdout},
 	}

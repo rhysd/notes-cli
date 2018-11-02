@@ -20,6 +20,8 @@ func TestParseArgs(t *testing.T) {
 		cmpopts.IgnoreTypes(&Config{}),
 		cmpopts.IgnoreFields(ListCmd{}, "Out"),
 		cmpopts.IgnoreFields(ConfigCmd{}, "Out"),
+		cmpopts.IgnoreFields(TagsCmd{}, "Out"),
+		cmpopts.IgnoreFields(CategoriesCmd{}, "Out"),
 	}
 
 	for _, tc := range []struct {

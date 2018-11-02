@@ -1,9 +1,10 @@
 package notes
 
 import (
-	"bytes"
-	"os"
-	"path/filepath"
+	"fmt"
+	"io"
+	"sort"
+	"strings"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -12,6 +13,7 @@ type TagsCmd struct {
 	cli      *kingpin.CmdClause
 	Config   *Config
 	Category string
+	Out      io.Writer
 }
 
 func (cmd *TagsCmd) defineCLI(app *kingpin.Application) {
@@ -24,13 +26,14 @@ func (cmd *TagsCmd) matchesCmdline(cmdline string) bool {
 }
 
 func (cmd *TagsCmd) Do() error {
-	var b bytes.Buffer
 	saw := map[string]struct{}{}
+	tags := []string{}
+
 	// If cmd.Category is empty, it scans all notes in home
-	if err := WalkNotes(filepath.Join(cmd.Config.HomePath, cmd.Category), cmd.Config, func(path string, note *Note) error {
+	if err := WalkNotesNew(cmd.Category, cmd.Config, func(path string, note *Note) error {
 		for _, tag := range note.Tags {
 			if _, ok := saw[tag]; !ok {
-				b.WriteString(tag + "\n")
+				tags = append(tags, tag)
 				saw[tag] = struct{}{}
 			}
 		}
@@ -38,8 +41,9 @@ func (cmd *TagsCmd) Do() error {
 	}); err != nil {
 		return err
 	}
-	if _, err := os.Stdout.Write(b.Bytes()); err != nil {
-		return err
-	}
-	return nil
+
+	sort.Strings(tags)
+
+	_, err := fmt.Fprintln(cmd.Out, strings.Join(tags, "\n"))
+	return err
 }
