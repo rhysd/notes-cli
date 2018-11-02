@@ -3,6 +3,7 @@ package notes
 import (
 	"bytes"
 	"fmt"
+	"github.com/fatih/color"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,6 +11,10 @@ import (
 )
 
 func TestListCmd(t *testing.T) {
+	old := color.NoColor
+	color.NoColor = true
+	defer func() { color.NoColor = old }()
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		panic(err)

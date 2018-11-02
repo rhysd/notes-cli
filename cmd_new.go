@@ -2,11 +2,11 @@ package notes
 
 import (
 	"fmt"
-	"github.com/mattn/go-isatty"
 	"github.com/pkg/errors"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 type NewCmd struct {
@@ -54,12 +54,6 @@ func (cmd *NewCmd) fallbackInput(note *Note) error {
 func (cmd *NewCmd) Do() error {
 	git := NewGit(cmd.Config)
 
-	if git != nil {
-		if err := git.Init(); err != nil {
-			return err
-		}
-	}
-
 	note, err := NewNote(cmd.Category, cmd.Tags, cmd.Filename, "", cmd.Config)
 	if err != nil {
 		return err
@@ -69,12 +63,19 @@ func (cmd *NewCmd) Do() error {
 		return err
 	}
 
+	if git != nil {
+		if _, err := os.Stat(filepath.Join(cmd.Config.HomePath, ".git")); err != nil {
+			if err := git.Init(); err != nil {
+				return err
+			}
+		}
+	}
+
 	if err := note.Open(); err != nil {
 		if !cmd.NoInline {
 			fmt.Fprintf(os.Stderr, "Note: %s\n", err)
 		}
-		fd := os.Stdin.Fd()
-		if !cmd.NoInline && (isatty.IsTerminal(fd) || isatty.IsCygwinTerminal(fd)) {
+		if !cmd.NoInline {
 			return cmd.fallbackInput(note)
 		}
 		// Final fallback is only showing the path to the note. Then users can open it by themselves.

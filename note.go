@@ -230,6 +230,13 @@ func WalkNotes(path string, cfg *Config, pred func(path string, note *Note) erro
 				return err
 			}
 
+			if info.IsDir() {
+				if info.Name() == ".git" {
+					return filepath.SkipDir
+				}
+				return nil
+			}
+
 			if info.IsDir() || !strings.HasSuffix(path, ".md") {
 				// Skip
 				return nil
