@@ -23,43 +23,36 @@ func TestParseArgs(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		what string
 		args []string
 		want Cmd
 	}{
 		{
-			what: "config command",
 			args: []string{"config", "home"},
 			want: &ConfigCmd{
 				Name: "home",
 			},
 		},
 		{
-			what: "save command",
 			args: []string{"save", "--message", "hello"},
 			want: &SaveCmd{
 				Message: "hello",
 			},
 		},
 		{
-			what: "tags command",
 			args: []string{"tags", "dog"},
 			want: &TagsCmd{
 				Category: "dog",
 			},
 		},
 		{
-			what: "categories command",
 			args: []string{"categories"},
 			want: &CategoriesCmd{},
 		},
 		{
-			what: "cats command",
 			args: []string{"cats"},
 			want: &CategoriesCmd{},
 		},
 		{
-			what: "list command",
 			args: []string{"list", "--category", "dog", "--tag", "cat", "--oneline"},
 			want: &ListCmd{
 				Category: "dog",
@@ -68,7 +61,6 @@ func TestParseArgs(t *testing.T) {
 			},
 		},
 		{
-			what: "ls command",
 			args: []string{"ls", "--category", "dog", "--tag", "cat", "--oneline"},
 			want: &ListCmd{
 				Category: "dog",
@@ -77,7 +69,6 @@ func TestParseArgs(t *testing.T) {
 			},
 		},
 		{
-			what: "new command",
 			args: []string{"new", "dog", "filename", "cat,bird", "--no-inline-input"},
 			want: &NewCmd{
 				Category: "dog",
@@ -87,7 +78,7 @@ func TestParseArgs(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.what, func(t *testing.T) {
+		t.Run(tc.args[0]+" command", func(t *testing.T) {
 			have, err := ParseCmd(tc.args)
 			if err != nil {
 				t.Fatal(err)

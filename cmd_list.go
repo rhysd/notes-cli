@@ -42,7 +42,7 @@ func (cmd *ListCmd) defineListCLI(c *kingpin.CmdClause) {
 }
 
 func (cmd *ListCmd) defineCLI(app *kingpin.Application) {
-	cmd.cli = app.Command("list", "List note paths with filtering by categories and/or tags with regular expressions")
+	cmd.cli = app.Command("list", "List note paths with filtering by categories and/or tags with regular expressions (alias: ls)")
 	cmd.defineListCLI(cmd.cli)
 	cmd.cliAlias = app.Command("ls", "List note paths with filtering by categories and/or tags with regular expressions").Hidden()
 	cmd.defineListCLI(cmd.cliAlias)
@@ -108,6 +108,7 @@ func (cmd *ListCmd) writeTable(colors []*color.Color, table [][]string) error {
 
 			sep := " "
 			if last {
+				pad = ""
 				sep = "\n"
 			}
 
@@ -149,15 +150,7 @@ func (cmd *ListCmd) printOnelineNotes(notes []*Note) error {
 	return cmd.writeTable(colors, data)
 }
 
-func (cmd *ListCmd) doCategories(cats []string) error {
-	var r *regexp.Regexp
-	if cmd.Tag != "" {
-		var err error
-		if r, err = regexp.Compile(cmd.Tag); err != nil {
-			return errors.Wrap(err, "Regular expression for filtering tags is invalid")
-		}
-	}
-
+func (cmd *ListCmd) doCategories(cats []string, tagRegex *regexp.Regexp) error {
 	notes := []*Note{}
 	for _, cat := range cats {
 		dir := filepath.Join(cmd.Config.HomePath, cat)
@@ -174,12 +167,12 @@ func (cmd *ListCmd) doCategories(cats []string) error {
 			if err != nil {
 				return err
 			}
-			if r == nil {
+			if tagRegex == nil {
 				notes = append(notes, note)
 				continue
 			}
 			for _, tag := range note.Tags {
-				if r.MatchString(tag) {
+				if tagRegex.MatchString(tag) {
 					notes = append(notes, note)
 					break
 				}
@@ -225,6 +218,13 @@ func (cmd *ListCmd) Do() error {
 		return errors.Wrap(err, "Cannot read note-cli home")
 	}
 
+	var tagRegex *regexp.Regexp
+	if cmd.Tag != "" {
+		if tagRegex, err = regexp.Compile(cmd.Tag); err != nil {
+			return errors.Wrap(err, "Regular expression for filtering tags is invalid")
+		}
+	}
+
 	if cmd.Category == "" {
 		cs := make([]string, 0, len(fs))
 		for _, f := range fs {
@@ -232,7 +232,7 @@ func (cmd *ListCmd) Do() error {
 				cs = append(cs, f.Name())
 			}
 		}
-		return cmd.doCategories(cs)
+		return cmd.doCategories(cs, tagRegex)
 	}
 
 	r, err := regexp.Compile(cmd.Category)
@@ -250,5 +250,6 @@ func (cmd *ListCmd) Do() error {
 			cs = append(cs, f.Name())
 		}
 	}
-	return cmd.doCategories(cs)
+
+	return cmd.doCategories(cs, tagRegex)
 }

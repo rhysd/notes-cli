@@ -15,7 +15,7 @@ type CategoriesCmd struct {
 }
 
 func (cmd *CategoriesCmd) defineCLI(app *kingpin.Application) {
-	cmd.cli = app.Command("categories", "List all categories")
+	cmd.cli = app.Command("categories", "List all categories (alias: cats)")
 	cmd.cliAlias = app.Command("cats", "List all categories. Please do not expect 🐱!").Hidden()
 }
 
