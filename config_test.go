@@ -144,3 +144,24 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 		})
 	}
 }
+
+func TestNewConfigGitAndEditorNotFound(t *testing.T) {
+	s := testNewConfigEnvState()
+	defer s.restore()
+
+	os.Setenv("NOTES_CLI_GIT", "/path/to/unknown-command")
+	os.Setenv("NOTES_CLI_EDITOR", "/path/to/unknown-command")
+
+	c, err := NewConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if c.GitPath != "" {
+		t.Fatal("git path should be empty:", c.GitPath)
+	}
+
+	if c.EditorPath != "" {
+		t.Fatal("editor path should be empty:", c.EditorPath)
+	}
+}

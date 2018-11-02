@@ -4,6 +4,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/mattn/go-colorable"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"os"
 )
 
 func ParseCmd(args []string) (Cmd, error) {
@@ -19,14 +20,13 @@ func ParseCmd(args []string) (Cmd, error) {
 		return nil, err
 	}
 
-	out := colorable.NewColorableStdout()
 	cmds := []Cmd{
 		&NewCmd{Config: c},
-		&ListCmd{Config: c, Out: out},
+		&ListCmd{Config: c, Out: colorable.NewColorableStdout()},
 		&CategoriesCmd{Config: c},
 		&TagsCmd{Config: c},
 		&SaveCmd{Config: c},
-		&ConfigCmd{Config: c},
+		&ConfigCmd{Config: c, Out: os.Stdout},
 	}
 
 	for _, cmd := range cmds {

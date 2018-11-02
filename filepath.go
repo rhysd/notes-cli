@@ -12,13 +12,12 @@ func canonPath(path string) string {
 	if err != nil {
 		return path // Give up
 	}
-	if !strings.HasPrefix(path, u.HomeDir) {
+	home := filepath.Clean(u.HomeDir)
+	if !strings.HasPrefix(path, home) {
 		return path
 	}
-	canon := strings.TrimPrefix(path, u.HomeDir)
-	sep := string(filepath.Separator)
-	if !strings.HasPrefix(canon, sep) {
-		canon = sep + canon
-	}
+	canon := strings.TrimPrefix(path, home)
+	// Note: home went through filepath.Clean. So it does not have trailing slash and canon is
+	// always prefixed with slash.
 	return "~" + canon
 }
