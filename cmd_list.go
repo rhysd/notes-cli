@@ -187,7 +187,7 @@ func (cmd *ListCmd) doCategories(cats []string) error {
 		}
 	}
 
-	switch cmd.SortBy {
+	switch strings.ToLower(cmd.SortBy) {
 	case "filename":
 		sortByFilename(notes)
 	case "category":

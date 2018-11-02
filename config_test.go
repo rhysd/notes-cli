@@ -129,7 +129,7 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer os.Remove(tc.val)
+			defer os.RemoveAll(tc.val)
 
 			if c.HomePath != tc.home {
 				t.Fatal("Home is unexpected:", c.HomePath, "wanted:", tc.home)
