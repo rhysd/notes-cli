@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -26,6 +28,10 @@ func (cmd *SaveCmd) Do() error {
 	git := NewGit(cmd.Config)
 	if git == nil {
 		return errors.New("'save' command cannot work without Git. Please check Git command listed in output of 'config' command is available")
+	}
+
+	if _, err := os.Stat(filepath.Join(cmd.Config.HomePath, ".git")); err != nil {
+		return errors.New("'.git' directory does not exist in home. Please create a new note with `notes new` at first")
 	}
 
 	if err := git.AddAll(); err != nil {
