@@ -28,6 +28,7 @@ type ListCmd struct {
 	Tag           string
 	Relative      bool
 	Oneline       bool
+	SortBy        string
 	Out           io.Writer
 }
 
@@ -37,6 +38,7 @@ func (cmd *ListCmd) defineListCLI(c *kingpin.CmdClause) {
 	c.Flag("tag", "Filter tag name by regular expression").Short('t').StringVar(&cmd.Tag)
 	c.Flag("relative", "Show relative paths from $NOTES_CLI_HOME directory").Short('r').BoolVar(&cmd.Relative)
 	c.Flag("oneline", "Show oneline information of note instead of path").Short('o').BoolVar(&cmd.Oneline)
+	c.Flag("sort", "Sort results by 'created', 'filename' or 'category'. 'created' is default").Short('s').EnumVar(&cmd.SortBy, "created", "filename", "category")
 }
 
 func (cmd *ListCmd) defineCLI(app *kingpin.Application) {
@@ -183,6 +185,15 @@ func (cmd *ListCmd) doCategories(cats []string) error {
 				}
 			}
 		}
+	}
+
+	switch cmd.SortBy {
+	case "filename":
+		sortByFilename(notes)
+	case "category":
+		sortByCategory(notes)
+	default:
+		sortByCreated(notes)
 	}
 
 	if cmd.Full {

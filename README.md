@@ -17,7 +17,7 @@ This tool is intended to be used nicely with other commands such as `grep` (or [
 For now, please install by building from source directly as follows:
 
 ```
-$ go get github.com/rhysd/notes-cli/cmd/notes
+$ go get -u github.com/rhysd/notes-cli/cmd/notes
 ```
 
 ## Basic Usage
@@ -212,7 +212,7 @@ Please set it to environment variable.
 export NOTES_CLI_HOME=/path/to/dir
 ```
 
-### I want to grep notes
+### How can I grep notes?
 
 Please combine grep tools with `notes list` on your command line. For example,
 
@@ -223,7 +223,7 @@ $ ag some word $(notes list)
 
 If you want to filter with categories or tags, please use `-c` and/or `-t` of `list` command.
 
-### I want to filter notes interactively and open it with my editor
+### How can I filter notes interactively and open it with my editor?
 
 Please pipe the list of paths from `notes list`. Following is an example with `peco` and Vim.
 
@@ -231,7 +231,19 @@ Please pipe the list of paths from `notes list`. Following is an example with `p
 $ notes list | peco | xargs -o vim --not-a-term
 ```
 
-### I want to remove some notes
+### Can I open the latest note without selecting it from list?
+
+Output of `notes list` is sorted by created date time by default. By using `head` command, you can
+choose the latest note in the list.
+
+```sh
+$ vim "$(notes list | head -1)"
+```
+
+By giving `--sort` (or `-s`) option to `notes list`, you can change how to sort. Please see
+`notes list --help` for more details.
+
+### How can I remove some notes?
 
 Please use `rm` and `notes list`. Following is an example that all notes of specific category `foo`
 are removed.
@@ -243,7 +255,7 @@ $ rm $(notes list -c foo)
 Thanks to Git repository, this does not remove your notes completely until you run `notes save`
 next time.
 
-### I want to nest categories
+### Can I nest categories?
 
 Categories cannot be nested. Instead, you can define your own nested naming rule for categories.
 For example `blog-personal-public` can indicate blog entries which is personal and publicly posted.
