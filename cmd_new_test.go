@@ -136,7 +136,7 @@ func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
 	cmd := &NewCmd{
 		Config:   cfg,
 		Category: "cat",
-		Filename: "test",
+		Filename: "test3",
 		Tags:     "foo, bar",
 		NoInline: true,
 	}
@@ -146,7 +146,7 @@ func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
 	}
 	defer os.RemoveAll(filepath.Join(cfg.HomePath, "cat"))
 
-	p := filepath.Join(cfg.HomePath, "cat", "test.md")
+	p := filepath.Join(cfg.HomePath, "cat", "test3.md")
 	n, err := LoadNote(p, cfg)
 	if err != nil {
 		t.Fatal(err)
@@ -160,7 +160,7 @@ func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
 		t.Error("Tags are not correct", n.Tags)
 	}
 
-	if n.Title != "test" {
+	if n.Title != "test3" {
 		t.Error(n.Title)
 	}
 

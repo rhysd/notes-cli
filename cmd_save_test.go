@@ -58,6 +58,14 @@ func TestSaveCmd(t *testing.T) {
 			}
 			defer os.RemoveAll(filepath.Join(cfg.HomePath, ".git"))
 
+			if out, err := g.Exec("config", "user.name", "You"); err != nil {
+				t.Fatal(out, err)
+			}
+
+			if out, err := g.Exec("config", "user.email", "you@example.com"); err != nil {
+				t.Fatal(out, err)
+			}
+
 			cmd := &SaveCmd{
 				Config:  cfg,
 				Message: tc.msg,
