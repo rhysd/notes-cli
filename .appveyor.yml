@@ -11,5 +11,10 @@ install:
     - go get -v -t -d ./...
 build: off
 test_script:
-    - go test -v ./...
+    - go build ./cmd/notes && .\notes --help
+    - go test -v -race -coverprofile=coverage.txt
+after_test:
+    - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+    - pip install codecov
+    - codecov -f "coverage.txt"
 deploy: off

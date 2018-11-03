@@ -5,4 +5,7 @@ os:
 install:
     - go get -t -d -v ./...
 script:
-    - go test -v ./...
+    - go build ./cmd/notes && ./notes --help
+    - go test -v -race -coverprofile=coverage.txt
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
