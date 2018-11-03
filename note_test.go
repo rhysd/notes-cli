@@ -51,7 +51,7 @@ func TestNewNote(t *testing.T) {
 func TestNewNoteFilenameNormalize(t *testing.T) {
 	cfg := &Config{GitPath: "git", HomePath: "."}
 
-	for _, f := range []string{"foo-bar", "foo bar.md", "foo bar"} {
+	for _, f := range []string{"foo-bar", "foo-bar.md"} {
 		n, err := NewNote("cat", "foo,bar", f, "", cfg)
 		if err != nil {
 			t.Fatal(err)

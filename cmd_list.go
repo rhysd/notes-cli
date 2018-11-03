@@ -20,6 +20,8 @@ var (
 	green  = color.New(color.FgGreen)
 )
 
+// ListCmd represents `notes list` command. Each public fields represent options of the command
+// Out field represents where this command should output.
 type ListCmd struct {
 	cli, cliAlias *kingpin.CmdClause
 	Config        *Config
@@ -216,6 +218,7 @@ func (cmd *ListCmd) doCategories(cats []string, tagRegex *regexp.Regexp) error {
 	return err
 }
 
+// Do runs `notes list` command and returns an error if occurs
 func (cmd *ListCmd) Do() error {
 	fs, err := ioutil.ReadDir(cmd.Config.HomePath)
 	if err != nil {

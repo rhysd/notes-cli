@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 )
 
+// NewCmd represents `notes new` command. Each public fields represent options of the command
 type NewCmd struct {
 	cli      *kingpin.CmdClause
 	Config   *Config
@@ -51,6 +52,7 @@ func (cmd *NewCmd) fallbackInput(note *Note) error {
 	return nil
 }
 
+// Do runs `notes new` command and returns an error if occurs
 func (cmd *NewCmd) Do() error {
 	git := NewGit(cmd.Config)
 

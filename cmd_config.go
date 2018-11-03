@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+// ConfigCmd represents `notes config` command. Each public fields represent options of the command.
+// Out field represents where this command should output.
 type ConfigCmd struct {
 	cli    *kingpin.CmdClause
 	Config *Config
@@ -24,6 +26,7 @@ func (cmd *ConfigCmd) matchesCmdline(cmdline string) bool {
 	return cmd.cli.FullCommand() == cmdline
 }
 
+// Do runs `notes config` command and returns an error if occurs
 func (cmd *ConfigCmd) Do() error {
 	switch strings.ToLower(cmd.Name) {
 	case "":

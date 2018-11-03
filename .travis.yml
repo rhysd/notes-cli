@@ -4,8 +4,10 @@ os:
     - osx
 install:
     - go get -t -d -v ./...
+    - go get -u golang.org/x/lint/golint
 script:
     - go build ./cmd/notes && ./notes --help
     - go test -v -race -coverprofile=coverage.txt
+    - golint ./...
 after_success:
   - bash <(curl -s https://codecov.io/bash)

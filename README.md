@@ -3,6 +3,7 @@ A small CLI note taking tool with your favorite editor
 [![Linux/Mac Build Status][travisci-badge]][travisci]
 [![Windows Build Status][appveyor-badge]][appveyor]
 [![Coverage Report][codecov-badge]][codecov]
+[![Documentation][doc-badge]][doc]
 
 **This repository is an experimental until version reaches v1.0.0. Features may be changed in the future and tests are not sufficient.**
 
@@ -148,6 +149,8 @@ Commands:
 
 ```
 
+This command can be used from Go program also. Please read [API documentation][doc] to know the interfaces.
+
 ### How to integrate with Vim
 
 Please write following code in your `.vimrc`.
@@ -285,3 +288,5 @@ It's up to you.
 [travisci]: https://travis-ci.org/rhysd/notes-cli
 [codecov-badge]: https://codecov.io/gh/rhysd/notes-cli/branch/master/graph/badge.svg
 [codecov]: https://codecov.io/gh/rhysd/notes-cli
+[doc-badge]: https://godoc.org/github.com/rhysd/notes-cli?status.svg
+[doc]: http://godoc.org/github.com/rhysd/notes-cli

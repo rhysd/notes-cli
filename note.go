@@ -19,27 +19,39 @@ var (
 	reTitleBar = regexp.MustCompile("^=+$")
 )
 
+// Note represents a note stored on filesystem or will be created
 type Note struct {
-	Config   *Config
+	// Config is a configuration of notes command which was created by NewConfig()
+	Config *Config
+	// Category is a category string. It must not be empty
 	Category string
-	Tags     []string
-	Created  time.Time
-	File     string
-	Title    string
+	// Tags is tags of note. It can be empty and cannot contain comma
+	Tags []string
+	// Created is a datetime when note was created
+	Created time.Time
+	// File is a file name of the note
+	File string
+	// Title is a title string of the note. When the note is not created yet, it may be empty
+	Title string
 }
 
+// DirPath returns the absolute category directory path of the note
 func (note *Note) DirPath() string {
 	return filepath.Join(note.Config.HomePath, note.Category)
 }
 
+// FilePath returns the absolute file path of the note
 func (note *Note) FilePath() string {
 	return filepath.Join(note.Config.HomePath, note.Category, note.File)
 }
 
+// RelFilePath returns the relative file path of the note from home directory
 func (note *Note) RelFilePath() string {
 	return filepath.Join(note.Category, note.File)
 }
 
+// Create creates a file of the note. When title is empty, file name omitting file extension is used
+// for it.
 func (note *Note) Create() error {
 	var b bytes.Buffer
 
@@ -69,6 +81,9 @@ func (note *Note) Create() error {
 	return errors.Wrap(ioutil.WriteFile(p, b.Bytes(), 0644), "Cannot write note to file")
 }
 
+// Open opens the note using an editor command user set. When user did not set any editor command
+// with $NOTES_CLI_EDITOR, this method fails. Otherwise, an editor process is spawned with argument
+// of path to the note file
 func (note *Note) Open() error {
 	if note.Config.EditorPath == "" {
 		return errors.New("Editor is not set. To open note in editor, please set $NOTES_CLI_EDITOR")
@@ -81,6 +96,7 @@ func (note *Note) Open() error {
 	return errors.Wrap(c.Run(), "Editor command did not run successfully")
 }
 
+// ReadBodyN reads body of note until maxBytes bytes and returns it as string
 func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 	path := note.FilePath()
 	f, err := os.Open(path)
@@ -136,6 +152,8 @@ func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 	return buf.String(), nil
 }
 
+// NewNote creates a new note instance with given parameters and configuration. Category and file name
+// cannot be empty. If given file name lacks file extension, it automatically adds ".md" to file name.
 func NewNote(cat, tags, file, title string, cfg *Config) (*Note, error) {
 	if cat == "" {
 		return nil, errors.New("Category cannot be empty")
@@ -151,13 +169,15 @@ func NewNote(cat, tags, file, title string, cfg *Config) (*Note, error) {
 		}
 	}
 
-	file = strings.Replace(file, " ", "-", -1)
 	if !strings.HasSuffix(file, ".md") {
 		file += ".md"
 	}
 	return &Note{cfg, cat, ts, time.Now(), file, title}, nil
 }
 
+// LoadNote reads note file from given path, parses it and creates Note instance. When given file path
+// does not exist or when the file does note contain mandatory metadata ('Category', 'Tags' and 'Created'),
+// this function returns an error
 func LoadNote(path string, cfg *Config) (*Note, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -223,6 +243,10 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 	return note, nil
 }
 
+// WalkNotes walks all notes with given predicate. If given category string is an empty, it traverses
+// notes of all categories. Otherwise, it only traverses notes of the specified categories. When the
+// category does not exist, this function returns an error. When given predicate returns an error or
+// when loading a note fails, this function stops traversing and immediately returns the error
 func WalkNotes(cat string, cfg *Config, pred func(path string, note *Note) error) error {
 	fs, err := ioutil.ReadDir(cfg.HomePath)
 	if err != nil {

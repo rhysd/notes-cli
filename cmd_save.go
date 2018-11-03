@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// SaveCmd represents `notes save` command. Each public fields represent options of the command
 type SaveCmd struct {
 	cli     *kingpin.CmdClause
 	Config  *Config
@@ -24,6 +25,7 @@ func (cmd *SaveCmd) matchesCmdline(cmdline string) bool {
 	return cmd.cli.FullCommand() == cmdline
 }
 
+// Do runs `notes save` command and returns an error if occurs
 func (cmd *SaveCmd) Do() error {
 	git := NewGit(cmd.Config)
 	if git == nil {

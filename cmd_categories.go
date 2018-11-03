@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+// CategoriesCmd represents `notes categories` command. Each public fields represent options of the command.
+// Out field represents where this command should output.
 type CategoriesCmd struct {
 	cli, cliAlias *kingpin.CmdClause
 	Config        *Config
@@ -25,6 +27,7 @@ func (cmd *CategoriesCmd) matchesCmdline(cmdline string) bool {
 	return cmd.cli.FullCommand() == cmdline || cmd.cliAlias.FullCommand() == cmdline
 }
 
+// Do runs `notes categories` command and returns an error if occurs
 func (cmd *CategoriesCmd) Do() error {
 	fs, err := ioutil.ReadDir(cmd.Config.HomePath)
 	if err != nil {

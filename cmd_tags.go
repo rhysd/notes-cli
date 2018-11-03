@@ -9,6 +9,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+// TagsCmd represents `notes tags` command. Each public fields represent options of the command
+// Out field represents where this command should output.
 type TagsCmd struct {
 	cli      *kingpin.CmdClause
 	Config   *Config
@@ -25,6 +27,7 @@ func (cmd *TagsCmd) matchesCmdline(cmdline string) bool {
 	return cmd.cli.FullCommand() == cmdline
 }
 
+// Do runs `notes tags` command and returns an error if occurs
 func (cmd *TagsCmd) Do() error {
 	saw := map[string]struct{}{}
 	tags := []string{}

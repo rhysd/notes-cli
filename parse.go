@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+// ParseCmd parses given arguments as command line options and returns corresponding subcommand instance.
+// When no subcommand matches or argus contains invalid argument, it returns an error
 func ParseCmd(args []string) (Cmd, error) {
 	cli := kingpin.New("notes", "Simple note taking tool for command line with your favorite editor")
 	noColor := cli.Flag("no-color", "Disable color output").Bool()

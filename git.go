@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// Git represents Git command for specific repository
 type Git struct {
 	bin  string
 	root string
@@ -17,6 +18,7 @@ func (git *Git) canonRoot() string {
 	return canonPath(git.root)
 }
 
+// Command returns exec.Command instance which runs given Git subcommand with given arguments
 func (git *Git) Command(subcmd string, args ...string) *exec.Cmd {
 	// e.g. 'git diff --cached' -> 'git -C /path/to/repo diff --cached'
 	a := append([]string{"-C", git.root, subcmd}, args...)
@@ -24,6 +26,7 @@ func (git *Git) Command(subcmd string, args ...string) *exec.Cmd {
 	return cmd
 }
 
+// Exec runs runs given Git subcommand with given arguments
 func (git *Git) Exec(subcmd string, args ...string) (string, error) {
 	b, err := git.Command(subcmd, args...).CombinedOutput()
 
@@ -45,6 +48,7 @@ func (git *Git) Exec(subcmd string, args ...string) (string, error) {
 	return string(b), err
 }
 
+// Init runs `git init` with no argument
 func (git *Git) Init() error {
 	if s, err := os.Stat(filepath.Join(git.root, ".git")); err == nil && s.IsDir() {
 		// Repository was already created
@@ -58,6 +62,7 @@ func (git *Git) Init() error {
 	return nil
 }
 
+// AddAll runs `git add -A`
 func (git *Git) AddAll() error {
 	out, err := git.Exec("add", "-A")
 	if err != nil {
@@ -66,6 +71,7 @@ func (git *Git) AddAll() error {
 	return nil
 }
 
+// Commit runs `git commit` with given message
 func (git *Git) Commit(msg string) error {
 	out, err := git.Exec("commit", "-m", msg)
 	if err != nil {
@@ -74,6 +80,7 @@ func (git *Git) Commit(msg string) error {
 	return nil
 }
 
+// TrackingRemote returns remote name branch name. It fails when current branch does not track any branch
 func (git *Git) TrackingRemote() (string, string, error) {
 	s, err := git.Exec("rev-parse", "--abbrev-ref", "--symbolic", "@{u}")
 	if err != nil {
@@ -84,6 +91,7 @@ func (git *Git) TrackingRemote() (string, string, error) {
 	return ss[0], ss[1], nil
 }
 
+// Push pushes given branch of repository to the given remote
 func (git *Git) Push(remote, branch string) error {
 	out, err := git.Exec("push", remote, branch)
 	if err != nil {
@@ -92,6 +100,7 @@ func (git *Git) Push(remote, branch string) error {
 	return nil
 }
 
+// NewGit creates Git instance from Config value. Home directory is assumed to be a root of Git repository
 func NewGit(c *Config) *Git {
 	if c.GitPath == "" {
 		// Git is optional
