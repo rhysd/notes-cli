@@ -89,3 +89,15 @@ func TestSaveCmd(t *testing.T) {
 		})
 	}
 }
+
+func TestSaveCmdNoGitInitYet(t *testing.T) {
+	cfg := testNewConfigForSaveCmd()
+	cmd := &SaveCmd{Config: cfg}
+	err := cmd.Do()
+	if err == nil {
+		t.Fatal("Error did not occur")
+	}
+	if !strings.Contains(err.Error(), "'.git' directory does not exist in home") {
+		t.Fatal("Unexpected error:", err)
+	}
+}

@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func TestListCmd(t *testing.T) {
+func testNewConfigForListCmd(subdir string) *Config {
 	old := color.NoColor
 	color.NoColor = true
 	defer func() { color.NoColor = old }()
@@ -20,8 +20,17 @@ func TestListCmd(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "list", "normal")}
+	cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "list", subdir)}
 
+	return cfg
+}
+
+func TestListCmd(t *testing.T) {
+	old := color.NoColor
+	color.NoColor = true
+	defer func() { color.NoColor = old }()
+
+	cfg := testNewConfigForListCmd("normal")
 	format := func(s string) string {
 		ss := strings.Split(strings.TrimPrefix(s, "\n"), "\n")
 		for i, s := range ss {
@@ -124,7 +133,7 @@ func TestListCmd(t *testing.T) {
 				Oneline: true,
 			},
 			want: format(`
-			a/4.md a bar        4
+			a/4.md a bar        this is title this is title this is title this is title this is title ...
 			a/1.md a foo,bar    this is title
 			c/5.md c a-bit-long this is title
 			b/2.md b foo        this is title
@@ -140,7 +149,7 @@ func TestListCmd(t *testing.T) {
 			},
 			want: format(`
 			a/1.md a foo,bar    this is title
-			a/4.md a bar        4
+			a/4.md a bar        this is title this is title this is title this is title this is title ...
 			b/2.md b foo        this is title
 			b/6.md b future     text from future
 			c/3.md c            this is title
@@ -229,8 +238,8 @@ func TestListCmd(t *testing.T) {
 			Tags:     bar
 			Created:  2017-10-30T11:37:45+09:00
 			
-			4
-			=
+			this is title this is title this is title this is title this is title this is title this is title this is title
+			===============================================================================================================
 			
 			this
 			is
@@ -463,17 +472,13 @@ func TestListNoHome(t *testing.T) {
 }
 
 func TestListBrokenCategoryRegex(t *testing.T) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "list", "normal")}
+	cfg := testNewConfigForListCmd("normal")
 	cmd := &ListCmd{
 		Config:   cfg,
 		Category: "(foo",
 	}
 
-	err = cmd.Do()
+	err := cmd.Do()
 	if err == nil {
 		t.Fatal("Error did not occur")
 	}
@@ -483,17 +488,13 @@ func TestListBrokenCategoryRegex(t *testing.T) {
 }
 
 func TestListBrokenTagRegex(t *testing.T) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "list", "normal")}
+	cfg := testNewConfigForListCmd("normal")
 	cmd := &ListCmd{
 		Config: cfg,
 		Tag:    "(foo",
 	}
 
-	err = cmd.Do()
+	err := cmd.Do()
 	if err == nil {
 		t.Fatal("Error did not occur")
 	}
@@ -503,13 +504,9 @@ func TestListBrokenTagRegex(t *testing.T) {
 }
 
 func TestListBrokenNote(t *testing.T) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "list", "fail")}
+	cfg := testNewConfigForListCmd("fail")
 	cmd := &ListCmd{Config: cfg}
-	err = cmd.Do()
+	err := cmd.Do()
 	if err == nil {
 		t.Fatal("Error did not occur")
 	}
@@ -557,5 +554,61 @@ func TestListSortByModified(t *testing.T) {
 			t.Fatal("not sorted at index", i, "prev:", prev.Format(time.RFC3339), "cur:", cur.Format(time.RFC3339))
 		}
 		prev = cur
+	}
+}
+
+func TestListNoteEmptyBody(t *testing.T) {
+	old := color.NoColor
+	color.NoColor = true
+	defer func() { color.NoColor = old }()
+
+	cfg := testNewConfigForListCmd("empty")
+	for _, tc := range []struct {
+		what string
+		cmd  *ListCmd
+		want string
+	}{
+		{
+			what: "oneline",
+			cmd: &ListCmd{
+				Oneline: true,
+			},
+			want: `
+			a<SEP>1.md a foo,bar empty body
+			`,
+		},
+		{
+			what: "full",
+			cmd: &ListCmd{
+				Full: true,
+			},
+			want: `
+			<HOME><SEP>a<SEP>1.md
+			Category: a
+			Tags:     foo, bar
+			Created:  2018-10-30T11:37:45+09:00
+			
+			empty body
+			==========
+			
+			`,
+		},
+	} {
+		t.Run(tc.what, func(t *testing.T) {
+			var buf bytes.Buffer
+			tc.cmd.Config = cfg
+			tc.cmd.Out = &buf
+			if err := tc.cmd.Do(); err != nil {
+				t.Fatal(err)
+			}
+			have := buf.String()
+			want := strings.TrimPrefix(tc.want, "\n")
+			want = strings.Replace(want, "\t", "", -1)
+			want = strings.Replace(want, "<HOME>", cfg.HomePath, -1)
+			want = strings.Replace(want, "<SEP>", string(filepath.Separator), -1)
+			if want != have {
+				t.Fatalf("Wanted %#v but have %#v", want, have)
+			}
+		})
 	}
 }

@@ -187,7 +187,7 @@ func (cmd *ListCmd) doCategories(cats []string, tagRegex *regexp.Regexp) error {
 		sortByCategory(notes)
 	case "modified":
 		if err := sortByModified(notes); err != nil {
-			return errors.Wrap(err, "Cannot sort notes by modified time")
+			return err
 		}
 	default:
 		sortByCreated(notes)
