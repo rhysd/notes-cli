@@ -1,8 +1,10 @@
 package notes
 
 import (
+	"os"
 	"sort"
 	"strings"
+	"time"
 )
 
 type byCreated []*Note
@@ -56,4 +58,50 @@ func (a byCategory) Less(i, j int) bool {
 
 func sortByCategory(n []*Note) {
 	sort.Sort(byCategory(n))
+}
+
+type byModified struct {
+	a    []*Note
+	memo map[*Note]time.Time
+	err  error
+}
+
+func (by *byModified) modTime(i int) time.Time {
+	n := by.a[i]
+	if t, ok := by.memo[n]; ok {
+		return t
+	}
+	s, err := os.Stat(n.FilePath())
+	if err != nil {
+		by.err = err
+		return time.Time{}
+	}
+	t := s.ModTime()
+	by.memo[n] = t
+	return t
+}
+func (by *byModified) Len() int {
+	return len(by.a)
+}
+func (by *byModified) Swap(i, j int) {
+	a := by.a
+	a[i], a[j] = a[j], a[i]
+}
+func (by *byModified) Less(i, j int) bool {
+	if by.err != nil {
+		return true
+	}
+	l, r := by.modTime(i), by.modTime(j)
+	return l.After(r)
+}
+
+// sortByModified sorts given notest by modified time. When an error occurs, the order of given notes
+// are undefined.
+func sortByModified(n []*Note) error {
+	by := &byModified{
+		a:    n,
+		memo: make(map[*Note]time.Time, len(n)),
+	}
+	sort.Sort(by)
+	return by.err
 }

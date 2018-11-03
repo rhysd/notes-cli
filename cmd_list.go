@@ -38,7 +38,7 @@ func (cmd *ListCmd) defineListCLI(c *kingpin.CmdClause) {
 	c.Flag("tag", "Filter tag name by regular expression").Short('t').StringVar(&cmd.Tag)
 	c.Flag("relative", "Show relative paths from $NOTES_CLI_HOME directory").Short('r').BoolVar(&cmd.Relative)
 	c.Flag("oneline", "Show oneline information of note instead of path").Short('o').BoolVar(&cmd.Oneline)
-	c.Flag("sort", "Sort results by 'created', 'filename' or 'category'. 'created' is default").Short('s').EnumVar(&cmd.SortBy, "created", "filename", "category")
+	c.Flag("sort", "Sort results by 'modified', 'created', 'filename' or 'category'. 'created' is default").Short('s').EnumVar(&cmd.SortBy, "modified", "created", "filename", "category")
 }
 
 func (cmd *ListCmd) defineCLI(app *kingpin.Application) {
@@ -185,6 +185,10 @@ func (cmd *ListCmd) doCategories(cats []string, tagRegex *regexp.Regexp) error {
 		sortByFilename(notes)
 	case "category":
 		sortByCategory(notes)
+	case "modified":
+		if err := sortByModified(notes); err != nil {
+			return errors.Wrap(err, "Cannot sort notes by modified time")
+		}
 	default:
 		sortByCreated(notes)
 	}

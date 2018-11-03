@@ -240,6 +240,13 @@ choose the latest note in the list.
 $ vim "$(notes list | head -1)"
 ```
 
+If you want to access to the last modified note, sorting by `modified` and taking first item by `head`
+should work.
+
+```sh
+$ vim "$(notes list --sort modified | head -1)"
+```
+
 By giving `--sort` (or `-s`) option to `notes list`, you can change how to sort. Please see
 `notes list --help` for more details.
 
