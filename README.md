@@ -6,11 +6,13 @@ A small CLI note taking tool with your favorite editor
 [![Documentation][doc-badge]][doc]
 
 This is a small CLI tool for note taking in terminal with your favorite editor.
-You can create/list notes via this tool.
+You can manage (create/open/list) notes via this tool on terminal.
 This tool also optionally can save your notes thanks to Git to avoid losing your notes.
 
 This tool is intended to be used nicely with other commands such as `grep` (or [ag][], [rg][]),
 `rm`, filtering tools such as [fzf][] or [peco][] and editors which can be started from command line.
+
+![demo screencast](https://github.com/rhysd/ss/blob/master/notes-cli/demo.gif?raw=true)
 
 
 
@@ -73,6 +75,8 @@ Directories structure under home is something like:
 └── category3
     └── note6.md
 ```
+
+You can see more practical example home directory at [example directory](./example/notes-cli).
 
 If you set your favorite editor to `$NOTES_CLI_EDITOR` environment variable, it opens the newly
 created note file with it. You can seamlessly edit the file.
