@@ -5,8 +5,6 @@ A small CLI note taking tool with your favorite editor
 [![Coverage Report][codecov-badge]][codecov]
 [![Documentation][doc-badge]][doc]
 
-**This repository is an experimental until version reaches v1.0.0. Features may be changed in the future and tests are not sufficient.**
-
 This is a small CLI tool for note taking in terminal with your favorite editor.
 You can create/list notes via this tool.
 This tool also optionally can save your notes thanks to Git to avoid losing your notes.
