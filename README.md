@@ -1,7 +1,8 @@
 A small CLI note taking tool with your favorite editor
 ======================================================
 [![Linux/Mac Build Status][travisci-badge]][travisci]
-[![Windows Build status][appveyor-badge]][appveyor]
+[![Windows Build Status][appveyor-badge]][appveyor]
+[![Coverage Report][codecov-badge]][codecov]
 
 **This repository is an experimental until version reaches v1.0.0. Features may be changed in the future and tests are not sufficient.**
 
@@ -282,3 +283,5 @@ It's up to you.
 [appveyor]: https://ci.appveyor.com/project/rhysd/notes-cli
 [travisci-badge]: https://travis-ci.org/rhysd/notes-cli.svg?branch=master
 [travisci]: https://travis-ci.org/rhysd/notes-cli
+[codecov-badge]: https://codecov.io/gh/rhysd/notes-cli/branch/master/graph/badge.svg
+[codecov]: https://codecov.io/gh/rhysd/notes-cli
