@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestListCmd(t *testing.T) {
@@ -514,5 +515,47 @@ func TestListBrokenNote(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "Cannot parse created date time") {
 		t.Fatal("Unexpected error:", err)
+	}
+}
+
+func TestListSortByModified(t *testing.T) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "modified-order")}
+
+	now := time.Now()
+	if err := os.Chtimes(filepath.Join(cfg.HomePath, "a", "2.md"), now, now); err != nil {
+		panic(err)
+	}
+
+	var buf bytes.Buffer
+	cmd := &ListCmd{
+		SortBy: "modified",
+		Config: cfg,
+		Out:    &buf,
+	}
+
+	if err := cmd.Do(); err != nil {
+		t.Fatal(err)
+	}
+
+	lines := strings.Split(strings.Trim(buf.String(), "\n"), "\n")
+	mods := []time.Time{}
+	for i, l := range lines {
+		s, err := os.Stat(l)
+		if err != nil {
+			t.Fatal("Cannot load note", l, "at line", i)
+		}
+		mods = append(mods, s.ModTime())
+	}
+
+	prev := mods[0]
+	for i, cur := range mods[1:] {
+		if prev.Before(cur) {
+			t.Fatal("not sorted at index", i, "prev:", prev.Format(time.RFC3339), "cur:", cur.Format(time.RFC3339))
+		}
+		prev = cur
 	}
 }

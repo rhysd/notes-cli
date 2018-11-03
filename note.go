@@ -223,7 +223,7 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 	return note, nil
 }
 
-func WalkNotesNew(cat string, cfg *Config, pred func(path string, note *Note) error) error {
+func WalkNotes(cat string, cfg *Config, pred func(path string, note *Note) error) error {
 	fs, err := ioutil.ReadDir(cfg.HomePath)
 	if err != nil {
 		return errors.Wrap(err, "Cannot read home")

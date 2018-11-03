@@ -30,7 +30,7 @@ func (cmd *TagsCmd) Do() error {
 	tags := []string{}
 
 	// If cmd.Category is empty, it scans all notes in home
-	if err := WalkNotesNew(cmd.Category, cmd.Config, func(path string, note *Note) error {
+	if err := WalkNotes(cmd.Category, cmd.Config, func(path string, note *Note) error {
 		for _, tag := range note.Tags {
 			if _, ok := saw[tag]; !ok {
 				tags = append(tags, tag)

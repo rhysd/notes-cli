@@ -470,7 +470,7 @@ func TestWalkNotes(t *testing.T) {
 			}
 
 			have := map[string]struct{}{}
-			if err := WalkNotesNew(tc.cat, cfg, func(p string, n *Note) error {
+			if err := WalkNotes(tc.cat, cfg, func(p string, n *Note) error {
 				p2 := n.FilePath()
 				if p != p2 {
 					t.Fatalf("'%s' v.s. '%s'", p, p2)
@@ -491,7 +491,7 @@ func TestWalkNotes(t *testing.T) {
 func TestWalkNotesPredReturnError(t *testing.T) {
 	cfg := noteTestdataConfig()
 	cfg.HomePath = filepath.Join(cfg.HomePath, "walk")
-	err := WalkNotesNew("", cfg, func(p string, n *Note) error {
+	err := WalkNotes("", cfg, func(p string, n *Note) error {
 		return errors.New("hello")
 	})
 	if err == nil {
@@ -505,7 +505,7 @@ func TestWalkNotesPredReturnError(t *testing.T) {
 func TestWalkNotesWalkInvalidCategory(t *testing.T) {
 	cfg := noteTestdataConfig()
 	cfg.HomePath = filepath.Join(cfg.HomePath, "walk")
-	err := WalkNotesNew("not-existing-cat", cfg, func(p string, n *Note) error {
+	err := WalkNotes("not-existing-cat", cfg, func(p string, n *Note) error {
 		return nil
 	})
 	if err == nil {
@@ -519,7 +519,7 @@ func TestWalkNotesWalkInvalidCategory(t *testing.T) {
 func TestWalkNotesHomeDoesNotExist(t *testing.T) {
 	cfg := noteTestdataConfig()
 	cfg.HomePath = "/path/to/somewhere/unknown/home"
-	err := WalkNotesNew("", cfg, func(p string, n *Note) error {
+	err := WalkNotes("", cfg, func(p string, n *Note) error {
 		return nil
 	})
 	if err == nil {
@@ -533,7 +533,7 @@ func TestWalkNotesHomeDoesNotExist(t *testing.T) {
 func TestWalkNotesBrokenNote(t *testing.T) {
 	cfg := noteTestdataConfig()
 	cfg.HomePath = filepath.Join(cfg.HomePath, "walk-fail")
-	err := WalkNotesNew("", cfg, func(p string, n *Note) error {
+	err := WalkNotes("", cfg, func(p string, n *Note) error {
 		return nil // Do nothing
 	})
 	if err == nil {

@@ -1,6 +1,9 @@
 package notes
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -66,5 +69,67 @@ func TestSortNotes(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestSortByModified(t *testing.T) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "modified-order")}
+
+	now := time.Now()
+	if err := os.Chtimes(filepath.Join(cfg.HomePath, "a", "2.md"), now, now); err != nil {
+		panic(err)
+	}
+
+	notes := []*Note{}
+	if err := WalkNotes("", cfg, func(_ string, note *Note) error {
+		notes = append(notes, note)
+		return nil
+	}); err != nil {
+		panic(err)
+	}
+
+	if err := sortByModified(notes); err != nil {
+		t.Fatal(err)
+	}
+
+	mods := []time.Time{}
+	for _, n := range notes {
+		s, err := os.Stat(n.FilePath())
+		if err != nil {
+			panic(err)
+		}
+		mods = append(mods, s.ModTime())
+	}
+
+	prev := mods[0]
+	for i, cur := range mods[1:] {
+		if prev.Before(cur) {
+			t.Fatal("not sorted at index", i, "prev:", prev.Format(time.RFC3339), "cur:", cur.Format(time.RFC3339))
+		}
+		prev = cur
+	}
+}
+
+func TestSortByModifiedError(t *testing.T) {
+	notes := []*Note{
+		&Note{
+			Config: &Config{
+				HomePath: "/path/to/unknown/home",
+			},
+			Category: "foo",
+			File:     "unknown.md",
+		},
+	}
+
+	err := sortByModified(notes)
+	if err == nil {
+		t.Fatal("Error did not occur")
+	}
+	if !strings.Contains(err.Error(), "Cannot sort by modified time") {
+		t.Fatal("Unexpected error", err)
 	}
 }

@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"github.com/pkg/errors"
 	"os"
 	"sort"
 	"strings"
@@ -61,25 +62,10 @@ func sortByCategory(n []*Note) {
 }
 
 type byModified struct {
-	a    []*Note
-	memo map[*Note]time.Time
-	err  error
+	a []*Note
+	t map[*Note]time.Time
 }
 
-func (by *byModified) modTime(i int) time.Time {
-	n := by.a[i]
-	if t, ok := by.memo[n]; ok {
-		return t
-	}
-	s, err := os.Stat(n.FilePath())
-	if err != nil {
-		by.err = err
-		return time.Time{}
-	}
-	t := s.ModTime()
-	by.memo[n] = t
-	return t
-}
 func (by *byModified) Len() int {
 	return len(by.a)
 }
@@ -88,20 +74,28 @@ func (by *byModified) Swap(i, j int) {
 	a[i], a[j] = a[j], a[i]
 }
 func (by *byModified) Less(i, j int) bool {
-	if by.err != nil {
-		return true
-	}
-	l, r := by.modTime(i), by.modTime(j)
+	a := by.a
+	l, r := by.t[a[i]], by.t[a[j]]
 	return l.After(r)
 }
 
-// sortByModified sorts given notest by modified time. When an error occurs, the order of given notes
-// are undefined.
-func sortByModified(n []*Note) error {
+// sortByModified sorts given notes by modified time. When an error occurs, the order of given notes
+// is undefined. The latest is the first.
+func sortByModified(notes []*Note) error {
 	by := &byModified{
-		a:    n,
-		memo: make(map[*Note]time.Time, len(n)),
+		a: notes,
+		t: make(map[*Note]time.Time, len(notes)),
 	}
+
+	for _, n := range notes {
+		s, err := os.Stat(n.FilePath())
+		if err != nil {
+			return errors.Wrap(err, "Cannot sort by modified time")
+		}
+		by.t[n] = s.ModTime()
+	}
+
 	sort.Sort(by)
-	return by.err
+
+	return nil
 }
