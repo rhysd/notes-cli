@@ -12,6 +12,7 @@ import (
 func ParseCmd(args []string) (Cmd, error) {
 	cli := kingpin.New("notes", "Simple note taking tool for command line with your favorite editor")
 	noColor := cli.Flag("no-color", "Disable color output").Bool()
+	colorAlways := cli.Flag("color-always", "Disable color output").Short('A').Bool()
 
 	cli.Version("1.0.0")
 	cli.Author("rhysd <https://github.com/rhysd>")
@@ -38,6 +39,10 @@ func ParseCmd(args []string) (Cmd, error) {
 	parsed, err := cli.Parse(args)
 	if err != nil {
 		return nil, err
+	}
+
+	if *colorAlways {
+		color.NoColor = false
 	}
 
 	if *noColor {

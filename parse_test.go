@@ -93,18 +93,37 @@ func TestParseArgs(t *testing.T) {
 	}
 }
 
-func TestParseGlobalFlags(t *testing.T) {
+func TestParseGlobalColorFlags(t *testing.T) {
 	old := color.NoColor
 	defer func() {
 		color.NoColor = old
 	}()
 
-	if _, err := ParseCmd([]string{"--no-color", "config"}); err != nil {
-		t.Fatal(err)
-	}
-
-	if !color.NoColor {
-		t.Fatal("Color was not disabled")
+	for _, tc := range []struct {
+		arg  string
+		want bool
+	}{
+		{
+			arg:  "--no-color",
+			want: true,
+		},
+		{
+			arg:  "--color-always",
+			want: false,
+		},
+		{
+			arg:  "-A",
+			want: false,
+		},
+	} {
+		t.Run(tc.arg, func(t *testing.T) {
+			if _, err := ParseCmd([]string{tc.arg, "config"}); err != nil {
+				t.Fatal(err)
+			}
+			if color.NoColor != tc.want {
+				t.Fatal("Color config is unexpected:", color.NoColor, "wanted", tc.want)
+			}
+		})
 	}
 }
 
