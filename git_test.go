@@ -115,8 +115,9 @@ func TestGitTrackingRemote(t *testing.T) {
 	if re != "origin" {
 		t.Error("Unexpected remote name", re)
 	}
-	if br != "master" {
-		t.Error("Unexpected remote name", br)
+	out, err := g.Exec("rev-parse", "--verify", br)
+	if err != nil {
+		t.Error("Branch is not correct", br, out)
 	}
 }
 
