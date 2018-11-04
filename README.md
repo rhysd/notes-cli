@@ -14,16 +14,6 @@ This tool is intended to be used nicely with other commands such as `grep` (or [
 
 ![demo screencast](https://github.com/rhysd/ss/blob/master/notes-cli/demo.gif?raw=true)
 
-Before installing, you can try locally:
-
-```
-$ go get -d github.com/rhysd/notes-cli/cmd/notes
-$ cd $GOPATH/src/github.com/rhysd/notes-cli
-$ go build ./cmd/notes
-$ export NOTES_CLI_HOME=$(pwd)/example/notes-cli
-$ ./notes list --full
-```
-
 
 
 ## Installation
@@ -36,6 +26,20 @@ Or you can install by building from source directly as follows. Go toolchain is 
 ```
 $ go get -u github.com/rhysd/notes-cli/cmd/notes
 ```
+
+Before starting to use, you can try it with examples.
+
+```sh
+$ git clone https://github.com/rhysd/notes-cli.git
+$ cd notes-cli/
+$ export NOTES_CLI_HOME=$(pwd)/example/notes-cli
+$ export NOTES_CLI_EDITOR=vim # Set your favorite editor
+$ notes list --full
+$ notes new test my-local-trial
+$ git status # Check what file was created in home
+```
+
+To uninstall, please remove `notes` (or `notes.exe` on Windows) executable.
 
 
 
@@ -252,13 +256,24 @@ Finally you can save your notes as revision of Git repository.
 $ notes save
 ```
 
-It saves all your notes under your `notes-cli` diretory as Git repository.
+It saves all your notes under your `notes-cli` directory as Git repository.
 It adds all changes in notes and automatically creates commit.
 
 By default, it only adds and commits your notes to the repository. But if you set `origin` remote to
 the repository, it automatically pushes the notes to the remote.
 
 For more details, please see `notes save --help`.
+
+
+### Update itself
+
+`notes` has the ability to update the executable by itself.
+
+```
+$ notes selfupdate
+```
+
+Before updating, you can only check if the latest version is available by `--dry` option.
 
 
 ### Use from Go program
