@@ -14,7 +14,7 @@ func ParseCmd(args []string) (Cmd, error) {
 	noColor := cli.Flag("no-color", "Disable color output").Bool()
 	colorAlways := cli.Flag("color-always", "Disable color output").Short('A').Bool()
 
-	cli.Version("1.0.0")
+	cli.Version(Version)
 	cli.Author("rhysd <https://github.com/rhysd>")
 	cli.HelpFlag.Short('h')
 
@@ -23,13 +23,16 @@ func ParseCmd(args []string) (Cmd, error) {
 		return nil, err
 	}
 
+	colorStdout := colorable.NewColorableStdout()
+
 	cmds := []Cmd{
 		&NewCmd{Config: c},
-		&ListCmd{Config: c, Out: colorable.NewColorableStdout()},
+		&ListCmd{Config: c, Out: colorStdout},
 		&CategoriesCmd{Config: c, Out: os.Stdout},
 		&TagsCmd{Config: c, Out: os.Stdout},
 		&SaveCmd{Config: c},
 		&ConfigCmd{Config: c, Out: os.Stdout},
+		&SelfupdateCmd{Out: colorStdout},
 	}
 
 	for _, cmd := range cmds {

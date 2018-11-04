@@ -10,3 +10,6 @@ type Cmd interface {
 	defineCLI(*kingpin.Application)
 	matchesCmdline(string) bool
 }
+
+// Version is version string of notes command
+var Version = "1.0.0"

@@ -3,7 +3,6 @@
 set -e
 
 rm -rf release
-ver="$(./notes --version 2>&1)"
 gox -arch 'amd64' -os 'linux darwin windows freebsd openbsd netbsd' ./cmd/notes
 mkdir -p release
 mv notes_* release/
@@ -15,6 +14,6 @@ for bin in *; do
         command="notes"
     fi
     mv "$bin" "$command"
-    zip "${bin}_${ver}.zip" "$command"
+    zip "${bin}.zip" "$command"
     rm "$command"
 done
