@@ -14,6 +14,16 @@ This tool is intended to be used nicely with other commands such as `grep` (or [
 
 ![demo screencast](https://github.com/rhysd/ss/blob/master/notes-cli/demo.gif?raw=true)
 
+Before installing, you can try locally:
+
+```
+$ go get -d github.com/rhysd/notes-cli/cmd/notes
+$ cd $GOPATH/src/github.com/rhysd/notes-cli
+$ go build ./cmd/notes
+$ export NOTES_CLI_HOME=$(pwd)/example/notes-cli
+$ ./notes list --full
+```
+
 
 
 ## Installation
