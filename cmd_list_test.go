@@ -4,8 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/fatih/color"
+	"github.com/rhysd/go-fakeio"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -610,5 +613,57 @@ func TestListNoteEmptyBody(t *testing.T) {
 				t.Fatalf("Wanted %#v but have %#v", want, have)
 			}
 		})
+	}
+}
+
+func TestListCmdEditOption(t *testing.T) {
+	fake := fakeio.Stdout()
+	defer fake.Restore()
+
+	exe, err := exec.LookPath("echo")
+	if err != nil {
+		panic(err)
+	}
+
+	cfg := testNewConfigForListCmd("normal")
+	cfg.EditorPath = exe
+
+	var buf bytes.Buffer
+	cmd := &ListCmd{
+		Config: cfg,
+		Out:    &buf,
+		Edit:   true,
+	}
+
+	if err := cmd.Do(); err != nil {
+		t.Fatal(err)
+	}
+
+	out := buf.String()
+	if out != "" {
+		t.Fatal("Unexpected output from command itself:", out)
+	}
+
+	stdout, err := fake.String()
+	if err != nil {
+		panic(err)
+	}
+
+	have := strings.Split(strings.TrimRight(stdout, "\n"), " ")
+	want := []string{}
+	for _, p := range []string{
+		"a/4.md",
+		"a/1.md",
+		"c/5.md",
+		"b/2.md",
+		"c/3.md",
+		"b/6.md",
+	} {
+		p = filepath.Join(cfg.HomePath, filepath.FromSlash(p))
+		want = append(want, p)
+	}
+
+	if !reflect.DeepEqual(want, have) {
+		t.Fatal("Args passed to editor is not expected:", have, "wanted", want)
 	}
 }

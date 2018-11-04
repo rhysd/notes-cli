@@ -99,17 +99,21 @@ func TestGitInitAddCommit(t *testing.T) {
 }
 
 func TestGitTrackingRemote(t *testing.T) {
-	// This test cannot be run on CI since it use detached HEAD for clone
+	// This test cannot be run on CI since they use detached HEAD for clone
+	wantErr := false
 	if _, ok := os.LookupEnv("TRAVIS"); ok {
-		return
+		wantErr = true
 	}
 	if _, ok := os.LookupEnv("APPVEYOR"); ok {
-		return
+		wantErr = true
 	}
 
 	g := NewGit(&Config{GitPath: "git", HomePath: "."})
 	re, br, err := g.TrackingRemote()
 	if err != nil {
+		if wantErr {
+			return
+		}
 		t.Fatal(err)
 	}
 	if re != "origin" {

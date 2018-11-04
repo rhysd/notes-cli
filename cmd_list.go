@@ -31,7 +31,7 @@ type ListCmd struct {
 	Relative      bool
 	Oneline       bool
 	SortBy        string
-	Editor        bool
+	Edit          bool
 	Out           io.Writer
 }
 
@@ -42,7 +42,7 @@ func (cmd *ListCmd) defineListCLI(c *kingpin.CmdClause) {
 	c.Flag("relative", "Show relative paths from $NOTES_CLI_HOME directory").Short('r').BoolVar(&cmd.Relative)
 	c.Flag("oneline", "Show oneline information of note instead of path").Short('o').BoolVar(&cmd.Oneline)
 	c.Flag("sort", "Sort results by 'modified', 'created', 'filename' or 'category'. 'created' is default").Short('s').EnumVar(&cmd.SortBy, "modified", "created", "filename", "category")
-	c.Flag("edit", "Open listed notes with an editor. $NOTES_CLI_EDITOR must be set").Short('e').BoolVar(&cmd.Editor)
+	c.Flag("edit", "Open listed notes with an editor. $NOTES_CLI_EDITOR must be set").Short('e').BoolVar(&cmd.Edit)
 }
 
 func (cmd *ListCmd) defineCLI(app *kingpin.Application) {
@@ -208,7 +208,7 @@ func (cmd *ListCmd) doCategories(cats []string, tagRegex *regexp.Regexp) error {
 		return cmd.printOnelineNotes(notes)
 	}
 
-	if cmd.Editor {
+	if cmd.Edit {
 		args := make([]string, 0, len(notes))
 		for _, n := range notes {
 			args = append(args, n.FilePath())
