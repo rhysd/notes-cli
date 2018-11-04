@@ -3,6 +3,7 @@ package notes
 import (
 	"bytes"
 	"github.com/fatih/color"
+	"os"
 	"strings"
 	"testing"
 )
@@ -16,6 +17,19 @@ func TestSelfupdate(t *testing.T) {
 	}()
 	Version = "0.0.1"
 	color.NoColor = true
+
+	onCI := false
+	if _, ok := os.LookupEnv("TRAVIS"); ok {
+		onCI = true
+	}
+	if _, ok := os.LookupEnv("APPVEYOR"); ok {
+		onCI = true
+	}
+	if onCI && os.Getenv("GITHUB_TOKEN") == "" {
+		// Skip this test since GitHub API token is not set.
+		// On CI, GitHub API almost expires without API token.
+		return
+	}
 
 	var buf bytes.Buffer
 	cmd := &SelfupdateCmd{
