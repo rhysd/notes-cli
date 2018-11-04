@@ -12,16 +12,14 @@ import (
 )
 
 func testNewConfigForNewCmd(subdir string) *Config {
-	cfg, err := NewConfig()
-	if err != nil {
-		panic(err)
-	}
 	cwd, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
-	cfg.HomePath = filepath.Join(cwd, "testdata", "new", subdir)
-	return cfg
+	return &Config{
+		GitPath:  "git",
+		HomePath: filepath.Join(cwd, "testdata", "new", subdir),
+	}
 }
 
 func TestNewCmdNewNote(t *testing.T) {

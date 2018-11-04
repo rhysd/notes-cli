@@ -24,12 +24,14 @@ func TestParseArgs(t *testing.T) {
 			NewCmd{},
 			SaveCmd{},
 			TagsCmd{},
+			SelfupdateCmd{},
 		),
 		cmpopts.IgnoreTypes(&Config{}),
 		cmpopts.IgnoreFields(ListCmd{}, "Out"),
 		cmpopts.IgnoreFields(ConfigCmd{}, "Out"),
 		cmpopts.IgnoreFields(TagsCmd{}, "Out"),
 		cmpopts.IgnoreFields(CategoriesCmd{}, "Out"),
+		cmpopts.IgnoreFields(SelfupdateCmd{}, "Out"),
 	}
 
 	for _, tc := range []struct {
@@ -63,19 +65,21 @@ func TestParseArgs(t *testing.T) {
 			want: &CategoriesCmd{},
 		},
 		{
-			args: []string{"list", "--category", "dog", "--tag", "cat", "--oneline"},
+			args: []string{"list", "--category", "dog", "--tag", "cat", "--oneline", "--edit"},
 			want: &ListCmd{
 				Category: "dog",
 				Tag:      "cat",
 				Oneline:  true,
+				Edit:     true,
 			},
 		},
 		{
-			args: []string{"ls", "--category", "dog", "--tag", "cat", "--oneline"},
+			args: []string{"ls", "--category", "dog", "--tag", "cat", "--oneline", "--edit"},
 			want: &ListCmd{
 				Category: "dog",
 				Tag:      "cat",
 				Oneline:  true,
+				Edit:     true,
 			},
 		},
 		{
@@ -85,6 +89,12 @@ func TestParseArgs(t *testing.T) {
 				Tags:     "cat,bird",
 				NoInline: true,
 				Filename: "filename",
+			},
+		},
+		{
+			args: []string{"selfupdate", "--dry"},
+			want: &SelfupdateCmd{
+				Dry: true,
 			},
 		},
 	} {

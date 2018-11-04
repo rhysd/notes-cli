@@ -265,7 +265,7 @@ func TestNoteOpenEditorFail(t *testing.T) {
 	if err == nil {
 		t.Fatal("Error did not occur")
 	}
-	if !strings.Contains(err.Error(), "Editor command did not run successfully") {
+	if !strings.Contains(err.Error(), "Editor command did not exit successfully") {
 		t.Fatal("Unexpected error:", err)
 	}
 }
