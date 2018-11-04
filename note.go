@@ -8,7 +8,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -85,15 +84,7 @@ func (note *Note) Create() error {
 // with $NOTES_CLI_EDITOR, this method fails. Otherwise, an editor process is spawned with argument
 // of path to the note file
 func (note *Note) Open() error {
-	if note.Config.EditorPath == "" {
-		return errors.New("Editor is not set. To open note in editor, please set $NOTES_CLI_EDITOR")
-	}
-	c := exec.Command(note.Config.EditorPath, note.FilePath())
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stderr
-	c.Stdin = os.Stdin
-	c.Dir = note.DirPath()
-	return errors.Wrap(c.Run(), "Editor command did not run successfully")
+	return openEditor(note.Config, note.FilePath())
 }
 
 // ReadBodyN reads body of note until maxBytes bytes and returns it as string

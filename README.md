@@ -36,7 +36,7 @@ $ go get -u github.com/rhysd/notes-cli/cmd/notes
 `notes` provides some subcommands to manage your markdown notes.
 
 - Create a new note with `notes new <category> <filename> [<tags>]`.
-- Open existing note by `notes ls` and your favorite editor. e.g., `vim $(notes ls)` opens all notes in Vim.
+- Open existing note by `notes ls -e` and your favorite editor. `$NOTES_CLI_EDITOR` must be set.
 - Check existing notes on terminal with `notes ls -o` (`-o` means showing one line information for each note).
 
 By `notes list` (omitting `-o`), it shows paths separated by newline. By choosing one line from the
@@ -129,6 +129,13 @@ For example, now there is only one note so it shows one path
 
 Note that `/Users/<NAME>/.local/share` is a default XDG data directory on macOS or Linux and you can
 change it by setting `$NOTES_CLI_HOME` environment variable.
+
+To open the listed notes with your editor, `--editor` (or `-e`) is a quickest way.
+
+```
+$ notes list --editor
+$ notes ls -e
+```
 
 When there are multiple notes, note is output per line. So you can easily retrieve some notes from
 them by filtering the list with `grep`, `head`, `peco`, `fzf`, ...
