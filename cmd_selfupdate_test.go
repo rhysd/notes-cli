@@ -8,16 +8,7 @@ import (
 	"testing"
 )
 
-func TestSelfupdate(t *testing.T) {
-	oldV := Version
-	oldC := color.NoColor
-	defer func() {
-		Version = oldV
-		color.NoColor = oldC
-	}()
-	Version = "0.0.1"
-	color.NoColor = true
-
+func maySkipTestForSelfupdate(t *testing.T) {
 	onCI := false
 	if _, ok := os.LookupEnv("TRAVIS"); ok {
 		onCI = true
@@ -26,10 +17,21 @@ func TestSelfupdate(t *testing.T) {
 		onCI = true
 	}
 	if onCI && os.Getenv("GITHUB_TOKEN") == "" {
-		// Skip this test since GitHub API token is not set.
-		// On CI, GitHub API almost expires without API token.
-		return
+		t.Skip("Skipping tests for selfupdate on CI without $GITHUB_TOKEN since GitHub API almost expires on CI without API token")
 	}
+}
+
+func TestSelfupdateUpdateToLatest(t *testing.T) {
+	maySkipTestForSelfupdate(t)
+
+	oldV := Version
+	oldC := color.NoColor
+	defer func() {
+		Version = oldV
+		color.NoColor = oldC
+	}()
+	Version = "0.0.1"
+	color.NoColor = true
 
 	var buf bytes.Buffer
 	cmd := &SelfupdateCmd{
@@ -50,5 +52,24 @@ func TestSelfupdate(t *testing.T) {
 	}
 	if !strings.Contains(out, "Release Note:") {
 		t.Error("Release note is not output", out)
+	}
+}
+
+func TestSelfupdateCurrentIsLatest(t *testing.T) {
+	maySkipTestForSelfupdate(t)
+
+	var buf bytes.Buffer
+	cmd := &SelfupdateCmd{
+		Dry: true,
+		Out: &buf,
+	}
+
+	if err := cmd.Do(); err != nil {
+		t.Fatal(err)
+	}
+
+	out := buf.String()
+	if !strings.Contains(out, "Current version is the latest") {
+		t.Fatal("Unexpected output:", out)
 	}
 }

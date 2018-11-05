@@ -36,8 +36,8 @@ func (cmd *SelfupdateCmd) Do() error {
 
 	v := semver.MustParse(Version)
 	if !found || latest.Version.Equals(v) {
-		_, err := fmt.Fprintln(cmd.Out, "Current version is the latest")
-		return err
+		fmt.Fprintln(cmd.Out, "Current version is the latest")
+		return nil
 	}
 
 	if !cmd.Dry {

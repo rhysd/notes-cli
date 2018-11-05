@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func testNewConfigForSaveCmd() *Config {
+func testNewConfigForSaveCmd(subdir string) *Config {
 	cfg, err := NewConfig()
 	if err != nil {
 		panic(err)
@@ -16,12 +16,26 @@ func testNewConfigForSaveCmd() *Config {
 	if err != nil {
 		panic(err)
 	}
-	cfg.HomePath = filepath.Join(cwd, "testdata", "save", "normal")
+	cfg.HomePath = filepath.Join(cwd, "testdata", "save", subdir)
 	return cfg
 }
 
+func prepareGitRepoForTestNewCmd(g *Git) {
+	if err := g.Init(); err != nil {
+		panic(err)
+	}
+
+	if _, err := g.Exec("config", "user.name", "You"); err != nil {
+		panic(err)
+	}
+
+	if _, err := g.Exec("config", "user.email", "you@example.com"); err != nil {
+		panic(err)
+	}
+}
+
 func TestNoGitForSave(t *testing.T) {
-	cfg := testNewConfigForSaveCmd()
+	cfg := testNewConfigForSaveCmd("normal")
 	cfg.GitPath = ""
 	cmd := &SaveCmd{Config: cfg}
 	err := cmd.Do()
@@ -34,7 +48,7 @@ func TestNoGitForSave(t *testing.T) {
 }
 
 func TestSaveCmd(t *testing.T) {
-	cfg := testNewConfigForSaveCmd()
+	cfg := testNewConfigForSaveCmd("normal")
 	g := NewGit(cfg)
 	for _, tc := range []struct {
 		what string
@@ -53,18 +67,8 @@ func TestSaveCmd(t *testing.T) {
 		},
 	} {
 		t.Run(tc.what, func(t *testing.T) {
-			if err := g.Init(); err != nil {
-				panic(err)
-			}
+			prepareGitRepoForTestNewCmd(g)
 			defer os.RemoveAll(filepath.Join(cfg.HomePath, ".git"))
-
-			if out, err := g.Exec("config", "user.name", "You"); err != nil {
-				t.Fatal(out, err)
-			}
-
-			if out, err := g.Exec("config", "user.email", "you@example.com"); err != nil {
-				t.Fatal(out, err)
-			}
 
 			cmd := &SaveCmd{
 				Config:  cfg,
@@ -91,7 +95,7 @@ func TestSaveCmd(t *testing.T) {
 }
 
 func TestSaveCmdNoGitInitYet(t *testing.T) {
-	cfg := testNewConfigForSaveCmd()
+	cfg := testNewConfigForSaveCmd("normal")
 	cmd := &SaveCmd{Config: cfg}
 	err := cmd.Do()
 	if err == nil {
@@ -99,5 +103,26 @@ func TestSaveCmdNoGitInitYet(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "'.git' directory does not exist in home") {
 		t.Fatal("Unexpected error:", err)
+	}
+}
+
+func TestSaveCmdAddNothing(t *testing.T) {
+	cfg := testNewConfigForSaveCmd("empty")
+	if err := os.MkdirAll(cfg.HomePath, 0755); err != nil {
+		panic(err)
+	}
+	g := NewGit(cfg)
+	prepareGitRepoForTestNewCmd(g)
+	defer os.RemoveAll(filepath.Join(cfg.HomePath, ".git"))
+
+	cmd := &SaveCmd{Config: cfg}
+	err := cmd.Do()
+
+	if err == nil {
+		t.Fatal("No error occurred")
+	}
+
+	if !strings.Contains(err.Error(), "nothing to commit") {
+		t.Fatal("Unexpected output:", err)
 	}
 }
