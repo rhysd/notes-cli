@@ -16,6 +16,13 @@ import (
 
 var (
 	reTitleBar = regexp.MustCompile("^=+$")
+	// Match to horizontal ruler of markdown: https://spec.commonmark.org/0.28/#thematic-break
+	// such as:
+	// ---
+	// ***
+	// ___
+	//   -	-   - -  -
+	reHorizontalRule = regexp.MustCompile(`^\s{0,3}(?:(?:-+\s*){3,}|(?:\*+\s*){3,}|(?:_+\s*){3,})$`)
 )
 
 // Note represents a note stored on filesystem or will be created
@@ -124,7 +131,7 @@ func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 		if err != nil {
 			break
 		}
-		if len(b) > 1 {
+		if len(b) > 1 && !reHorizontalRule.Match(b) {
 			buf.Write(b)
 			break
 		}
@@ -134,9 +141,8 @@ func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 	if len > maxBytes {
 		return string(buf.Bytes()[:maxBytes]), nil
 	}
-	maxBytes -= len
 
-	if _, err := io.CopyN(&buf, r, maxBytes); err != nil && err != io.EOF {
+	if _, err := io.CopyN(&buf, r, maxBytes-len); err != nil && err != io.EOF {
 		return "", err
 	}
 

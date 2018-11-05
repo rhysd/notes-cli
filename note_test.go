@@ -323,6 +323,10 @@ func TestNoteReadBodyN(t *testing.T) {
 			note: must(NewNote("read-body", "", "no-body", "this is title", cfg)),
 			want: "",
 		},
+		{
+			note: must(NewNote("read-body", "", "ignore-horizontal-rules", "this is title", cfg)),
+			want: "text\n\n---\n^ not igno",
+		},
 	} {
 		t.Run(tc.note.File, func(t *testing.T) {
 			have, err := tc.note.ReadBodyN(20)
