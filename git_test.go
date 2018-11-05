@@ -160,3 +160,19 @@ func TestGitOpFails(t *testing.T) {
 		})
 	}
 }
+
+func TestGitInitTwice(t *testing.T) {
+	dir := "test-tmp-dir-git-init"
+	if err := os.Mkdir(dir, 0755); err != nil {
+		panic(err)
+	}
+	defer os.RemoveAll(dir)
+
+	g := NewGit(&Config{GitPath: "git", HomePath: dir})
+	if err := g.Init(); err != nil {
+		t.Fatal(err)
+	}
+	if err := g.Init(); err != nil {
+		t.Fatal(err)
+	}
+}
