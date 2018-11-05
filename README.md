@@ -356,6 +356,17 @@ Other categories would be named like `blog-personal-private`, `blog-company-publ
 It's up to you.
 
 
+### How can I migrate from [memolist.vim](https://github.com/glidenote/memolist.vim)?
+
+Please try [migration script](./scripts/migrate-from-memolist.rb).
+
+```
+$ git clone https://github.com/rhysd/notes-cli.git
+$ cd ./notes-cli
+$ ruby ./scripts/migrate-from-memolist.rb /path/to/memolist/dir /path/to/note-cli/home
+```
+
+
 ### How can I integrate with Vim?
 
 Please write following code in your `.vimrc`.
