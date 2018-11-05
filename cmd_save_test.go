@@ -128,6 +128,10 @@ func TestSaveCmdAddNothing(t *testing.T) {
 }
 
 func TestSaveCmdCannotPush(t *testing.T) {
+	if _, ok := os.LookupEnv("APPVEYOR"); ok {
+		t.Skip("Pushing to not permitted repository hangs on Appveyor")
+	}
+
 	cfg := testNewConfigForSaveCmd("normal")
 	g := NewGit(cfg)
 	prepareGitRepoForTestNewCmd(g)
