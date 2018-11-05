@@ -65,12 +65,36 @@ func TestNewNoteFilenameNormalize(t *testing.T) {
 func TestNewNoteError(t *testing.T) {
 	cfg := &Config{GitPath: "git", HomePath: "."}
 
-	if _, err := NewNote("", "", "foo.md", "", cfg); err == nil {
-		t.Error("empty category should cause an error")
-	}
-
-	if _, err := NewNote("cat", "", "", "", cfg); err == nil {
-		t.Error("empty file name should cause an error")
+	for _, tc := range []struct {
+		cat  string
+		file string
+		want string
+	}{
+		{
+			cat:  "",
+			file: "foo.md",
+			want: "Cannot be empty",
+		},
+		{
+			cat:  "cat",
+			file: "",
+			want: "File name cannot be empty",
+		},
+		{
+			cat:  "foo|bar",
+			file: "",
+			want: "Invalid category as directory name",
+		},
+	} {
+		t.Run(tc.want, func(t *testing.T) {
+			_, err := NewNote(tc.cat, "", tc.file, "", cfg)
+			if err == nil {
+				t.Fatal("Error did not occur")
+			}
+			if !strings.Contains(err.Error(), tc.want) {
+				t.Fatal("Unexpected error:", err)
+			}
+		})
 	}
 }
 

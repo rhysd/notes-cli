@@ -209,7 +209,7 @@ func TestNewCmdNoteInvalidInput(t *testing.T) {
 	if err == nil {
 		t.Fatal("No error occurred")
 	}
-	if !strings.Contains(err.Error(), "Category cannot be empty") {
+	if !strings.Contains(err.Error(), "Invalid category as directory name") {
 		t.Fatal("Unexpected error:", err)
 	}
 }

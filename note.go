@@ -146,8 +146,8 @@ func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 // NewNote creates a new note instance with given parameters and configuration. Category and file name
 // cannot be empty. If given file name lacks file extension, it automatically adds ".md" to file name.
 func NewNote(cat, tags, file, title string, cfg *Config) (*Note, error) {
-	if cat == "" {
-		return nil, errors.New("Category cannot be empty")
+	if err := validateDirname(cat); err != nil {
+		return nil, errors.Wrap(err, "Invalid category as directory name")
 	}
 	if file == "" {
 		return nil, errors.New("File name cannot be empty")
