@@ -22,7 +22,7 @@ var Version = "1.1.0"
 func ParseCmd(args []string) (Cmd, error) {
 	cli := kingpin.New("notes", "Simple note taking tool for command line with your favorite editor")
 	noColor := cli.Flag("no-color", "Disable color output").Bool()
-	colorAlways := cli.Flag("color-always", "Disable color output").Short('A').Bool()
+	colorAlways := cli.Flag("color-always", "Enable color output always").Short('A').Bool()
 
 	cli.Version(Version)
 	cli.Author("rhysd <https://github.com/rhysd>")
