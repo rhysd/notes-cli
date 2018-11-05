@@ -126,3 +126,35 @@ func TestSaveCmdAddNothing(t *testing.T) {
 		t.Fatal("Unexpected output:", err)
 	}
 }
+
+func TestSaveCmdCannotPush(t *testing.T) {
+	cfg := testNewConfigForSaveCmd("normal")
+	g := NewGit(cfg)
+	prepareGitRepoForTestNewCmd(g)
+	defer os.RemoveAll(filepath.Join(cfg.HomePath, ".git"))
+
+	if out, err := g.Exec("remote", "add", "origin", "https://github.com/rhysd-test/empty.git"); err != nil {
+		t.Fatal(err, out)
+	}
+	if out, err := g.Exec("fetch"); err != nil {
+		t.Fatal(err, out)
+	}
+	if out, err := g.Exec("commit", "--allow-empty", "--allow-empty-message", "-m", ""); err != nil {
+		t.Fatal(err, out)
+	}
+	if out, err := g.Exec("branch", "--set-upstream-to", "origin/master", "master"); err != nil {
+		t.Fatal(err, out)
+	}
+
+	cmd := &SaveCmd{
+		Config: cfg,
+	}
+
+	err := cmd.Do()
+	if err == nil {
+		t.Fatal("No error occurred")
+	}
+	if !strings.Contains(err.Error(), "Cannot push to 'origin' remote") {
+		t.Fatal("Unexpected output:", err)
+	}
+}

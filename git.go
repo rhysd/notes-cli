@@ -93,7 +93,7 @@ func (git *Git) TrackingRemote() (string, string, error) {
 
 // Push pushes given branch of repository to the given remote
 func (git *Git) Push(remote, branch string) error {
-	out, err := git.Exec("push", remote, branch)
+	out, err := git.Exec("push", "-u", remote, branch)
 	if err != nil {
 		return errors.Wrapf(err, "Cannot push changes to %s/%s at '%s': %s", remote, branch, git.canonRoot(), out)
 	}
