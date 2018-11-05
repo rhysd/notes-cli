@@ -6,7 +6,6 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 )
 
 // NewCmd represents `notes new` command. Each public fields represent options of the command
@@ -66,10 +65,8 @@ func (cmd *NewCmd) Do() error {
 	}
 
 	if git != nil {
-		if _, err := os.Stat(filepath.Join(cmd.Config.HomePath, ".git")); err != nil {
-			if err := git.Init(); err != nil {
-				return err
-			}
+		if err := git.Init(); err != nil {
+			return err
 		}
 	}
 
