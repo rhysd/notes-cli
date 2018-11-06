@@ -15,7 +15,7 @@ type Cmd interface {
 }
 
 // Version is version string of notes command
-var Version = "1.1.0"
+var Version = "1.1.1"
 
 // ParseCmd parses given arguments as command line options and returns corresponding subcommand instance.
 // When no subcommand matches or argus contains invalid argument, it returns an error
