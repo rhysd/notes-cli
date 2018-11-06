@@ -41,7 +41,11 @@ func (cmd *SelfupdateCmd) Do() error {
 	}
 
 	if !cmd.Dry {
-		if err := selfupdate.UpdateTo(latest.AssetURL, os.Args[0]); err != nil {
+		exe, err := os.Executable()
+		if err != nil {
+			return errors.Wrap(err, "Cannot get path to executable to update")
+		}
+		if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil {
 			return err
 		}
 	}
