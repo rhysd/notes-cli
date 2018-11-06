@@ -21,7 +21,10 @@ It consists structs which represent each subcommands.
 	var buf bytes.Buffer
 
 	// Create user configuration
-	cfg := notes.NewConfig()
+	cfg, err := notes.NewConfig()
+	if err != nil {
+		panic(err)
+	}
 
 	// Prepare `notes list` command
 	cmd := &notes.ListCmd{

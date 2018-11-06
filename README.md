@@ -144,10 +144,10 @@ For example, now there is only one note so it shows one path
 Note that `/Users/<NAME>/.local/share` is a default XDG data directory on macOS or Linux and you can
 change it by setting `$NOTES_CLI_HOME` environment variable.
 
-To open the listed notes with your editor, `--editor` (or `-e`) is a quickest way.
+To open the listed notes with your editor, `--edit` (or `-e`) is a quickest way.
 
 ```
-$ notes list --editor
+$ notes list --edit
 $ notes ls -e
 ```
 
