@@ -265,6 +265,41 @@ the repository, it automatically pushes the notes to the remote.
 For more details, please see `notes save --help`.
 
 
+### Shell Completions
+
+- For zsh:
+
+Please put `_notes` completion script to your completion directory.
+
+```
+$ git clone https://github.com/rhysd/notes-cli.git
+$ cp nodes-cli/completions/zsh/_notes /path/to/completion/dir/
+```
+
+The completion directory must be listed in `$fpath`.
+
+```
+fpath=(/path/to/completion/dir $fpath)
+```
+
+- For bash:
+
+Please add following line to your `.bashrc`.
+
+```
+$ eval "$(notes --completion-script-bash)"
+```
+
+
+### Setup `man` manual
+
+`notes` command can generate `man` manual file.
+
+```
+$ notes --help-man > /usr/local/share/man/man1/notes.1
+```
+
+
 ### Update itself
 
 `notes` has the ability to update the executable by itself.

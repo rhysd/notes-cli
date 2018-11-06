@@ -2,6 +2,9 @@
 
 set -e
 
+go test -v
+golint
+
 rm -rf release
 gox -arch 'amd64' -os 'linux darwin windows freebsd openbsd netbsd' ./cmd/notes
 mkdir -p release

@@ -1,0 +1,101 @@
+#compdef notes
+
+local ret=1
+local commands; commands=(
+'new:Create a new note'
+'list:List note paths with filtering by categories and/or tags with regular expressions (alias: ls)'
+'ls:List note paths with filtering by categories and/or tags with regular expressions (alias: ls)'
+'categories:List all categories (alias: cats)'
+'cats:List all categories (alias: cats)'
+'tags:List all tags'
+'save:Save notes using Git'
+'config:Output config value to stdout'
+'help:Show help'
+'selfupdate:Update myself to the latest version'
+)
+
+_arguments \
+  "1: :{_describe 'command' commands}" \
+  '*:: :->args'
+
+case $state in
+    args)
+        local common_flags; common_flags=(
+        '--help[Show context-sensitive help]'
+        '-h[Show context-sensitive help]'
+        '--version[Show application version]'
+        '--no-color[Disable color output]'
+        '--color-always[Enable color output always]'
+        '-A[Enable color output always]'
+        )
+        case $words[1] in
+            new)
+                _arguments \
+                    '--no-inline-input[Does not request inline input even if no editor is set]' \
+                    ${common_flags[@]} \
+                    && ret=0
+            ;;
+            list|ls)
+                _arguments \
+                    '--no-inline-input[Does not request inline input even if no editor is set]' \
+                    '-f[Show full information of note instead of path]' \
+                    '--full[Show full information of note instead of path]' \
+                    '--category=[Filter category name by regular expression]' \
+                    '--tag=[Filter tag name by regular expression]' \
+                    '-r[Show relative paths from $NOTES_CLI_HOME directory]' \
+                    '--relative[Show relative paths from $NOTES_CLI_HOME directory]' \
+                    '-o[Show oneline information of note instead of path]' \
+                    '--oneline[Show oneline information of note instead of path]' \
+                    "--sort[Sort results by 'modified', 'created', 'filename' or 'category'. 'created' is default]" \
+                    '-e[Open listed notes with an editor. $NOTES_CLI_EDITOR must be set]' \
+                    '--edit[Open listed notes with an editor. $NOTES_CLI_EDITOR must be set]' \
+                    ${common_flags[@]} \
+                    && ret=0
+            ;;
+            categories|cats)
+                _arguments \
+                    ${common_flags[@]} \
+                    && ret=0
+            ;;
+            tags)
+                _arguments \
+                    ${common_flags[@]} \
+                    && ret=0
+            ;;
+            save)
+                _arguments \
+                    '--message=[Commit message on save]' \
+                    ${common_flags[@]} \
+                    && ret=0
+            ;;
+            config)
+                local names; names=(
+                'home:Home directory of notes-cli'
+                'editor:Editor command path to open note'
+                'git:Git command path to save notes'
+                )
+
+                _arguments \
+                    "1: :{_describe 'name' names}" \
+                    ${common_flags[@]} \
+                    && ret=0
+            ;;
+            help)
+                _arguments \
+                    "1: :{_describe 'command' commands}" \
+                    && ret=0
+            ;;
+            selfupdate)
+                _arguments \
+                    '--dry[Dry run update. Only check the newer version is available]' \
+                    ${common_flags[@]} \
+                    && ret=0
+            ;;
+        esac
+    ;;
+    *)
+        ret=0
+    ;;
+esac
+
+return $ret
