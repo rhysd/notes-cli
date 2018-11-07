@@ -118,3 +118,27 @@ func TestSelfupdateUpdateSuccessfully(t *testing.T) {
 		t.Fatal("Unexpected version. Wanted:", v, "but have output:", out)
 	}
 }
+
+func TestSelfupdateUpdateError(t *testing.T) {
+	maySkipTestForSelfupdate(t)
+
+	if !testCheckOnCI() {
+		t.Skip("Run test for selfupdate failure only on CI since takes time")
+	}
+
+	oldV := Version
+	defer func() {
+		Version = oldV
+	}()
+	Version = "0.0.1"
+
+	var buf bytes.Buffer
+	cmd := &SelfupdateCmd{Out: &buf}
+	err := cmd.Do()
+	if err == nil {
+		t.Fatal("Error did not occur")
+	}
+	if !strings.Contains(err.Error(), "the command is not found in") {
+		t.Fatal("Unexpected error:", err)
+	}
+}
