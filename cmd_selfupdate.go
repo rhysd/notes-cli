@@ -12,9 +12,10 @@ import (
 
 // SelfupdateCmd represents `notes selfupdate` subcommand.
 type SelfupdateCmd struct {
-	cli *kingpin.CmdClause
-	Dry bool
-	Out io.Writer
+	cli  *kingpin.CmdClause
+	Dry  bool
+	Slug string
+	Out  io.Writer
 }
 
 func (cmd *SelfupdateCmd) defineCLI(app *kingpin.Application) {
@@ -29,7 +30,12 @@ func (cmd *SelfupdateCmd) matchesCmdline(cmdline string) bool {
 // Do method checks the newer version binary. If new version is available, it updates myself with
 // the latest binary.
 func (cmd *SelfupdateCmd) Do() error {
-	latest, found, err := selfupdate.DetectLatest("rhysd/notes-cli")
+	slug := cmd.Slug
+	if slug == "" {
+		slug = "rhysd/notes-cli"
+	}
+
+	latest, found, err := selfupdate.DetectLatest(slug)
 	if err != nil {
 		return errors.Wrap(err, "Cannot detect version from GitHub")
 	}
