@@ -12,10 +12,12 @@ import (
 // TagsCmd represents `notes tags` command. Each public fields represent options of the command
 // Out field represents where this command should output.
 type TagsCmd struct {
-	cli      *kingpin.CmdClause
-	Config   *Config
+	cli    *kingpin.CmdClause
+	Config *Config
+	// Category is a category name of tags. If this value is empty, tags of all categories will be output
 	Category string
-	Out      io.Writer
+	// Out is a writer to write output of this command. Kind of stdout is expected
+	Out io.Writer
 }
 
 func (cmd *TagsCmd) defineCLI(app *kingpin.Application) {

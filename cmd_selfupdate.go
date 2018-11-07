@@ -12,10 +12,14 @@ import (
 
 // SelfupdateCmd represents `notes selfupdate` subcommand.
 type SelfupdateCmd struct {
-	cli  *kingpin.CmdClause
-	Dry  bool
+	cli *kingpin.CmdClause
+	// Dry is a flag equivalent to --dry
+	Dry bool
+	// Slug is a "user/repo" string where releases are put. This field is useful when you forked
+	// notes-cli into your own repository.
 	Slug string
-	Out  io.Writer
+	// Out is a writer to write output of this command. Kind of stdout is expected
+	Out io.Writer
 }
 
 func (cmd *SelfupdateCmd) defineCLI(app *kingpin.Application) {

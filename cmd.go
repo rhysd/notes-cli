@@ -14,7 +14,7 @@ type Cmd interface {
 	matchesCmdline(string) bool
 }
 
-// Version is version string of notes command
+// Version is version string of notes command. It conforms semantic versioning
 var Version = "1.1.2"
 
 // ParseCmd parses given arguments as command line options and returns corresponding subcommand instance.

@@ -11,8 +11,10 @@ import (
 
 // SaveCmd represents `notes save` command. Each public fields represent options of the command
 type SaveCmd struct {
-	cli     *kingpin.CmdClause
-	Config  *Config
+	cli    *kingpin.CmdClause
+	Config *Config
+	// Message is a message of Git commit which will be created to save notes. If this value is empty,
+	// automatically generated message will be used.
 	Message string
 }
 

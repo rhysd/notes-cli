@@ -10,11 +10,15 @@ import (
 
 // NewCmd represents `notes new` command. Each public fields represent options of the command
 type NewCmd struct {
-	cli      *kingpin.CmdClause
-	Config   *Config
+	cli    *kingpin.CmdClause
+	Config *Config
+	// Category is a category name of the new note. This must be a name allowed for directory name
 	Category string
+	// Filename is a file name of the new note
 	Filename string
-	Tags     string
+	// Tags is a comma-separated string of tags of the new note
+	Tags string
+	// NoInline is a flag equivalent to --no-inline-input
 	NoInline bool
 }
 

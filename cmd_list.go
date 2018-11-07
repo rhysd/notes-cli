@@ -25,14 +25,22 @@ var (
 type ListCmd struct {
 	cli, cliAlias *kingpin.CmdClause
 	Config        *Config
-	Full          bool
-	Category      string
-	Tag           string
-	Relative      bool
-	Oneline       bool
-	SortBy        string
-	Edit          bool
-	Out           io.Writer
+	// Full is a flag equivalent to --full
+	Full bool
+	// Category is a regex string equivalent to --cateogry
+	Category string
+	// Tag is a regex string equivalent to --tag
+	Tag string
+	// Relative is a flag equivalent to --relative
+	Relative bool
+	// Oneline is a flag equivalent to --oneline
+	Oneline bool
+	// Tag is a string indicating how to sort the list. This value is equivalent to --sort option
+	SortBy string
+	// Edit is a flag equivalent to --edit
+	Edit bool
+	// Out is a writer to write output of this command. Kind of stdout is expected
+	Out io.Writer
 }
 
 func (cmd *ListCmd) defineListCLI(c *kingpin.CmdClause) {

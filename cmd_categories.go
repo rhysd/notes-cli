@@ -15,7 +15,8 @@ import (
 type CategoriesCmd struct {
 	cli, cliAlias *kingpin.CmdClause
 	Config        *Config
-	Out           io.Writer
+	// Out is a writer to write output of this command. Kind of stdout is expected
+	Out io.Writer
 }
 
 func (cmd *CategoriesCmd) defineCLI(app *kingpin.Application) {

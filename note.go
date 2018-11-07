@@ -57,7 +57,7 @@ func (note *Note) RelFilePath() string {
 }
 
 // Create creates a file of the note. When title is empty, file name omitting file extension is used
-// for it.
+// for it. This function will fail when the file is already existing.
 func (note *Note) Create() error {
 	var b bytes.Buffer
 

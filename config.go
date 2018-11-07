@@ -76,7 +76,9 @@ func editorPath() string {
 	return exe
 }
 
-// NewConfig creates a new Config instance with looking the user's environment
+// NewConfig creates a new Config instance by looking the user's environment. GitPath and EditorPath
+// may be empty when proper configuration is not found. When home directory path cannot be located,
+// this function returns an error
 func NewConfig() (*Config, error) {
 	h, err := homePath()
 	if err != nil {

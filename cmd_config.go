@@ -13,8 +13,10 @@ import (
 type ConfigCmd struct {
 	cli    *kingpin.CmdClause
 	Config *Config
-	Name   string
-	Out    io.Writer
+	// Name is a name of configuration. Must be one of "", "home", "git" or "editor"
+	Name string
+	// Out is a writer to write output of this command. Kind of stdout is expected
+	Out io.Writer
 }
 
 func (cmd *ConfigCmd) defineCLI(app *kingpin.Application) {
