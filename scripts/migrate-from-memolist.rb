@@ -3,6 +3,7 @@
 require 'pathname'
 require 'fileutils'
 require 'date'
+require 'mkmf'
 
 def help
   puts "#{$PROGRAM_NAME} <memolist dir> <notes-cli home>"
@@ -46,7 +47,7 @@ def migrate(memo, home_dir)
     #{memo.title}
     #{'=' * memo.title.length}
     - Category: #{memo.category}
-    - Tags: #{memo.tags}
+    - Tags: #{memo.tags.join(", ")}
     - Created: #{memo.date.rfc3339}
     ---
 
@@ -76,11 +77,13 @@ def main
   Dir.glob("#{memolist_dir}/*.md").map{|p| read_memo p}.each do |path|
     migrate(path, notes_home)
   end
+
+  git = find_executable('git')
+  if git
+    system(git, '-C', notes_home.to_s, 'init')
+  end
 end
 
-#
-# main
-#
 if __FILE__ == $PROGRAM_NAME
   main
 end
