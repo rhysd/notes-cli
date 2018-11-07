@@ -3,7 +3,6 @@
 require 'pathname'
 require 'fileutils'
 require 'date'
-require 'mkmf'
 
 def help
   puts "#{$PROGRAM_NAME} <memolist dir> <notes-cli home>"
@@ -56,6 +55,17 @@ def migrate(memo, home_dir)
   end
 end
 
+def which(cmd)
+  exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+  ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+    exts.each do |ext|
+      exe = File.join(path, "#{cmd}#{ext}")
+      return exe if File.executable?(exe) && !File.directory?(exe)
+    end
+  end
+  return nil
+end
+
 def main
   if ARGV.length < 2
     help
@@ -78,7 +88,7 @@ def main
     migrate(path, notes_home)
   end
 
-  git = find_executable('git')
+  git = which('git')
   if git
     system(git, '-C', notes_home.to_s, 'init')
   end
