@@ -84,7 +84,19 @@ func (note *Note) Create() error {
 		return errors.Errorf("Cannot create new note since file '%s' already exists. Please edit it", note.RelFilePath())
 	}
 
-	return errors.Wrap(ioutil.WriteFile(p, b.Bytes(), 0644), "Cannot write note to file")
+	f, err := os.Create(p)
+	if err != nil {
+		return errors.Wrap(err, "Cannot create note file")
+	}
+	defer f.Close()
+
+	f.Write(b.Bytes())
+
+	if b, err := ioutil.ReadFile(filepath.Join(d, ".template.md")); err == nil && len(b) > 0 {
+		f.Write(b)
+	}
+
+	return nil
 }
 
 // Open opens the note using an editor command user set. When user did not set any editor command
@@ -155,9 +167,10 @@ func NewNote(cat, tags, file, title string, cfg *Config) (*Note, error) {
 	if err := validateDirname(cat); err != nil {
 		return nil, errors.Wrap(err, "Invalid category as directory name")
 	}
-	if file == "" {
-		return nil, errors.New("File name cannot be empty")
+	if file == "" || strings.HasPrefix(file, ".") {
+		return nil, errors.New("File name cannot be empty and cannot start with '.'")
 	}
+
 	ts := []string{}
 	for _, t := range strings.Split(tags, ",") {
 		t = strings.TrimSpace(t)

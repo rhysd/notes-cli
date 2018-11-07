@@ -49,14 +49,11 @@ To uninstall, please remove `notes` (or `notes.exe` on Windows) executable.
 
 `notes` provides some subcommands to manage your markdown notes.
 
-- Create a new note with `notes new <category> <filename> [<tags>]`.
+- Create a new note with `notes new <category> <filename> [<tags>]`. Every note must have one category
+  and it can have zero or more tags.
 - Open existing note by `notes ls -e` and your favorite editor. `$NOTES_CLI_EDITOR` must be set.
-- Check existing notes on terminal with `notes ls -o` (`-o` means showing one line information for each note).
-
-By `notes list` (omitting `-o`), it shows paths separated by newline. By choosing one line from the
-output and pass it to your editor's command as argument, you can easily open the note in your editor.
-
-Every note must have one category. And it can have zero or more tags.
+- Check existing notes on terminal with `notes ls -o` (`-o` means showing one line information for
+  each note).
 
 
 ### Create a new note
@@ -246,6 +243,39 @@ blog/how-to-handle-files.md blog golang,file How to handle files in Go
 This is useful for checking many notes at a glance.
 
 For more details, please see `notes list --help`.
+
+
+### Note Templates
+
+You can create a template of note for each category. When `.template.md` file is put in a category
+directory, it is automatically inserted on `notes new`.
+
+For example, when `HOME/minutes/.template.md` is created with following content:
+
+```markdown
+---
+
+- Agenda: 
+- Attendee: 
+
+
+```
+
+Executing `notes new minutes weekly-meeting-2018-11-07` will create a new note with inserting the
+template like:
+
+```markdown
+weekly-meeting-2018-11-07
+=========================
+Category: minutes
+Tags: 
+Created: 2018-11-07T14:19:27+09:00
+
+---
+
+- Agenda: 
+- Attendee: 
+```
 
 
 ### Save notes to Git repository

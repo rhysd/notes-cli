@@ -81,6 +81,11 @@ func TestNewNoteError(t *testing.T) {
 			want: "File name cannot be empty",
 		},
 		{
+			cat:  "cat",
+			file: ".foo",
+			want: "cannot start with '.'",
+		},
+		{
 			cat:  "foo|bar",
 			file: "",
 			want: "Invalid category as directory name",
@@ -185,6 +190,20 @@ func TestCreateNoteFile(t *testing.T) {
 				- Tags: 
 				- Created: {{created}}
 				
+				`),
+		},
+		{
+			note: check(NewNote("with-template", "", "create-with-template", "this is title", cfg)),
+			want: heredoc(`
+				this is title
+				=============
+				- Category: with-template
+				- Tags: 
+				- Created: {{created}}
+				
+				!!!!!!!
+				This text was inserted via template
+				!!!!!!!
 				`),
 		},
 	} {
