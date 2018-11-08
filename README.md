@@ -421,6 +421,26 @@ Other categories would be named like `blog-personal-private`, `blog-company-publ
 It's up to you.
 
 
+### I don't want to show the metadata in note. Can I hide them?
+
+Metadata can be commented out as follows:
+
+```markdown
+some title
+==========
+<!--
+- Category: cat
+- Tags:
+- Created: 2018-11-09T02:14:27+09:00
+-->
+
+Body
+```
+
+The closing comment `-->` is not included in note body. Commented metadata are not rendered and read
+only by `notes` command.
+
+
 ### How can I migrate from [memolist.vim](https://github.com/glidenote/memolist.vim)?
 
 Please try [migration script](./scripts/migrate-from-memolist.rb).

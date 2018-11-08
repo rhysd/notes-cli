@@ -346,6 +346,14 @@ func TestNoteReadBodyN(t *testing.T) {
 			note: must(NewNote("read-body", "", "ignore-horizontal-rules", "this is title", cfg)),
 			want: "text\n\n---\n^ not igno",
 		},
+		{
+			note: must(NewNote("hide-metadata", "", "1.md", "this is title", cfg)),
+			want: "this\nis\ntest\n",
+		},
+		{
+			note: must(NewNote("hide-metadata", "", "2.md", "this is title", cfg)),
+			want: "this\nis\ntest\n",
+		},
 	} {
 		t.Run(tc.note.File, func(t *testing.T) {
 			have, err := tc.note.ReadBodyN(20)
@@ -390,6 +398,7 @@ func TestLoadNote(t *testing.T) {
 		file  string
 		tags  string
 		title string
+		cat   string
 	}{
 		{
 			file:  "normal",
@@ -412,13 +421,25 @@ func TestLoadNote(t *testing.T) {
 			title: "(no title)",
 		},
 		{
-			file:  "space-around-metadata",
+			file:  "1.md",
 			tags:  "foo,bar",
 			title: "this is title",
+			cat:   "hide-metadata",
+		},
+		{
+			file:  "2.md",
+			tags:  "foo,bar",
+			title: "this is title",
+			cat:   "hide-metadata",
 		},
 	} {
 		t.Run(tc.file, func(t *testing.T) {
-			want, err := NewNote("load", tc.tags, tc.file, tc.title, cfg)
+			cat := tc.cat
+			if cat == "" {
+				cat = "load"
+			}
+
+			want, err := NewNote(cat, tc.tags, tc.file, tc.title, cfg)
 			if err != nil {
 				panic(err)
 			}

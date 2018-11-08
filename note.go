@@ -23,6 +23,7 @@ var (
 	// ___
 	//   -	-   - -  -
 	reHorizontalRule = regexp.MustCompile(`^\s{0,3}(?:(?:-+\s*){3,}|(?:\*+\s*){3,}|(?:_+\s*){3,})$`)
+	closingComment   = []byte("-->\n")
 )
 
 // Note represents a note stored on filesystem or will be created
@@ -143,7 +144,7 @@ func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 		if err != nil {
 			break
 		}
-		if len(b) > 1 && !reHorizontalRule.Match(b) {
+		if len(b) > 1 && !reHorizontalRule.Match(b) && !bytes.Equal(b, closingComment) {
 			buf.Write(b)
 			break
 		}
