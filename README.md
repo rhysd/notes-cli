@@ -454,7 +454,10 @@ $ ruby ./scripts/migrate-from-memolist.rb /path/to/memolist/dir /path/to/note-cl
 
 ### How can I integrate with Vim?
 
-Please write following code in your `.vimrc`.
+You can try [Vim plugin for notes-cli](https://github.com/rhysd/vim-notes-cli)
+
+If you feel the plugin is too much, you can also try following configuration. Please write following
+code in your `.vimrc`.
 
 ```vim
 function! s:notes_grep(args) abort
