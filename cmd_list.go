@@ -172,7 +172,7 @@ func (cmd *ListCmd) doCategories(cats []string, tagRegex *regexp.Regexp) error {
 		}
 		for _, f := range fs {
 			n := f.Name()
-			if f.IsDir() || !strings.HasSuffix(n, ".md") {
+			if f.IsDir() || !strings.HasSuffix(n, ".md") || strings.HasPrefix(n, ".") {
 				continue
 			}
 			note, err := LoadNote(filepath.Join(dir, n), cmd.Config)
@@ -253,8 +253,8 @@ func (cmd *ListCmd) Do() error {
 	if cmd.Category == "" {
 		cs := make([]string, 0, len(fs))
 		for _, f := range fs {
-			if f.IsDir() {
-				cs = append(cs, f.Name())
+			if n := f.Name(); f.IsDir() && !strings.HasPrefix(n, ".") {
+				cs = append(cs, n)
 			}
 		}
 		return cmd.doCategories(cs, tagRegex)

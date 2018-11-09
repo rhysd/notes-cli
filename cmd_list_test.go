@@ -15,10 +15,6 @@ import (
 )
 
 func testNewConfigForListCmd(subdir string) *Config {
-	old := color.NoColor
-	color.NoColor = true
-	defer func() { color.NoColor = old }()
-
 	cwd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -430,6 +426,58 @@ func TestListCmd(t *testing.T) {
 					}
 				}
 				t.Fatalf("have:\n%s\n\n%s", have, hint)
+			}
+		})
+	}
+}
+
+func TestListNotesVariousHomes(t *testing.T) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, tc := range []struct {
+		home string
+		want string
+	}{
+		{
+			home: "with-template",
+			want: "a/1.md\n",
+		},
+		{
+			home: "hide-metadata",
+			want: "a/1.md\na/2.md\n",
+		},
+		{
+			home: "with-dot-dirs",
+			want: "a/1.md\n",
+		},
+	} {
+		t.Run(tc.home, func(t *testing.T) {
+			cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "list", tc.home)}
+
+			var buf bytes.Buffer
+			cmd := &ListCmd{
+				Config:   cfg,
+				Out:      &buf,
+				Relative: true,
+			}
+
+			if err := cmd.Do(); err != nil {
+				t.Fatal(err)
+			}
+
+			have := buf.String()
+
+			ss := strings.Split(tc.want, "\n")
+			for i, s := range ss {
+				ss[i] = filepath.FromSlash(strings.Replace(s, "\t", "", -1))
+			}
+			want := strings.Join(ss, "\n")
+
+			if want != have {
+				t.Fatalf("Wanted %#v but have %#v", want, have)
 			}
 		})
 	}
