@@ -198,9 +198,9 @@ For example,
 
 ```
 /Users/me/.local/share/notes-cli/blog/how-to-handle-files.md
-Category: blog
-Tags: golang, file
-Created: 2018-10-28T07:19:27+09:00
+- Category: blog
+- Tags: golang, file
+- Created: 2018-10-28T07:19:27+09:00
 
 How to handle files in Go
 =========================
@@ -267,9 +267,9 @@ template like:
 ```markdown
 weekly-meeting-2018-11-07
 =========================
-Category: minutes
-Tags: 
-Created: 2018-11-07T14:19:27+09:00
+- Category: minutes
+- Tags:
+- Created: 2018-11-07T14:19:27+09:00
 
 ---
 
@@ -457,22 +457,25 @@ $ ruby ./scripts/migrate-from-memolist.rb /path/to/memolist/dir /path/to/note-cl
 Please write following code in your `.vimrc`.
 
 ```vim
-function! s:notes_selection_done(selected) abort
-    silent! autocmd! plugin-notes-cli
-    let home = substitute(system('notes config home'), '\n$', '', '')
-    let sep = has('win32') ? '\' : '/'
-    let path = home . sep . split(a:selected, ' ')[0]
-    execute 'split' '+setf\ markdown' path
-    echom 'Note opened: ' . a:selected
+function! s:notes_grep(args) abort
+    let idx = match(a:args, '\s\+\ze/[^/]\+/')
+    if idx <= 0
+        " When :NotesGrep /pat/
+        let paths = join(split(system('notes list'), '\n'), ' ')
+        execute 'vimgrep' a:args paths
+        return
+    endif
+
+    " When :NotesGrep {args} /pat/
+    let paths = join(split(system('notes list ' . a:args[:idx]), '\n'), ' ')
+    if paths ==# ''
+        echohl ErrorMsg | echo 'No file found' | echohl None
+        return
+    endif
+    let pat = a:args[idx:]
+    execute 'vimgrep' pat paths
 endfunction
-function! s:notes_open(args) abort
-    execute 'terminal ++close bash -c "notes list --oneline | peco"'
-    augroup plugin-notes-cli
-        autocmd!
-        autocmd BufWinLeave <buffer> call <SID>notes_selection_done(getline(1))
-    augroup END
-endfunction
-command! -nargs=* NotesOpen call <SID>notes_open(<q-args>)
+command! -nargs=+ NotesGrep call <SID>notes_grep(<q-args>)
 
 function! s:notes_new(...) abort
     if has_key(a:, 1)
@@ -510,9 +513,9 @@ endfunction
 command! -nargs=* NotesLastMod call <SID>notes_last_mod(<q-args>)
 ```
 
-- `:NotesOpen [args]`: It shows notes as list with incremental filtering thanks to `peco` command.
-  The chosen note is opened in a new buffer. `args` is passed to `notes list` command. So you can
-  easily filter paths by categories (`-c`) or tags (`-t`).
+- `:NotesGrep [args] /pat/`: It searches notes by `:vimgrep` with givein `/pat/`. Thanks to `:vimgrep`,
+  the search result is stored to a quickfix list. You can easily check matches and open the file from
+  the list by open quickfix window with `:copen`.
 - `:NotesNew [args]`: It creates a new note and opens it with a new buffer. `args` is the same as
   `notes new` but category and file name can be empty. In the case, Vim ask you to input them after
   starting the command.
