@@ -50,17 +50,23 @@ func (cmd *SelfupdateCmd) Do() error {
 		return nil
 	}
 
-	if !cmd.Dry {
-		exe, err := os.Executable()
-		if err != nil {
-			return errors.Wrap(err, "Cannot get path to executable to update")
-		}
-		if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil {
-			return err
-		}
-	}
-
 	yellow.Fprintf(cmd.Out, "New version v%s\n\n", latest.Version)
 	fmt.Fprintf(cmd.Out, "Release Note:\n%s\n", latest.ReleaseNotes)
+
+	if cmd.Dry {
+		return nil
+	}
+
+	fmt.Fprint(cmd.Out, "\nDownloading and unarchiving the new release asset...")
+
+	exe, err := os.Executable()
+	if err != nil {
+		return errors.Wrap(err, "Cannot get path to executable to update")
+	}
+	if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil {
+		return err
+	}
+
+	fmt.Fprintln(cmd.Out, "Done.")
 	return nil
 }
