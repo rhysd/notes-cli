@@ -20,8 +20,8 @@ type ConfigCmd struct {
 }
 
 func (cmd *ConfigCmd) defineCLI(app *kingpin.Application) {
-	cmd.cli = app.Command("config", "Output config value to stdout")
-	cmd.cli.Arg("name", "One of 'home', 'git', 'editor'").StringVar(&cmd.Name)
+	cmd.cli = app.Command("config", "Output config values to stdout. By default output all values with KEY=VALUE style")
+	cmd.cli.Arg("name", "Key name. One of 'home', 'git', 'editor'. Only value will be output").StringVar(&cmd.Name)
 }
 
 func (cmd *ConfigCmd) matchesCmdline(cmdline string) bool {

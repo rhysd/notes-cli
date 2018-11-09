@@ -20,8 +20,8 @@ type CategoriesCmd struct {
 }
 
 func (cmd *CategoriesCmd) defineCLI(app *kingpin.Application) {
-	cmd.cli = app.Command("categories", "List all categories (alias: cats)")
-	cmd.cliAlias = app.Command("cats", "List all categories. Please do not expect 🐱!").Hidden()
+	cmd.cli = app.Command("categories", "List all categories to stdout (alias: cats)")
+	cmd.cliAlias = app.Command("cats", "List all categories to stdout. Please do not expect 🐱!").Hidden()
 }
 
 func (cmd *CategoriesCmd) matchesCmdline(cmdline string) bool {

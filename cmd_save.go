@@ -19,8 +19,8 @@ type SaveCmd struct {
 }
 
 func (cmd *SaveCmd) defineCLI(app *kingpin.Application) {
-	cmd.cli = app.Command("save", "Save notes using Git")
-	cmd.cli.Flag("message", "Commit message on save").Short('m').StringVar(&cmd.Message)
+	cmd.cli = app.Command("save", "Save notes using Git. It adds all notes and creates a commit to Git repository at home directory")
+	cmd.cli.Flag("message", "Commit message on save. If omitted, an automatic message will be used").Short('m').StringVar(&cmd.Message)
 }
 
 func (cmd *SaveCmd) matchesCmdline(cmdline string) bool {

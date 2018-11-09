@@ -23,11 +23,11 @@ type NewCmd struct {
 }
 
 func (cmd *NewCmd) defineCLI(app *kingpin.Application) {
-	cmd.cli = app.Command("new", "Create a new note")
-	cmd.cli.Arg("category", "Category of memo").Required().StringVar(&cmd.Category)
-	cmd.cli.Arg("filename", "Name of memo").Required().StringVar(&cmd.Filename)
-	cmd.cli.Arg("tags", "Comma-separated tags of memo").StringVar(&cmd.Tags)
-	cmd.cli.Flag("no-inline-input", "Does not request inline input even if no editor is set").BoolVar(&cmd.NoInline)
+	cmd.cli = app.Command("new", "Create a new note with given category and file name")
+	cmd.cli.Arg("category", "Category of note. Note must belong to one category").Required().StringVar(&cmd.Category)
+	cmd.cli.Arg("filename", "File name of note. It automatically adds '.md' file extension if omitted").Required().StringVar(&cmd.Filename)
+	cmd.cli.Arg("tags", "Comma-separated tags of note. Zero or more tags can be specified to note").StringVar(&cmd.Tags)
+	cmd.cli.Flag("no-inline-input", "Does not request inline input even if no editor is set to $NOTES_CLI_EDITOR").BoolVar(&cmd.NoInline)
 }
 
 func (cmd *NewCmd) matchesCmdline(cmdline string) bool {

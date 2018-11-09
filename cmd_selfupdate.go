@@ -23,7 +23,7 @@ type SelfupdateCmd struct {
 }
 
 func (cmd *SelfupdateCmd) defineCLI(app *kingpin.Application) {
-	cmd.cli = app.Command("selfupdate", "Update myself to the latest version")
+	cmd.cli = app.Command("selfupdate", "Update myself to the latest version. It downloads the latest version executable and replaces current executable with it")
 	cmd.cli.Flag("dry", "Dry run update. Only check the newer version is available").Short('d').BoolVar(&cmd.Dry)
 }
 

@@ -44,19 +44,19 @@ type ListCmd struct {
 }
 
 func (cmd *ListCmd) defineListCLI(c *kingpin.CmdClause) {
-	c.Flag("full", "Show full information of note instead of path").Short('f').BoolVar(&cmd.Full)
-	c.Flag("category", "Filter category name by regular expression").Short('c').StringVar(&cmd.Category)
-	c.Flag("tag", "Filter tag name by regular expression").Short('t').StringVar(&cmd.Tag)
+	c.Flag("full", "Show list of full information of note (full path, metadata, title, body) instead of file path").Short('f').BoolVar(&cmd.Full)
+	c.Flag("category", "Filter list by category name with regular expression").Short('c').StringVar(&cmd.Category)
+	c.Flag("tag", "Filter list by tag name with regular expression").Short('t').StringVar(&cmd.Tag)
 	c.Flag("relative", "Show relative paths from $NOTES_CLI_HOME directory").Short('r').BoolVar(&cmd.Relative)
-	c.Flag("oneline", "Show oneline information of note instead of path").Short('o').BoolVar(&cmd.Oneline)
-	c.Flag("sort", "Sort results by 'modified', 'created', 'filename' or 'category'. 'created' is default").Short('s').EnumVar(&cmd.SortBy, "modified", "created", "filename", "category")
-	c.Flag("edit", "Open listed notes with an editor. $NOTES_CLI_EDITOR must be set").Short('e').BoolVar(&cmd.Edit)
+	c.Flag("oneline", "Show oneline information of note (relative path, category, tags, title) instead of file path").Short('o').BoolVar(&cmd.Oneline)
+	c.Flag("sort", "Sort list by 'modified', 'created', 'filename' or 'category'. Default is 'created'").Short('s').EnumVar(&cmd.SortBy, "modified", "created", "filename", "category")
+	c.Flag("edit", "Open listed notes with your favorite editor. $NOTES_CLI_EDITOR must be set. Paths of listed notes are passed to the editor command's arguments").Short('e').BoolVar(&cmd.Edit)
 }
 
 func (cmd *ListCmd) defineCLI(app *kingpin.Application) {
-	cmd.cli = app.Command("list", "List note paths with filtering by categories and/or tags with regular expressions (alias: ls)")
+	cmd.cli = app.Command("list", "List notes with filtering by categories and/or tags with regular expressions. By default, it shows full path of notes (alias: ls)")
 	cmd.defineListCLI(cmd.cli)
-	cmd.cliAlias = app.Command("ls", "List note paths with filtering by categories and/or tags with regular expressions").Hidden()
+	cmd.cliAlias = app.Command("ls", "List notes with filtering by categories and/or tags with regular expressions. By default, it shows full path of notes ").Hidden()
 	cmd.defineListCLI(cmd.cliAlias)
 }
 
