@@ -137,7 +137,7 @@ func TestSaveCmdCannotPush(t *testing.T) {
 	prepareGitRepoForTestNewCmd(g)
 	defer os.RemoveAll(filepath.Join(cfg.HomePath, ".git"))
 
-	if out, err := g.Exec("remote", "add", "origin", "git@github.com:rhysd-test/empty.git"); err != nil {
+	if out, err := g.Exec("remote", "add", "origin", "https://github.com/rhysd-test/empty.git"); err != nil {
 		t.Fatal(err, out)
 	}
 	if out, err := g.Exec("fetch"); err != nil {
