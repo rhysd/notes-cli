@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"github.com/rhysd/go-tmpenv"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -8,37 +9,21 @@ import (
 	"testing"
 )
 
-type testConfigEnvState map[string]string
-
-func testNewConfigEnvState() testConfigEnvState {
-	s := testConfigEnvState{}
-
-	for _, key := range []string{
+func testNewConfigEnvGuard() *tmpenv.Envguard {
+	g := tmpenv.New()
+	g.Add(
 		"NOTES_CLI_HOME",
 		"XDG_DATA_HOME",
 		"APPLOCALDATA",
 		"NOTES_CLI_GIT",
 		"NOTES_CLI_EDITOR",
-	} {
-		if e, ok := os.LookupEnv(key); ok {
-			s[key] = e
-			os.Unsetenv(key)
-		}
-	}
-	return s
-}
-
-func (state testConfigEnvState) restore() {
-	for k, v := range state {
-		if err := os.Setenv(k, v); err != nil {
-			panic(err)
-		}
-	}
+	)
+	return g
 }
 
 func TestNewDefaultConfig(t *testing.T) {
-	s := testNewConfigEnvState()
-	defer s.restore()
+	g := testNewConfigEnvGuard()
+	defer g.Restore()
 
 	c, err := NewConfig()
 	if err != nil {
@@ -69,8 +54,8 @@ func TestNewDefaultConfig(t *testing.T) {
 }
 
 func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
-	s := testNewConfigEnvState()
-	defer s.restore()
+	g := testNewConfigEnvGuard()
+	defer g.Restore()
 
 	ls, err := exec.LookPath("ls")
 	if err != nil {
@@ -120,8 +105,8 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 		}
 
 		t.Run(tc.key, func(t *testing.T) {
-			s := testNewConfigEnvState()
-			defer s.restore()
+			g := testNewConfigEnvGuard()
+			defer g.Restore()
 
 			os.Setenv(tc.key, tc.val)
 
@@ -146,8 +131,8 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 }
 
 func TestNewConfigGitAndEditorNotFound(t *testing.T) {
-	s := testNewConfigEnvState()
-	defer s.restore()
+	g := testNewConfigEnvGuard()
+	defer g.Restore()
 
 	os.Setenv("NOTES_CLI_GIT", "/path/to/unknown-command")
 	os.Setenv("NOTES_CLI_EDITOR", "/path/to/unknown-command")

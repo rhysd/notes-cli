@@ -13,6 +13,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rhysd/go-fakeio v0.0.0-20181103044911-f4b9186d1710
 	github.com/rhysd/go-github-selfupdate v1.1.0
+	github.com/rhysd/go-tmpenv v1.0.0
 	github.com/stretchr/testify v1.2.2 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )

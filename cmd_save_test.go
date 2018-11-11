@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"github.com/rhysd/go-tmpenv"
 	"os"
 	"path/filepath"
 	"strings"
@@ -132,17 +133,11 @@ func TestSaveCmdCannotPush(t *testing.T) {
 		t.Skip("Pushing to not permitted repository hangs on Appveyor")
 	}
 
-	saved := os.Getenv("GIT_TERMINAL_PROMPT")
-	if err := os.Setenv("GIT_TERMINAL_PROMPT", "0"); err != nil {
+	tmp := tmpenv.New()
+	defer tmp.Restore()
+	if err := tmp.Setenv("GIT_TERMINAL_PROMPT", "0"); err != nil {
 		panic(err)
 	}
-	defer func() {
-		if saved == "" {
-			os.Unsetenv("GIT_TERMINAL_PROMPT")
-		} else {
-			os.Setenv("GIT_TERMINAL_PROMPT", saved)
-		}
-	}()
 
 	cfg := testNewConfigForSaveCmd("normal")
 	g := NewGit(cfg)
