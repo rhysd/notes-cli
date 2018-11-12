@@ -100,13 +100,17 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 			home: filepath.FromSlash("test-win-config-home/notes-cli"),
 		},
 	} {
-		if runtime.GOOS != "windows" && tc.key == "APPLOCALDATA" {
-			continue
-		}
-
 		t.Run(tc.key, func(t *testing.T) {
+			if runtime.GOOS != "windows" && tc.key == "APPLOCALDATA" {
+				t.Skip("APPLOCALDATA is refered only on Windows")
+			}
+
 			g := testNewConfigEnvGuard()
 			defer g.Restore()
+
+			// Unset all environment variables at first
+			os.Unsetenv("NOTES_CLI_HOME")
+			os.Unsetenv("XDG_DATA_HOME")
 
 			os.Setenv(tc.key, tc.val)
 
