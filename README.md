@@ -51,7 +51,7 @@ To uninstall, please remove `notes` (or `notes.exe` on Windows) executable.
 
 - Create a new note with `notes new <category> <filename> [<tags>]`. Every note must have one category
   and it can have zero or more tags.
-- Open existing note by `notes ls -e` and your favorite editor. `$NOTES_CLI_EDITOR` must be set.
+- Open existing note by `notes ls -e` and your favorite editor. `$NOTES_CLI_EDITOR` (or `EDITOR` as fallback) must be set.
 - Check existing notes on terminal with `notes ls -o` (`-o` means showing one line information for
   each note).
 
@@ -90,7 +90,8 @@ Directories structure under home is something like:
 You can see more practical example home directory at [example directory](./example/notes-cli).
 
 If you set your favorite editor to `$NOTES_CLI_EDITOR` environment variable, it opens the newly
-created note file with it. You can seamlessly edit the file.
+created note file with it. You can seamlessly edit the file. (If it is not set, `$EDITOR` is also
+referred.)
 
 ```markdown
 how-to-handle-files
@@ -350,7 +351,7 @@ the interfaces.
 
 ## FAQ
 
-### I want to specify `/path/to/dir` as home
+### Can I specify `/path/to/dir` as home?
 
 Please set it to environment variable.
 
@@ -454,6 +455,7 @@ This option may be better than mixing many pictures and note files in the same d
 
 If you want to differentiate images directory from other category directories, please give `.` prefix
 like `HOME/.images` since category directories cannot have `.` prefix as their names.
+
 
 ### How can I migrate from [memolist.vim](https://github.com/glidenote/memolist.vim)?
 

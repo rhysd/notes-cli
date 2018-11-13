@@ -63,17 +63,14 @@ func gitPath() string {
 }
 
 func editorPath() string {
-	env := os.Getenv("NOTES_CLI_EDITOR")
-	if env == "" {
-		return ""
+	for _, key := range []string{"NOTES_CLI_EDITOR", "EDITOR"} {
+		if env := os.Getenv(key); env != "" {
+			if exe, err := exec.LookPath(env); err == nil {
+				return exe
+			}
+		}
 	}
-
-	exe, err := exec.LookPath(env)
-	if err != nil {
-		return ""
-	}
-
-	return exe
+	return ""
 }
 
 // NewConfig creates a new Config instance by looking the user's environment. GitPath and EditorPath

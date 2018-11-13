@@ -16,6 +16,7 @@ func testNewConfigEnvGuard() *tmpenv.Envguard {
 		"APPLOCALDATA",
 		"NOTES_CLI_GIT",
 		"NOTES_CLI_EDITOR",
+		"EDITOR",
 	)
 	panicIfErr(err)
 	return g
@@ -71,6 +72,18 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 
 	if c.GitPath != ls {
 		t.Fatal("git path is unexpected:", c.GitPath, "wanted:", ls)
+	}
+
+	if c.EditorPath != ls {
+		t.Fatal("Editor is unexpected:", c.EditorPath, "wanted:", ls)
+	}
+
+	os.Unsetenv("NOTES_CLI_EDITOR")
+	os.Setenv("EDITOR", ls)
+
+	c, err = NewConfig()
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	if c.EditorPath != ls {
