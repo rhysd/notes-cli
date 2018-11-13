@@ -43,8 +43,8 @@ github.com/rhysd/go-fakeio v0.0.0-20181103044911-f4b9186d1710 h1:NoTIfTevBIdxZ9q
 github.com/rhysd/go-fakeio v0.0.0-20181103044911-f4b9186d1710/go.mod h1:joYxF906trVwp2JLrE4jlN7A0z6wrz8O6o1UjarbFzE=
 github.com/rhysd/go-github-selfupdate v1.1.0 h1:+aMomy69YCYxJ6kr13nYIgAJWSB1kHK5M5YpbmjQkWo=
 github.com/rhysd/go-github-selfupdate v1.1.0/go.mod h1:jbfShZ+Nl3IHUgr77kwQjObcWf1z961UAoD6p5LrPBU=
-github.com/rhysd/go-tmpenv v1.0.0 h1:f3qBb6GdF/O77RwRkI8obfIANfHDLyA6RfaJfZNNCx4=
-github.com/rhysd/go-tmpenv v1.0.0/go.mod h1:gVCqrLB8aEm4ktX2E0USZAKryxMwt1h8WWZjNwzKuQY=
+github.com/rhysd/go-tmpenv v1.2.0 h1:HN+4dbWugTg5Iz477nyqWiQpo+LmI/w6a0Nh0nYtKsQ=
+github.com/rhysd/go-tmpenv v1.2.0/go.mod h1:gVCqrLB8aEm4ktX2E0USZAKryxMwt1h8WWZjNwzKuQY=
 github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/tcnksm/go-gitconfig v0.1.2 h1:iiDhRitByXAEyjgBqsKi9QU4o2TNtv9kPP3RgPgXBPw=

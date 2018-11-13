@@ -10,20 +10,20 @@ import (
 )
 
 func testNewConfigEnvGuard() *tmpenv.Envguard {
-	g := tmpenv.New()
-	g.Add(
+	g, err := tmpenv.Unset(
 		"NOTES_CLI_HOME",
 		"XDG_DATA_HOME",
 		"APPLOCALDATA",
 		"NOTES_CLI_GIT",
 		"NOTES_CLI_EDITOR",
 	)
+	panicIfErr(err)
 	return g
 }
 
 func TestNewDefaultConfig(t *testing.T) {
 	g := testNewConfigEnvGuard()
-	defer g.Restore()
+	defer func() { panicIfErr(g.Restore()) }()
 
 	c, err := NewConfig()
 	if err != nil {
@@ -55,7 +55,7 @@ func TestNewDefaultConfig(t *testing.T) {
 
 func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 	g := testNewConfigEnvGuard()
-	defer g.Restore()
+	defer func() { panicIfErr(g.Restore()) }()
 
 	ls, err := exec.LookPath("ls")
 	if err != nil {
@@ -107,10 +107,6 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 
 			g := testNewConfigEnvGuard()
 			defer func() { panicIfErr(g.Restore()) }()
-
-			// Unset all environment variables at first
-			panicIfErr(os.Unsetenv("NOTES_CLI_HOME"))
-			panicIfErr(os.Unsetenv("XDG_DATA_HOME"))
 
 			panicIfErr(os.Setenv(tc.key, tc.val))
 
