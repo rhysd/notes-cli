@@ -136,9 +136,7 @@ func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
 	if err := cmd.Do(); err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
-		panicIfErr(os.RemoveAll(filepath.Join(cfg.HomePath, "cat")))
-	}()
+	defer os.RemoveAll(filepath.Join(cfg.HomePath, "cat"))
 
 	p := filepath.Join(cfg.HomePath, "cat", "test3.md")
 	n, err := LoadNote(p, cfg)
