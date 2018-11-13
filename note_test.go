@@ -219,6 +219,7 @@ func TestCreateNoteFile(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			defer f.Close()
 
 			b, err := ioutil.ReadAll(f)
 			if err != nil {
