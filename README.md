@@ -441,6 +441,20 @@ The closing comment `-->` is not included in note body. Commented metadata are n
 only by `notes` command.
 
 
+### How image resources are managed?
+
+I recommend to create a directory for resources under home.
+
+All non-markdown resources (are ignored by `notes` command. So you can freely put your `.png` or `.jpg`
+files in the same directory as note markdown files.
+
+Or you can use a separate directory dedicated for images like `HOME/images/` or `HOME/category1/images`.
+This option may be better than mixing many pictures and note files in the same directory when you use
+`grep`.
+
+If you want to differentiate images directory from other category directories, please give `.` prefix
+like `HOME/.images` since category directories cannot have `.` prefix as their names.
+
 ### How can I migrate from [memolist.vim](https://github.com/glidenote/memolist.vim)?
 
 Please try [migration script](./scripts/migrate-from-memolist.rb).
