@@ -10,29 +10,19 @@ import (
 
 func testNewConfigForSaveCmd(subdir string) *Config {
 	cfg, err := NewConfig()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	cfg.HomePath = filepath.Join(cwd, "testdata", "save", subdir)
 	return cfg
 }
 
 func prepareGitRepoForTestNewCmd(g *Git) {
-	if err := g.Init(); err != nil {
-		panic(err)
-	}
-
-	if _, err := g.Exec("config", "user.name", "You"); err != nil {
-		panic(err)
-	}
-
-	if _, err := g.Exec("config", "user.email", "you@example.com"); err != nil {
-		panic(err)
-	}
+	panicIfErr(g.Init())
+	_, err := g.Exec("config", "user.name", "You")
+	panicIfErr(err)
+	_, err = g.Exec("config", "user.email", "you@example.com")
+	panicIfErr(err)
 }
 
 func TestNoGitForSave(t *testing.T) {
@@ -81,9 +71,7 @@ func TestSaveCmd(t *testing.T) {
 			}
 
 			log, err := g.Exec("log", "--oneline")
-			if err != nil {
-				panic(err)
-			}
+			panicIfErr(err)
 			lines := strings.Split(strings.TrimSuffix(log, "\n"), "\n")
 			if len(lines) != 1 {
 				t.Fatal("Number of logs is not match. log:", log)
@@ -109,12 +97,12 @@ func TestSaveCmdNoGitInitYet(t *testing.T) {
 
 func TestSaveCmdAddNothing(t *testing.T) {
 	cfg := testNewConfigForSaveCmd("empty")
-	if err := os.MkdirAll(cfg.HomePath, 0755); err != nil {
-		panic(err)
-	}
+	panicIfErr(os.MkdirAll(cfg.HomePath, 0755))
 	g := NewGit(cfg)
 	prepareGitRepoForTestNewCmd(g)
-	defer os.RemoveAll(filepath.Join(cfg.HomePath, ".git"))
+	defer func() {
+		panicIfErr(os.RemoveAll(filepath.Join(cfg.HomePath, ".git")))
+	}()
 
 	cmd := &SaveCmd{Config: cfg}
 	err := cmd.Do()
@@ -134,10 +122,8 @@ func TestSaveCmdCannotPush(t *testing.T) {
 	}
 
 	tmp := tmpenv.New()
-	defer tmp.Restore()
-	if err := tmp.Setenv("GIT_TERMINAL_PROMPT", "0"); err != nil {
-		panic(err)
-	}
+	defer func() { panicIfErr(tmp.Restore()) }()
+	panicIfErr(tmp.Setenv("GIT_TERMINAL_PROMPT", "0"))
 
 	cfg := testNewConfigForSaveCmd("normal")
 	g := NewGit(cfg)

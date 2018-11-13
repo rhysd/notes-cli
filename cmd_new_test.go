@@ -13,9 +13,7 @@ import (
 
 func testNewConfigForNewCmd(subdir string) *Config {
 	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	return &Config{
 		GitPath:  "git",
 		HomePath: filepath.Join(cwd, "testdata", "new", subdir),
@@ -68,9 +66,7 @@ func TestNewCmdNewNote(t *testing.T) {
 	defer f.Close()
 
 	b, err := ioutil.ReadAll(f)
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	s := string(b)
 
 	if !strings.Contains(s, "this\nis\ntest") {
@@ -86,9 +82,7 @@ func TestNewCmdNewNote(t *testing.T) {
 	}
 
 	stdout, err := fake.String()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	stdout = strings.TrimSuffix(stdout, "\n")
 	if stdout != p {
 		t.Error("Output is not path to the file:", stdout)
@@ -142,7 +136,9 @@ func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
 	if err := cmd.Do(); err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(filepath.Join(cfg.HomePath, "cat"))
+	defer func() {
+		panicIfErr(os.RemoveAll(filepath.Join(cfg.HomePath, "cat")))
+	}()
 
 	p := filepath.Join(cfg.HomePath, "cat", "test3.md")
 	n, err := LoadNote(p, cfg)
@@ -167,9 +163,7 @@ func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
 	}
 
 	stdout, err := fake.String()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	stdout = strings.TrimSuffix(stdout, "\n")
 	if stdout != p {
 		t.Error("Output is not path to the file:", stdout)

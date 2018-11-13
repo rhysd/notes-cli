@@ -9,9 +9,7 @@ import (
 
 func TestCanonPathCanonicalize(t *testing.T) {
 	u, err := user.Current()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	h := u.HomeDir
 
 	p := filepath.Join(h, "foo", "bar")
@@ -29,9 +27,7 @@ func TestCanonPathCanonicalize(t *testing.T) {
 
 func TestCanonPathDoesNotCanonicalize(t *testing.T) {
 	u, err := user.Current()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	h := u.HomeDir
 
 	p := filepath.Join("foo", "bar")

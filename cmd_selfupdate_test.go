@@ -87,9 +87,7 @@ func TestSelfupdateUpdateSuccessfully(t *testing.T) {
 	}
 
 	exe, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	var buf bytes.Buffer
 	cmd := &SelfupdateCmd{

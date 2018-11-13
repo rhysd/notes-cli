@@ -16,9 +16,7 @@ import (
 
 func noteTestdataConfig() *Config {
 	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	home := filepath.Join(cwd, "testdata", "note")
 	return &Config{GitPath: "git", HomePath: home}
 }
@@ -134,9 +132,7 @@ func TestCreateNoteFile(t *testing.T) {
 	cfg := noteTestdataConfig()
 
 	check := func(n *Note, err error) *Note {
-		if err != nil {
-			panic(err)
-		}
+		panicIfErr(err)
 		return n
 	}
 
@@ -213,7 +209,7 @@ func TestCreateNoteFile(t *testing.T) {
 			if err := n.Create(); err != nil {
 				t.Fatal(err)
 			}
-			defer os.RemoveAll(p)
+			defer func() { panicIfErr(os.RemoveAll(p)) }()
 
 			if n.Created.IsZero() {
 				t.Fatal("Created date time was not set")
@@ -243,9 +239,7 @@ func TestNoteCreateFail(t *testing.T) {
 	cfg := noteTestdataConfig()
 
 	n, err := NewNote("fail", "", "create-already-exists.md", "this is title", cfg)
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	err = n.Create()
 	if err == nil {
@@ -260,9 +254,7 @@ func TestNoteCreateFail(t *testing.T) {
 func TestNoteOpenNoEditor(t *testing.T) {
 	cfg := &Config{GitPath: "git", HomePath: "."}
 	n, err := NewNote("cat", "", "foo", "title", cfg)
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	err = n.Open()
 	if err == nil {
 		t.Fatal("error did not occur")
@@ -276,15 +268,11 @@ func TestNoteOpenEditor(t *testing.T) {
 	cfg := noteTestdataConfig()
 
 	bin, err := exec.LookPath("true")
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	cfg.EditorPath = bin
 
 	n, err := NewNote("cat1", "", "foo", "title", cfg)
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	if err := n.Open(); err != nil {
 		t.Fatal(err)
 	}
@@ -294,15 +282,11 @@ func TestNoteOpenEditorFail(t *testing.T) {
 	cfg := noteTestdataConfig()
 
 	bin, err := exec.LookPath("false")
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	cfg.EditorPath = bin
 
 	n, err := NewNote("cat1", "", "foo", "title", cfg)
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	err = n.Open()
 	if err == nil {
@@ -316,9 +300,7 @@ func TestNoteOpenEditorFail(t *testing.T) {
 func TestNoteReadBodyN(t *testing.T) {
 	cfg := noteTestdataConfig()
 	must := func(n *Note, err error) *Note {
-		if err != nil {
-			panic(err)
-		}
+		panicIfErr(err)
 		return n
 	}
 
@@ -372,9 +354,7 @@ func TestNoteReadBodyNFailure(t *testing.T) {
 	for _, file := range []string{"missing-created", "missing-tags", "missing-category"} {
 		t.Run(file, func(t *testing.T) {
 			n, err := NewNote("fail", "", file, "this is title", cfg)
-			if err != nil {
-				panic(err)
-			}
+			panicIfErr(err)
 			_, err = n.ReadBodyN(20)
 			if err == nil {
 				t.Fatal("Error did not occur")
@@ -390,9 +370,7 @@ func TestLoadNote(t *testing.T) {
 	cmpopt := cmpopts.IgnoreFields(Note{}, "Config", "Created")
 	cfg := noteTestdataConfig()
 	created, err := time.Parse(time.RFC3339, "2018-10-30T11:37:45+09:00")
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	for _, tc := range []struct {
 		file  string
@@ -440,9 +418,7 @@ func TestLoadNote(t *testing.T) {
 			}
 
 			want, err := NewNote(cat, tc.tags, tc.file, tc.title, cfg)
-			if err != nil {
-				panic(err)
-			}
+			panicIfErr(err)
 
 			have, err := LoadNote(want.FilePath(), cfg)
 			if err != nil {

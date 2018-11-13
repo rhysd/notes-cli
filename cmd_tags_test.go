@@ -10,9 +10,7 @@ import (
 
 func TestTagsCmd(t *testing.T) {
 	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	cfg := &Config{
 		HomePath: filepath.Join(cwd, "testdata", "list", "normal"),
@@ -65,9 +63,7 @@ func TestTagsInvalidHome(t *testing.T) {
 
 func TestTagsInvalidCategory(t *testing.T) {
 	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	cfg := &Config{
 		HomePath: filepath.Join(cwd, "testdata", "list", "normal"),

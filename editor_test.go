@@ -12,9 +12,7 @@ func TestOpenEditor(t *testing.T) {
 	defer fake.Restore()
 
 	exe, err := exec.LookPath("echo")
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	cfg := &Config{
 		EditorPath: exe,
@@ -47,9 +45,7 @@ func TestEditorPathNotSet(t *testing.T) {
 
 func TestEditorExitError(t *testing.T) {
 	exe, err := exec.LookPath("false")
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	err = openEditor(&Config{EditorPath: exe})
 	if err == nil {

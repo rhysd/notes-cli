@@ -16,12 +16,8 @@ import (
 
 func testNewConfigForListCmd(subdir string) *Config {
 	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "list", subdir)}
-
-	return cfg
+	panicIfErr(err)
+	return &Config{HomePath: filepath.Join(cwd, "testdata", "list", subdir)}
 }
 
 func TestListCmd(t *testing.T) {
@@ -486,10 +482,8 @@ func TestListNotesVariousHomes(t *testing.T) {
 func TestListNoNote(t *testing.T) {
 	dir := "test-for-list-empty"
 	cfg := &Config{HomePath: dir}
-	if err := os.Mkdir(dir, 0755); err != nil {
-		panic(err)
-	}
-	defer os.RemoveAll(dir)
+	panicIfErr(os.Mkdir(dir, 0755))
+	defer func() { panicIfErr(os.RemoveAll(dir)) }()
 
 	for _, c := range []*ListCmd{
 		&ListCmd{},
@@ -568,15 +562,11 @@ func TestListBrokenNote(t *testing.T) {
 
 func TestListSortByModified(t *testing.T) {
 	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "modified-order")}
 
 	now := time.Now()
-	if err := os.Chtimes(filepath.Join(cfg.HomePath, "a", "2.md"), now, now); err != nil {
-		panic(err)
-	}
+	panicIfErr(os.Chtimes(filepath.Join(cfg.HomePath, "a", "2.md"), now, now))
 
 	var buf bytes.Buffer
 	cmd := &ListCmd{
@@ -669,9 +659,7 @@ func TestListCmdEditOption(t *testing.T) {
 	defer fake.Restore()
 
 	exe, err := exec.LookPath("echo")
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	cfg := testNewConfigForListCmd("normal")
 	cfg.EditorPath = exe
@@ -693,9 +681,7 @@ func TestListCmdEditOption(t *testing.T) {
 	}
 
 	stdout, err := fake.String()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	have := strings.Split(strings.TrimRight(stdout, "\n"), " ")
 	want := []string{}

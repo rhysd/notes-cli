@@ -10,9 +10,7 @@ import (
 
 func TestCategoriesCmd(t *testing.T) {
 	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	cfg := &Config{
 		HomePath: filepath.Join(cwd, "testdata", "list", "normal"),

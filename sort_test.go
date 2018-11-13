@@ -10,9 +10,7 @@ import (
 
 func TestSortNotes(t *testing.T) {
 	cfg, err := NewConfig()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	newNote := func(cat, file, created string) *Note {
 		t, err := time.Parse(time.RFC3339, created)
@@ -74,23 +72,19 @@ func TestSortNotes(t *testing.T) {
 
 func TestSortByModified(t *testing.T) {
 	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	cfg := &Config{HomePath: filepath.Join(cwd, "testdata", "modified-order")}
 
 	now := time.Now()
-	if err := os.Chtimes(filepath.Join(cfg.HomePath, "a", "2.md"), now, now); err != nil {
-		panic(err)
-	}
+	panicIfErr(os.Chtimes(filepath.Join(cfg.HomePath, "a", "2.md"), now, now))
 
 	notes := []*Note{}
-	if err := WalkNotes("", cfg, func(_ string, note *Note) error {
-		notes = append(notes, note)
-		return nil
-	}); err != nil {
-		panic(err)
-	}
+	panicIfErr(
+		WalkNotes("", cfg, func(_ string, note *Note) error {
+			notes = append(notes, note)
+			return nil
+		}),
+	)
 
 	if err := sortByModified(notes); err != nil {
 		t.Fatal(err)
@@ -99,9 +93,7 @@ func TestSortByModified(t *testing.T) {
 	mods := []time.Time{}
 	for _, n := range notes {
 		s, err := os.Stat(n.FilePath())
-		if err != nil {
-			panic(err)
-		}
+		panicIfErr(err)
 		mods = append(mods, s.ModTime())
 	}
 

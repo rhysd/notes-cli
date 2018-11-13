@@ -9,8 +9,7 @@ import (
 )
 
 func TestVersion(t *testing.T) {
-	_, err := semver.Parse(Version)
-	if err != nil {
+	if _, err := semver.Parse(Version); err != nil {
 		t.Fatal(err)
 	}
 }

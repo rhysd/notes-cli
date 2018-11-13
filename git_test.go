@@ -12,7 +12,7 @@ func TestGitExecSuccess(t *testing.T) {
 
 	out, err := g.Exec("status", "-b")
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal(err, out)
 	}
 	if !strings.HasPrefix(out, "On branch ") && !strings.HasPrefix(out, "HEAD detached at ") {
 		t.Fatal("Unexpected output:", out)
@@ -39,10 +39,8 @@ func TestGitIsOptional(t *testing.T) {
 
 func TestGitInitAddCommit(t *testing.T) {
 	dir := "test-tmp-dir-git"
-	if err := os.Mkdir(dir, 0755); err != nil {
-		panic(err)
-	}
-	defer os.RemoveAll(dir)
+	panicIfErr(os.Mkdir(dir, 0755))
+	defer func() { panicIfErr(os.RemoveAll(dir)) }()
 
 	g := NewGit(&Config{GitPath: "git", HomePath: dir})
 
@@ -66,9 +64,7 @@ func TestGitInitAddCommit(t *testing.T) {
 	}
 
 	f, err := os.Create(filepath.Join(dir, "tmp.txt"))
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	f.WriteString("hello\n")
 	f.Close()
 
@@ -77,9 +73,7 @@ func TestGitInitAddCommit(t *testing.T) {
 	}
 
 	out, err := g.Exec("status")
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 	if !strings.Contains(out, "new file:   tmp.txt") {
 		t.Fatal("file was not added. Status:", out)
 	}
@@ -89,9 +83,7 @@ func TestGitInitAddCommit(t *testing.T) {
 	}
 
 	out, err = g.Exec("log", "--oneline")
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
 
 	if !strings.Contains(out, "hello hello") {
 		t.Fatal("The commit does not exist in log:", out)
@@ -163,10 +155,8 @@ func TestGitOpFails(t *testing.T) {
 
 func TestGitInitTwice(t *testing.T) {
 	dir := "test-tmp-dir-git-init"
-	if err := os.Mkdir(dir, 0755); err != nil {
-		panic(err)
-	}
-	defer os.RemoveAll(dir)
+	panicIfErr(os.Mkdir(dir, 0755))
+	defer func() { panicIfErr(os.RemoveAll(dir)) }()
 
 	g := NewGit(&Config{GitPath: "git", HomePath: dir})
 	if err := g.Init(); err != nil {

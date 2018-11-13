@@ -10,7 +10,7 @@ guard :shell do
     when /_test\.go$/
       parent = File.dirname m[0]
       sources = Dir["#{parent}/*.go"].reject{|p| p.end_with? '_test.go'}.join(' ')
-      run "go test -v #{m[0]} #{sources}"
+      run "go test -v #{m[0]} #{sources} common_test.go"
       run "golint #{m[0]}"
     else
       run 'go build ./cmd/notes'

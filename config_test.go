@@ -106,29 +106,31 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 			}
 
 			g := testNewConfigEnvGuard()
-			defer g.Restore()
+			defer func() { panicIfErr(g.Restore()) }()
 
 			// Unset all environment variables at first
-			os.Unsetenv("NOTES_CLI_HOME")
-			os.Unsetenv("XDG_DATA_HOME")
+			panicIfErr(os.Unsetenv("NOTES_CLI_HOME"))
+			panicIfErr(os.Unsetenv("XDG_DATA_HOME"))
 
-			os.Setenv(tc.key, tc.val)
+			panicIfErr(os.Setenv(tc.key, tc.val))
 
 			c, err := NewConfig()
 			if err != nil {
 				t.Fatal(err)
 			}
-			defer os.RemoveAll(tc.val)
+			defer func() {
+				panicIfErr(os.RemoveAll(tc.val))
+			}()
 
 			if c.HomePath != tc.home {
 				t.Fatal("Home is unexpected:", c.HomePath, "wanted:", tc.home)
 			}
 			stat, err := os.Stat(c.HomePath)
 			if err != nil {
-				t.Fatal(err)
+				t.Fatal(err, c.HomePath)
 			}
 			if !stat.IsDir() {
-				t.Fatal("Directory was not created for home:", stat)
+				t.Fatal("Directory was not created for home:", c.HomePath, stat)
 			}
 		})
 	}
@@ -136,10 +138,10 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 
 func TestNewConfigGitAndEditorNotFound(t *testing.T) {
 	g := testNewConfigEnvGuard()
-	defer g.Restore()
+	defer func() { panicIfErr(g.Restore()) }()
 
-	os.Setenv("NOTES_CLI_GIT", "/path/to/unknown-command")
-	os.Setenv("NOTES_CLI_EDITOR", "/path/to/unknown-command")
+	panicIfErr(os.Setenv("NOTES_CLI_GIT", "/path/to/unknown-command"))
+	panicIfErr(os.Setenv("NOTES_CLI_EDITOR", "/path/to/unknown-command"))
 
 	c, err := NewConfig()
 	if err != nil {
