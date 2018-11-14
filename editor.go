@@ -17,9 +17,6 @@ func openEditor(config *Config, paths ...string) error {
 	if err != nil {
 		return errors.Wrap(err, "Cannot parse editor command line. Please check $NOTES_CLI_EDITOR or $EDITOR")
 	}
-	if len(cmdline) == 0 {
-		return errors.New("Editor is not set. To open note in editor, please set $NOTES_CLI_EDITOR or $EDITOR")
-	}
 
 	editor := cmdline[0]
 	args := make([]string, 0, len(cmdline)-1+len(paths))
