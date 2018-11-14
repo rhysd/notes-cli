@@ -1,10 +1,10 @@
 <a name="v1.3.0"></a>
 # [v1.3.0](https://github.com/rhysd/notes-cli/releases/tag/v1.3.0) - 14 Nov 2018
 
-- New: Refer `$EDITOR` environment variable when `$NOTES_CLI_EDITOR` is not set
-- Improve: Allow `$NOTES_CLI_EDITOR` to have options such as `"vim -g"`. Previously only command and path could be specified like `"code"` or `"/path/to/emacs"`
-- Improve: Add more documents
-- Fix: Add/Fix some tests
+- **New:** Refer `$EDITOR` environment variable when `$NOTES_CLI_EDITOR` is not set
+- **Improve:** Allow `$NOTES_CLI_EDITOR` to have options such as `"vim -g"`. Previously only command and path could be specified like `"code"` or `"/path/to/emacs"`
+- **Improve:** Add more documents
+- **Fix:** Add/Fix some tests
 
 [Changes][v1.3.0]
 
@@ -12,11 +12,11 @@
 <a name="v1.2.0"></a>
 # [v1.2.0](https://github.com/rhysd/notes-cli/releases/tag/v1.2.0) - 09 Nov 2018
 
-- New: Enable to put a template file for notes per category
-- New: Enable to hide metadata by surrounding it with `<!-- ... -->` comment
-- Fix: Improve and fix descriptions of commands in help texts
-- Fix: Improve migration script
-- Fix: Improve API documents
+- **New:** Enable to put a template file for notes per category
+- **New:** Enable to hide metadata by surrounding it with `<!-- ... -->` comment
+- **Fix:** Improve and fix descriptions of commands in help texts
+- **Fix:** Improve migration script
+- **Fix:** Improve API documents
 
 [Changes][v1.2.0]
 
@@ -51,9 +51,9 @@ By 2., you can add `<hr/>` after metadata to separate your list from metadata:
 ```markdown
 Shopping
 =======
-- Category: memo
-- Tags:
-- Created: 2018-11-6T20:36:00+09:00
+- **Category:** memo
+- **Tags:**
+- **Created:** 2018-11-6T20:36:00+09:00
 ----------
 
 - Milk
