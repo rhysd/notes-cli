@@ -15,8 +15,8 @@ func TestOpenEditor(t *testing.T) {
 	panicIfErr(err)
 
 	cfg := &Config{
-		EditorPath: exe,
-		HomePath:   ".",
+		EditorCmd: exe,
+		HomePath:  ".",
 	}
 
 	if err := openEditor(cfg, "foo", "bar"); err != nil {
@@ -47,11 +47,11 @@ func TestEditorExitError(t *testing.T) {
 	exe, err := exec.LookPath("false")
 	panicIfErr(err)
 
-	err = openEditor(&Config{EditorPath: exe})
+	err = openEditor(&Config{EditorCmd: exe})
 	if err == nil {
 		t.Fatal("Error did not occur")
 	}
-	if !strings.Contains(err.Error(), "Editor command did not exit successfully") {
+	if !strings.Contains(err.Error(), "did not exit successfully") {
 		t.Fatal("Unexpected error:", err)
 	}
 }

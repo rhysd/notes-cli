@@ -37,14 +37,14 @@ func (cmd *ConfigCmd) Do() error {
 			"HOME=%s\nGIT=%s\nEDITOR=%s\n",
 			cmd.Config.HomePath,
 			cmd.Config.GitPath,
-			cmd.Config.EditorPath,
+			cmd.Config.EditorCmd,
 		)
 	case "home":
 		fmt.Fprintln(cmd.Out, cmd.Config.HomePath)
 	case "git":
 		fmt.Fprintln(cmd.Out, cmd.Config.GitPath)
 	case "editor":
-		fmt.Fprintln(cmd.Out, cmd.Config.EditorPath)
+		fmt.Fprintln(cmd.Out, cmd.Config.EditorCmd)
 	default:
 		return errors.Errorf("Unknown config name '%s'", cmd.Name)
 	}

@@ -662,7 +662,7 @@ func TestListCmdEditOption(t *testing.T) {
 	panicIfErr(err)
 
 	cfg := testNewConfigForListCmd("normal")
-	cfg.EditorPath = exe
+	cfg.EditorCmd = exe
 
 	var buf bytes.Buffer
 	cmd := &ListCmd{

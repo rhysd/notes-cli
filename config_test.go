@@ -49,8 +49,8 @@ func TestNewDefaultConfig(t *testing.T) {
 			t.Fatal("Git path should not be detected:", c.GitPath)
 		}
 	}
-	if c.EditorPath != "" {
-		t.Fatal("Editor path should be empty by default:", c.EditorPath)
+	if c.EditorCmd != "" {
+		t.Fatal("Editor path should be empty by default:", c.EditorCmd)
 	}
 }
 
@@ -74,8 +74,8 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 		t.Fatal("git path is unexpected:", c.GitPath, "wanted:", ls)
 	}
 
-	if c.EditorPath != ls {
-		t.Fatal("Editor is unexpected:", c.EditorPath, "wanted:", ls)
+	if c.EditorCmd != ls {
+		t.Fatal("Editor is unexpected:", c.EditorCmd, "wanted:", ls)
 	}
 
 	os.Unsetenv("NOTES_CLI_EDITOR")
@@ -86,8 +86,8 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if c.EditorPath != ls {
-		t.Fatal("Editor is unexpected:", c.EditorPath, "wanted:", ls)
+	if c.EditorCmd != ls {
+		t.Fatal("Editor is unexpected:", c.EditorCmd, "wanted:", ls)
 	}
 }
 
@@ -145,12 +145,11 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 	}
 }
 
-func TestNewConfigGitAndEditorNotFound(t *testing.T) {
+func TestNewConfigGitNotFound(t *testing.T) {
 	g := testNewConfigEnvGuard()
 	defer func() { panicIfErr(g.Restore()) }()
 
 	panicIfErr(os.Setenv("NOTES_CLI_GIT", "/path/to/unknown-command"))
-	panicIfErr(os.Setenv("NOTES_CLI_EDITOR", "/path/to/unknown-command"))
 
 	c, err := NewConfig()
 	if err != nil {
@@ -159,9 +158,5 @@ func TestNewConfigGitAndEditorNotFound(t *testing.T) {
 
 	if c.GitPath != "" {
 		t.Fatal("git path should be empty:", c.GitPath)
-	}
-
-	if c.EditorPath != "" {
-		t.Fatal("editor path should be empty:", c.EditorPath)
 	}
 }
