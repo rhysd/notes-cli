@@ -1,3 +1,14 @@
+<a name="v1.3.0"></a>
+# [v1.3.0](https://github.com/rhysd/notes-cli/releases/tag/v1.3.0) - 14 Nov 2018
+
+- New: Refer `$EDITOR` environment variable when `$NOTES_CLI_EDITOR` is not set
+- Improve: Allow `$NOTES_CLI_EDITOR` to have options such as `"vim -g"`. Previously only command and path could be specified like `"code"` or `"/path/to/emacs"`
+- Improve: Add more documents
+- Fix: Add/Fix some tests
+
+[Changes][v1.3.0]
+
+
 <a name="v1.2.0"></a>
 # [v1.2.0](https://github.com/rhysd/notes-cli/releases/tag/v1.2.0) - 09 Nov 2018
 
@@ -77,6 +88,7 @@ https://github.com/rhysd/notes-cli/blob/master/README.md
 [Changes][v1.0.0]
 
 
+[v1.3.0]: https://github.com/rhysd/notes-cli/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/rhysd/notes-cli/compare/v1.1.2...v1.2.0
 [v1.1.2]: https://github.com/rhysd/notes-cli/compare/v1.1.1...v1.1.2
 [v1.1.1]: https://github.com/rhysd/notes-cli/compare/v1.1.0...v1.1.1
