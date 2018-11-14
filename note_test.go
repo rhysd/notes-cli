@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/kballard/go-shellquote"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -270,6 +271,7 @@ func TestNoteOpenEditor(t *testing.T) {
 
 	bin, err := exec.LookPath("true")
 	panicIfErr(err)
+	bin = shellquote.Join(bin) // On Windows, it may contain 'Program Files'
 	cfg.EditorCmd = bin
 
 	n, err := NewNote("cat1", "", "foo", "title", cfg)
@@ -284,6 +286,7 @@ func TestNoteOpenEditorFail(t *testing.T) {
 
 	bin, err := exec.LookPath("false")
 	panicIfErr(err)
+	bin = shellquote.Join(bin) // On Windows, it may contain 'Program Files'
 	cfg.EditorCmd = bin
 
 	n, err := NewNote("cat1", "", "foo", "title", cfg)

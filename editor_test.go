@@ -66,20 +66,11 @@ func TestOpenEditor(t *testing.T) {
 	}
 }
 
-func TestEditorExitError(t *testing.T) {
+func TestEditorInvalidEditor(t *testing.T) {
 	exe, err := exec.LookPath("false")
 	panicIfErr(err)
+	exe = shellquote.Join(exe)
 
-	err = openEditor(&Config{EditorCmd: exe})
-	if err == nil {
-		t.Fatal("Error did not occur")
-	}
-	if !strings.Contains(err.Error(), "did not exit successfully") {
-		t.Fatal("Unexpected error:", err)
-	}
-}
-
-func TestEditorInvalidEditor(t *testing.T) {
 	for _, tc := range []struct {
 		what  string
 		value string
@@ -93,7 +84,7 @@ func TestEditorInvalidEditor(t *testing.T) {
 		{
 			what:  "empty command",
 			value: "''",
-			want:  "no such file or directory",
+			want:  "did not exit successfully",
 		},
 		{
 			what:  "unterminated single quote",
@@ -104,6 +95,16 @@ func TestEditorInvalidEditor(t *testing.T) {
 			what:  "unterminated double quote",
 			value: "vim \"-g",
 			want:  "Cannot parse editor command line",
+		},
+		{
+			what:  "executable exit failure",
+			value: exe,
+			want:  "did not exit successfully",
+		},
+		{
+			what:  "executable does not exist",
+			value: "unknown-command-which-does-not-exist",
+			want:  "did not exit successfully",
 		},
 	} {
 		t.Run(tc.want, func(t *testing.T) {

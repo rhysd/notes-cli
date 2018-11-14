@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"github.com/kballard/go-shellquote"
 	"github.com/rhysd/go-tmpenv"
 	"os"
 	"os/exec"
@@ -59,11 +60,10 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 	defer func() { panicIfErr(g.Restore()) }()
 
 	ls, err := exec.LookPath("ls")
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
+	qls := shellquote.Join(ls) // On Windows, it may contain 'Program Files'
 	os.Setenv("NOTES_CLI_GIT", ls)
-	os.Setenv("NOTES_CLI_EDITOR", ls)
+	os.Setenv("NOTES_CLI_EDITOR", qls)
 
 	c, err := NewConfig()
 	if err != nil {
@@ -74,20 +74,20 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 		t.Fatal("git path is unexpected:", c.GitPath, "wanted:", ls)
 	}
 
-	if c.EditorCmd != ls {
-		t.Fatal("Editor is unexpected:", c.EditorCmd, "wanted:", ls)
+	if c.EditorCmd != qls {
+		t.Fatal("Editor is unexpected:", c.EditorCmd, "wanted:", qls)
 	}
 
 	os.Unsetenv("NOTES_CLI_EDITOR")
-	os.Setenv("EDITOR", ls)
+	os.Setenv("EDITOR", qls)
 
 	c, err = NewConfig()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if c.EditorCmd != ls {
-		t.Fatal("Editor is unexpected:", c.EditorCmd, "wanted:", ls)
+	if c.EditorCmd != qls {
+		t.Fatal("Editor is unexpected:", c.EditorCmd, "wanted:", qls)
 	}
 }
 

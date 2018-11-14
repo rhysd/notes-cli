@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/fatih/color"
+	"github.com/kballard/go-shellquote"
 	"github.com/rhysd/go-fakeio"
 	"os"
 	"os/exec"
@@ -660,6 +661,7 @@ func TestListCmdEditOption(t *testing.T) {
 
 	exe, err := exec.LookPath("echo")
 	panicIfErr(err)
+	exe = shellquote.Join(exe) // On Windows it may contain 'Program Files' so quoting is necessary
 
 	cfg := testNewConfigForListCmd("normal")
 	cfg.EditorCmd = exe
