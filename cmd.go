@@ -7,11 +7,16 @@ import (
 	"os"
 )
 
-// Cmd is an interface for subcommands of notes command
-type Cmd interface {
+// parsableCmd is an interface for subcommands of notes command parsed from command line arguments
+type parsableCmd interface {
 	Do() error
 	defineCLI(*kingpin.Application)
 	matchesCmdline(string) bool
+}
+
+// Cmd is an interface for subcommands of notes command
+type Cmd interface {
+	Do() error
 }
 
 // Version is version string of notes command. It conforms semantic versioning
@@ -35,7 +40,7 @@ func ParseCmd(args []string) (Cmd, error) {
 
 	colorStdout := colorable.NewColorableStdout()
 
-	cmds := []Cmd{
+	cmds := []parsableCmd{
 		&NewCmd{Config: c},
 		&ListCmd{Config: c, Out: colorStdout},
 		&CategoriesCmd{Config: c, Out: os.Stdout},
@@ -51,6 +56,9 @@ func ParseCmd(args []string) (Cmd, error) {
 
 	parsed, err := cli.Parse(args)
 	if err != nil {
+		if ext, ok := NewExternalCmd(err, args); ok {
+			return ext, nil
+		}
 		return nil, err
 	}
 

@@ -5,6 +5,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"strings"
 	"testing"
 )
 
@@ -35,7 +36,7 @@ func TestParseArgs(t *testing.T) {
 
 	for _, tc := range []struct {
 		args []string
-		want Cmd
+		want parsableCmd
 	}{
 		{
 			args: []string{"config", "home"},
@@ -145,7 +146,11 @@ func TestParseGlobalColorFlags(t *testing.T) {
 }
 
 func TestParseFailure(t *testing.T) {
-	if _, err := ParseCmd([]string{"unknown-command"}); err == nil {
+	_, err := ParseCmd([]string{"--unknown-flag"})
+	if err == nil {
 		t.Fatal("Unknown command did not cause an error")
+	}
+	if !strings.Contains(err.Error(), "unknown long flag") {
+		t.Fatal("Unexpected error:", err)
 	}
 }
