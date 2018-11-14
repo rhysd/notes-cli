@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/kballard/go-shellquote"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -270,7 +271,8 @@ func TestNoteOpenEditor(t *testing.T) {
 
 	bin, err := exec.LookPath("true")
 	panicIfErr(err)
-	cfg.EditorPath = bin
+	bin = shellquote.Join(bin) // On Windows, it may contain 'Program Files'
+	cfg.EditorCmd = bin
 
 	n, err := NewNote("cat1", "", "foo", "title", cfg)
 	panicIfErr(err)
@@ -284,7 +286,8 @@ func TestNoteOpenEditorFail(t *testing.T) {
 
 	bin, err := exec.LookPath("false")
 	panicIfErr(err)
-	cfg.EditorPath = bin
+	bin = shellquote.Join(bin) // On Windows, it may contain 'Program Files'
+	cfg.EditorCmd = bin
 
 	n, err := NewNote("cat1", "", "foo", "title", cfg)
 	panicIfErr(err)
@@ -293,7 +296,7 @@ func TestNoteOpenEditorFail(t *testing.T) {
 	if err == nil {
 		t.Fatal("Error did not occur")
 	}
-	if !strings.Contains(err.Error(), "Editor command did not exit successfully") {
+	if !strings.Contains(err.Error(), "did not exit successfully") {
 		t.Fatal("Unexpected error:", err)
 	}
 }

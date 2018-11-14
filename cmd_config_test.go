@@ -8,9 +8,9 @@ import (
 
 func TestConfigCmd(t *testing.T) {
 	cfg := &Config{
-		HomePath:   "/path/to/home",
-		GitPath:    "/path/to/git",
-		EditorPath: "vim",
+		HomePath:  "/path/to/home",
+		GitPath:   "/path/to/git",
+		EditorCmd: "vim",
 	}
 	for _, tc := range []struct {
 		name string
@@ -57,9 +57,9 @@ func TestConfigCmd(t *testing.T) {
 
 func TestConfigCmdError(t *testing.T) {
 	cfg := &Config{
-		HomePath:   "/path/to/home",
-		GitPath:    "/path/to/git",
-		EditorPath: "vim",
+		HomePath:  "/path/to/home",
+		GitPath:   "/path/to/git",
+		EditorCmd: "vim",
 	}
 	c := ConfigCmd{
 		Config: cfg,

@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"github.com/kballard/go-shellquote"
 	"github.com/rhysd/go-tmpenv"
 	"os"
 	"os/exec"
@@ -49,8 +50,8 @@ func TestNewDefaultConfig(t *testing.T) {
 			t.Fatal("Git path should not be detected:", c.GitPath)
 		}
 	}
-	if c.EditorPath != "" {
-		t.Fatal("Editor path should be empty by default:", c.EditorPath)
+	if c.EditorCmd != "" {
+		t.Fatal("Editor path should be empty by default:", c.EditorCmd)
 	}
 }
 
@@ -59,11 +60,10 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 	defer func() { panicIfErr(g.Restore()) }()
 
 	ls, err := exec.LookPath("ls")
-	if err != nil {
-		panic(err)
-	}
+	panicIfErr(err)
+	qls := shellquote.Join(ls) // On Windows, it may contain 'Program Files'
 	os.Setenv("NOTES_CLI_GIT", ls)
-	os.Setenv("NOTES_CLI_EDITOR", ls)
+	os.Setenv("NOTES_CLI_EDITOR", qls)
 
 	c, err := NewConfig()
 	if err != nil {
@@ -74,20 +74,20 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 		t.Fatal("git path is unexpected:", c.GitPath, "wanted:", ls)
 	}
 
-	if c.EditorPath != ls {
-		t.Fatal("Editor is unexpected:", c.EditorPath, "wanted:", ls)
+	if c.EditorCmd != qls {
+		t.Fatal("Editor is unexpected:", c.EditorCmd, "wanted:", qls)
 	}
 
 	os.Unsetenv("NOTES_CLI_EDITOR")
-	os.Setenv("EDITOR", ls)
+	os.Setenv("EDITOR", qls)
 
 	c, err = NewConfig()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if c.EditorPath != ls {
-		t.Fatal("Editor is unexpected:", c.EditorPath, "wanted:", ls)
+	if c.EditorCmd != qls {
+		t.Fatal("Editor is unexpected:", c.EditorCmd, "wanted:", qls)
 	}
 }
 
@@ -145,12 +145,11 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 	}
 }
 
-func TestNewConfigGitAndEditorNotFound(t *testing.T) {
+func TestNewConfigGitNotFound(t *testing.T) {
 	g := testNewConfigEnvGuard()
 	defer func() { panicIfErr(g.Restore()) }()
 
 	panicIfErr(os.Setenv("NOTES_CLI_GIT", "/path/to/unknown-command"))
-	panicIfErr(os.Setenv("NOTES_CLI_EDITOR", "/path/to/unknown-command"))
 
 	c, err := NewConfig()
 	if err != nil {
@@ -159,9 +158,5 @@ func TestNewConfigGitAndEditorNotFound(t *testing.T) {
 
 	if c.GitPath != "" {
 		t.Fatal("git path should be empty:", c.GitPath)
-	}
-
-	if c.EditorPath != "" {
-		t.Fatal("editor path should be empty:", c.EditorPath)
 	}
 }

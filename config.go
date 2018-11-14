@@ -19,10 +19,11 @@ type Config struct {
 	// Otherwise, `git` is used by default. This is optional and can be empty. When empty, some command
 	// and functionality which require Git don't work
 	GitPath string
-	// EditorPath is a file path to executable of your favorite editor. If $NOTES_CLI_EDITOR is set, it is used.
-	// Otherwise, this value will be empty. When empty, some functionality which requires an editor to open note
-	// doesn't work
-	EditorPath string
+	// EditorCmd is a command of your favorite editor. If $NOTES_CLI_EDITOR is set, it is used. This value is
+	// similar to $EDITOR environment variable and can contain command arguments like "vim -g". Otherwise,
+	// this value will be empty. When empty, some functionality which requires an editor to open note doesn't
+	// work
+	EditorCmd string
 }
 
 func homePath() (string, error) {
@@ -62,12 +63,10 @@ func gitPath() string {
 	return exe
 }
 
-func editorPath() string {
+func editorCmd() string {
 	for _, key := range []string{"NOTES_CLI_EDITOR", "EDITOR"} {
 		if env := os.Getenv(key); env != "" {
-			if exe, err := exec.LookPath(env); err == nil {
-				return exe
-			}
+			return env
 		}
 	}
 	return ""
@@ -87,5 +86,5 @@ func NewConfig() (*Config, error) {
 		return nil, errors.Wrapf(err, "Could not create home '%s'", h)
 	}
 
-	return &Config{h, gitPath(), editorPath()}, nil
+	return &Config{h, gitPath(), editorCmd()}, nil
 }
