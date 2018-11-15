@@ -279,6 +279,27 @@ weekly-meeting-2018-11-07
 ```
 
 
+### Extend `notes` command by adding new subcommands
+
+Yes. Like [Git](https://git-scm.com/), `notes` command tries to run external subcommands when user
+specifies unknown subcommand. For example, when entering `notes foo`, `notes` command notices that
+it is not a built-in subcommand. Then it attempts to execute `notes-foo` with the same arguments.
+
+Let's say following script is put in your `$PATH` as `notes-hello`.
+
+```sh
+#!/bin/sh
+echo "Hello! $*"
+```
+
+And hit `notes hello`. It outputs `Hello! hello` since given argument `hello` is simply passed to
+executed underlying subcommand.
+So, when hit `notes --no-color hello --foo`, it outputs `Hello! --no-color hello --foo`. By forwarding
+all arguments, subcommand can refer global options specified before subcommand.
+
+This external subcommand support is useful when you want to extend `notes` functionality to fit your
+usage. For example, you can create your own command to upload your blog notes to your blog services.
+
 ### Save notes to Git repository
 
 Finally you can save your notes as revision of Git repository.
@@ -420,6 +441,8 @@ Categories cannot be nested. Instead, you can define your own nested naming rule
 For example `blog-personal-public` can indicate blog entries which is personal and publicly posted.
 Other categories would be named like `blog-personal-private`, `blog-company-public`, ...
 It's up to you.
+
+This may be changed in the future.
 
 
 ### I don't want to show the metadata in note. Can I hide them?
