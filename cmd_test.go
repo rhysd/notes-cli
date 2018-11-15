@@ -159,7 +159,7 @@ func TestParseFailure(t *testing.T) {
 	}
 }
 
-func TestExternalCommand(t *testing.T) {
+func TestParseExternalCommand(t *testing.T) {
 	bindir := testExternalCommandBinaryDir("test", t)
 	tmp := tmpenv.New("PATH")
 	defer tmp.Restore()

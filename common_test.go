@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -26,7 +27,11 @@ func testExternalCommandBinaryDir(name string, t *testing.T) string {
 	cwd, err := os.Getwd()
 	panicIfErr(err)
 	pkg := "./testdata/external/notes-external-" + name
-	exe := filepath.Join(cwd, filepath.FromSlash(pkg), "notes-external-test")
+	exeFile := "notes-external-" + name
+	if runtime.GOOS == "windows" {
+		exeFile += ".exe"
+	}
+	exe := filepath.Join(cwd, filepath.FromSlash(pkg), exeFile)
 	if _, err := os.Stat(exe); err != nil {
 		c := exec.Command("go", "build", "-o", exe, pkg)
 		out, err := c.CombinedOutput()

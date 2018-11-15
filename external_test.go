@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -29,7 +30,13 @@ func TestNewExternalCmdOK(t *testing.T) {
 		if !ok {
 			t.Fatal("subcommand was not extracted", name)
 		}
-		if want, have := "notes-"+name, filepath.Base(c.ExePath); have != want {
+
+		want := "notes-" + name
+		if runtime.GOOS == "windows" {
+			want += ".bat"
+		}
+
+		if have := filepath.Base(c.ExePath); have != want {
 			t.Fatal("Wanted command name", want, "but have", have)
 		}
 		if !reflect.DeepEqual(args, c.Args) {
@@ -109,7 +116,7 @@ func TestRunExternalCommandExitFailure(t *testing.T) {
 
 	panicIfErr(os.Setenv("PATH", os.Getenv("PATH")+string(os.PathListSeparator)+bindir))
 
-	cmd, ok := NewExternalCmd(errors.New(`expected command but got "external-test"`), []string{})
+	cmd, ok := NewExternalCmd(errors.New(`expected command but got "external-error"`), []string{})
 	if !ok {
 		t.Fatal("Subcommand was not found")
 	}
@@ -118,7 +125,12 @@ func TestRunExternalCommandExitFailure(t *testing.T) {
 	if err == nil {
 		t.Fatal("Error did not occur")
 	}
-	if !strings.Contains(err.Error(), "External command 'notes-external-test' did not exit successfully") {
+	exe := "notes-external-error"
+	if runtime.GOOS == "windows" {
+		exe += ".exe"
+	}
+	want := fmt.Sprintf("External command '%s' did not exit successfully", exe)
+	if !strings.Contains(err.Error(), want) {
 		t.Fatal("Unexpected error:", err)
 	}
 }
