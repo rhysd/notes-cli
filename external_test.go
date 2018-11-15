@@ -1,0 +1,124 @@
+package notes
+
+import (
+	"errors"
+	"fmt"
+	"github.com/rhysd/go-fakeio"
+	"github.com/rhysd/go-tmpenv"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+	"testing"
+)
+
+func TestNewExternalCmdOK(t *testing.T) {
+	cwd, err := os.Getwd()
+	panicIfErr(err)
+	bindir := filepath.Join(cwd, "testdata", "external", "bin-name")
+	tmp := tmpenv.New("PATH")
+	defer tmp.Restore()
+
+	panicIfErr(os.Setenv("PATH", os.Getenv("PATH")+string(os.PathListSeparator)+bindir))
+
+	for _, name := range []string{
+		"foo", "foo-bar", "foo_bar", "-", "_", "-foo", "bar_",
+	} {
+		args := []string{"--foo", "xxx", "-b"}
+		c, ok := NewExternalCmd(fmt.Errorf(`expected command but got "%s"`, name), args)
+		if !ok {
+			t.Fatal("subcommand was not extracted", name)
+		}
+		if want, have := "notes-"+name, filepath.Base(c.ExePath); have != want {
+			t.Fatal("Wanted command name", want, "but have", have)
+		}
+		if !reflect.DeepEqual(args, c.Args) {
+			t.Fatal("Passed args are unexpected:", c.Args)
+		}
+	}
+}
+
+func TestNewExternalCmdSubcmdNotFound(t *testing.T) {
+	for _, tc := range []struct {
+		what string
+		msg  string
+	}{
+		{
+			what: "subcommand is not contained in parse error message",
+			msg:  "unknown long flag '--foo'",
+		},
+		{
+			what: "unknown subcommand",
+			msg:  `expected command but got "unknown-subcommand-specified"`,
+		},
+		{
+			what: "invalid subcommand name",
+			msg:  `expected command but got "./foo"`,
+		},
+	} {
+		t.Run(tc.what, func(t *testing.T) {
+			c, ok := NewExternalCmd(errors.New(tc.msg), []string{})
+			if ok {
+				t.Fatalf("Error did not occur: %#v", c)
+			}
+		})
+	}
+}
+
+func TestRunExternalCommandOK(t *testing.T) {
+	bindir := testExternalCommandBinaryDir("test", t)
+	tmp := tmpenv.New("PATH")
+	defer tmp.Restore()
+
+	panicIfErr(os.Setenv("PATH", os.Getenv("PATH")+string(os.PathListSeparator)+bindir))
+
+	args := []string{"-A", "external-test", "--foo", "xxx", "-b"}
+	cmd, ok := NewExternalCmd(errors.New(`expected command but got "external-test"`), args)
+	if !ok {
+		t.Fatal("Subcommand was not found")
+	}
+
+	fake := fakeio.Stdout().Stderr()
+	defer fake.Restore()
+
+	if err := cmd.Do(); err != nil {
+		t.Fatal(err)
+	}
+
+	out, err := fake.String()
+	panicIfErr(err)
+
+	if !strings.Contains(out, "Output from stdout") {
+		t.Fatal("Output to stdout is unexpected:", out)
+	}
+
+	if !strings.Contains(out, "Output from stderr") {
+		t.Fatal("Output to stderr is unexpected:", out)
+	}
+
+	want := fmt.Sprintln(args)
+	if !strings.Contains(out, want) {
+		t.Fatal("Passed arguments to external command is unexpected. Wanted", want, "in output but have output", out)
+	}
+}
+
+func TestRunExternalCommandExitFailure(t *testing.T) {
+	bindir := testExternalCommandBinaryDir("error", t)
+	tmp := tmpenv.New("PATH")
+	defer tmp.Restore()
+
+	panicIfErr(os.Setenv("PATH", os.Getenv("PATH")+string(os.PathListSeparator)+bindir))
+
+	cmd, ok := NewExternalCmd(errors.New(`expected command but got "external-test"`), []string{})
+	if !ok {
+		t.Fatal("Subcommand was not found")
+	}
+
+	err := cmd.Do()
+	if err == nil {
+		t.Fatal("Error did not occur")
+	}
+	if !strings.Contains(err.Error(), "External command 'notes-external-test' did not exit successfully") {
+		t.Fatal("Unexpected error:", err)
+	}
+}

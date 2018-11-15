@@ -4,9 +4,11 @@ import (
 	"github.com/pkg/errors"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 )
 
+// Note: External command name must consist of alphabets, numbers, dash '-' and underscore '_'.
 var (
 	reExtractCmdName = regexp.MustCompile(`^expected command but got "([[:alnum:]_-]+)"$`)
 )
@@ -25,7 +27,11 @@ func (cmd *ExternalCmd) Do() error {
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	c.Stdin = os.Stdin
-	return errors.Wrapf(c.Run(), "External command '%s' did not exit successfully", cmd.ExePath)
+	if err := c.Run(); err != nil {
+		name := filepath.Base(cmd.ExePath)
+		return errors.Wrapf(err, "External command '%s' did not exit successfully", name)
+	}
+	return nil
 }
 
 // NewExternalCmd creates ExternalCmd instance from given error and arguments. The error must be parse
