@@ -78,7 +78,7 @@ func TestNewCmdNewNote(t *testing.T) {
 		if s, err := os.Stat(dotgit); err != nil || !s.IsDir() {
 			t.Fatal(".git directory was not created. `git init` did not run:", err)
 		}
-		defer os.RemoveAll(dotgit)
+		os.RemoveAll(dotgit)
 	}
 
 	stdout, err := fake.String()
@@ -116,6 +116,7 @@ func TestNewCmdNewNote(t *testing.T) {
 		if s, err := os.Stat(dotgit); err != nil || !s.IsDir() {
 			t.Fatal(".git directory was not created. `git init` did not run:", err)
 		}
+		defer os.RemoveAll(dotgit)
 	}
 }
 
@@ -137,6 +138,7 @@ func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(filepath.Join(cfg.HomePath, "cat"))
+	defer os.RemoveAll(filepath.Join(cfg.HomePath, ".git"))
 
 	p := filepath.Join(cfg.HomePath, "cat", "test3.md")
 	n, err := LoadNote(p, cfg)

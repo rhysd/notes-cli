@@ -279,6 +279,23 @@ weekly-meeting-2018-11-07
 ```
 
 
+### Save notes to Git repository
+
+Finally you can save your notes as revision of Git repository.
+
+```
+$ notes save
+```
+
+It saves all your notes under your `notes-cli` directory as Git repository.
+It adds all changes in notes and automatically creates commit.
+
+By default, it only adds and commits your notes to the repository. But if you set `origin` remote to
+the repository, it automatically pushes the notes to the remote.
+
+For more details, please see `notes save --help`.
+
+
 ### Extend `notes` command by adding new subcommands
 
 Yes. Like [Git](https://git-scm.com/), `notes` command tries to run external subcommands when user
@@ -299,22 +316,6 @@ all arguments, subcommand can refer global options specified before subcommand.
 
 This external subcommand support is useful when you want to extend `notes` functionality to fit your
 usage. For example, you can create your own command to upload your blog notes to your blog services.
-
-### Save notes to Git repository
-
-Finally you can save your notes as revision of Git repository.
-
-```
-$ notes save
-```
-
-It saves all your notes under your `notes-cli` directory as Git repository.
-It adds all changes in notes and automatically creates commit.
-
-By default, it only adds and commits your notes to the repository. But if you set `origin` remote to
-the repository, it automatically pushes the notes to the remote.
-
-For more details, please see `notes save --help`.
 
 
 ### Shell Completions
@@ -463,6 +464,32 @@ Body
 
 The closing comment `-->` is not included in note body. Commented metadata are not rendered and read
 only by `notes` command.
+
+
+### Can I hide metadata by default?
+
+Yes. When `.template.md` starts with `-->` (closing comment), `notes` automatically consider that you
+expect to hide metadata and insert `<!--` proper position.
+
+For example, if you have `category1/.template.md`,
+
+```markdown
+-->
+
+```
+
+`notes new` will create a new note as follows:
+
+```markdown
+some-title
+==========
+<!--
+- Category: category1
+- Tags:
+- Created: 2018-11-15T23:14:27+09:00
+-->
+
+```
 
 
 ### How image resources are managed?

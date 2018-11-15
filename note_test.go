@@ -197,10 +197,39 @@ func TestCreateNoteFile(t *testing.T) {
 				- Category: with-template
 				- Tags: 
 				- Created: {{created}}
+				!!!!!!!
+				This text was inserted via template
+				!!!!!!!
+				`),
+		},
+		{
+			note: check(NewNote("with-template2", "", "create-with-template", "this is title", cfg)),
+			want: heredoc(`
+				this is title
+				=============
+				- Category: with-template2
+				- Tags: 
+				- Created: {{created}}
+				-------------
 				
 				!!!!!!!
 				This text was inserted via template
 				!!!!!!!
+				`),
+		},
+		{
+			note: check(NewNote("with-template-comment-metadata", "", "create-with-template", "this is title", cfg)),
+			want: heredoc(`
+				this is title
+				=============
+				<!--
+				- Category: with-template-comment-metadata
+				- Tags: 
+				- Created: {{created}}
+				-->
+				-------------
+				
+				Metadata is commented out since template starts with '-->'
 				`),
 		},
 	} {

@@ -60,6 +60,13 @@ func (note *Note) RelFilePath() string {
 // Create creates a file of the note. When title is empty, file name omitting file extension is used
 // for it. This function will fail when the file is already existing.
 func (note *Note) Create() error {
+	d := note.DirPath()
+
+	var template []byte
+	if b, err := ioutil.ReadFile(filepath.Join(d, ".template.md")); err == nil && len(b) > 0 {
+		template = b
+	}
+
 	var b bytes.Buffer
 
 	// Write title
@@ -70,12 +77,23 @@ func (note *Note) Create() error {
 	b.WriteString(title + "\n")
 	b.WriteString(strings.Repeat("=", len(title)) + "\n")
 
+	if template != nil && bytes.HasPrefix(template, []byte("-->")) {
+		// User expects metadata to be commented out. Start to surround metadata with comment
+		b.WriteString("<!--\n")
+	}
+
 	// Write metadata
 	fmt.Fprintf(&b, "- Category: %s\n", note.Category)
 	fmt.Fprintf(&b, "- Tags: %s\n", strings.Join(note.Tags, ", "))
-	fmt.Fprintf(&b, "- Created: %s\n\n", note.Created.Format(time.RFC3339))
+	fmt.Fprintf(&b, "- Created: %s\n", note.Created.Format(time.RFC3339))
 
-	d := note.DirPath()
+	if template != nil {
+		b.Write(template)
+	} else {
+		// When template is not inserted, it's better to separate metadata and body with empty line
+		b.WriteRune('\n')
+	}
+
 	if err := os.MkdirAll(d, 0755); err != nil {
 		return errors.Wrapf(err, "Could not create category directory '%s'", d)
 	}
@@ -92,10 +110,6 @@ func (note *Note) Create() error {
 	defer f.Close()
 
 	f.Write(b.Bytes())
-
-	if b, err := ioutil.ReadFile(filepath.Join(d, ".template.md")); err == nil && len(b) > 0 {
-		f.Write(b)
-	}
 
 	return nil
 }
