@@ -1,10 +1,15 @@
 package notes
 
 import (
+	"fmt"
 	"github.com/blang/semver"
 	"github.com/fatih/color"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/rhysd/go-fakeio"
+	"github.com/rhysd/go-tmpenv"
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -35,7 +40,7 @@ func TestParseArgs(t *testing.T) {
 
 	for _, tc := range []struct {
 		args []string
-		want Cmd
+		want parsableCmd
 	}{
 		{
 			args: []string{"config", "home"},
@@ -145,7 +150,72 @@ func TestParseGlobalColorFlags(t *testing.T) {
 }
 
 func TestParseFailure(t *testing.T) {
-	if _, err := ParseCmd([]string{"unknown-command"}); err == nil {
+	_, err := ParseCmd([]string{"--unknown-flag"})
+	if err == nil {
 		t.Fatal("Unknown command did not cause an error")
+	}
+	if !strings.Contains(err.Error(), "unknown long flag") {
+		t.Fatal("Unexpected error:", err)
+	}
+}
+
+func TestParseExternalCommand(t *testing.T) {
+	bindir := testExternalCommandBinaryDir("test", t)
+	tmp := tmpenv.New("PATH")
+	defer tmp.Restore()
+
+	panicIfErr(os.Setenv("PATH", os.Getenv("PATH")+string(os.PathListSeparator)+bindir))
+
+	for _, tc := range []struct {
+		what string
+		args []string
+	}{
+		{
+			what: "no arg",
+			args: []string{"external-test"},
+		},
+		{
+			what: "with args",
+			args: []string{"external-test", "--foo", "xxx", "-b"},
+		},
+		{
+			what: "with global args",
+			args: []string{"--no-color", "external-test", "--foo", "xxx", "-b"},
+		},
+	} {
+		t.Run(tc.what, func(t *testing.T) {
+			cmd, err := ParseCmd(tc.args)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			ext, ok := cmd.(*ExternalCmd)
+			if !ok {
+				t.Fatalf("Did not resolve to external command: %#v", cmd)
+			}
+
+			fake := fakeio.Stdout().Stderr()
+			defer fake.Restore()
+
+			if err := ext.Do(); err != nil {
+				t.Fatal(err)
+			}
+
+			output, err := fake.String()
+			panicIfErr(err)
+
+			if !strings.Contains(output, "Output from stdout") {
+				t.Fatal("Output to stdout is unexpected:", output)
+			}
+
+			if !strings.Contains(output, "Output from stderr") {
+				t.Fatal("Output to stderr is unexpected:", output)
+			}
+
+			want := fmt.Sprintln(tc.args)
+			if !strings.Contains(output, want) {
+				t.Fatal("Passed arguments to external command is unexpected. Wanted", want, "in output but have output", output)
+			}
+		})
 	}
 }
