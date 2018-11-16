@@ -244,7 +244,7 @@ func TestListCmd(t *testing.T) {
 			HOME/a/1.md
 			Category: a
 			Tags:     foo, bar
-			Created:  2018-10-30T11:37:45+09:00
+			Created:  2018-10-30T11:17:45+09:00
 			
 			this is title
 			=============
@@ -391,7 +391,7 @@ func TestListCmd(t *testing.T) {
 			HOME/a/1.md
 			Category: a
 			Tags:     foo, bar
-			Created:  2018-10-30T11:37:45+09:00
+			Created:  2018-10-30T11:17:45+09:00
 			
 			this is title
 			=============
@@ -512,7 +512,7 @@ func TestListNoHome(t *testing.T) {
 	if err == nil {
 		t.Fatal("Error did not occur")
 	}
-	if !strings.Contains(err.Error(), "Cannot read note-cli home") {
+	if !strings.Contains(err.Error(), "Cannot read home") {
 		t.Fatal("Unexpected error:", err)
 	}
 }
