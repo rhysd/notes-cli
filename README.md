@@ -248,8 +248,8 @@ For more details, please see `notes list --help`.
 
 ### Note Templates
 
-You can create a template of note for each category. When `.template.md` file is put in a category
-directory, it is automatically inserted on `notes new`.
+You can create a template of note at each category directory or at root. When `.template.md` file
+is put in a category directory or home, it is automatically inserted on `notes new`.
 
 For example, when `HOME/minutes/.template.md` is created with following content:
 
@@ -277,6 +277,18 @@ weekly-meeting-2018-11-07
 - Agenda: 
 - Attendee: 
 ```
+
+Template file at category directory is prioritized. For example, when `notes new minutes weekly-meeting-2018-11-07`
+is run in following situation,
+
+```
+HOME
+├── .template.md
+└── minutes
+    └── .template.md
+```
+
+`HOME/minutes/.template.md` is used rather than `HOME/.template.md`.
 
 
 ### Save notes to Git repository

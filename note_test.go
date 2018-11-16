@@ -142,8 +142,9 @@ func TestCreateNoteFile(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		note *Note
-		want string
+		note       *Note
+		want       string
+		nestedHome string
 	}{
 		{
 			note: check(NewNote("cat1", "foo,bar", "create-normal", "this is title", cfg)),
@@ -218,7 +219,7 @@ func TestCreateNoteFile(t *testing.T) {
 				`),
 		},
 		{
-			note: check(NewNote("with-template-comment-metadata", "", "create-with-template", "this is title", cfg)),
+			note: check(NewNote("with-template-comment-metadata", "", "commentout-metadata-with-template", "this is title", cfg)),
 			want: heredoc(`
 				this is title
 				=============
@@ -232,8 +233,41 @@ func TestCreateNoteFile(t *testing.T) {
 				Metadata is commented out since template starts with '-->'
 				`),
 		},
+		{
+			nestedHome: "template-at-home",
+			note:       check(NewNote("cat1", "", "create-with-template-at-home", "this is title", cfg)),
+			want: heredoc(`
+				this is title
+				=============
+				- Category: cat1
+				- Tags: 
+				- Created: {{created}}
+				------
+				
+				Template at root was inserted
+				`),
+		},
+		{
+			nestedHome: "template-at-home",
+			note:       check(NewNote("cat2", "", "prioritize-category-local-template", "this is title", cfg)),
+			want: heredoc(`
+				this is title
+				=============
+				- Category: cat2
+				- Tags: 
+				- Created: {{created}}
+				------
+				
+				Template under cat2 was inserted
+				`),
+		},
 	} {
 		t.Run(tc.note.File, func(t *testing.T) {
+			if tc.nestedHome != "" {
+				old := cfg.HomePath
+				defer func() { cfg.HomePath = old }()
+				cfg.HomePath = filepath.Join(cfg.HomePath, tc.nestedHome)
+			}
 			n := tc.note
 			p := filepath.Join(cfg.HomePath, n.Category, n.File)
 			if err := n.Create(); err != nil {

@@ -57,13 +57,30 @@ func (note *Note) RelFilePath() string {
 	return filepath.Join(note.Category, note.File)
 }
 
+// TemplatePath resolves a path to template file of the note. If no template is found, it returns
+// false as second return value
+func (note *Note) TemplatePath() (string, bool) {
+	d := note.DirPath()
+	p := filepath.Join(d, ".template.md")
+	if _, err := os.Stat(p); err == nil {
+		return p, true
+	}
+	p = filepath.Join(filepath.Dir(d), ".template.md")
+	if _, err := os.Stat(p); err == nil {
+		return p, true
+	}
+	return "", false
+}
+
 // Create creates a file of the note. When title is empty, file name omitting file extension is used
 // for it. This function will fail when the file is already existing.
 func (note *Note) Create() error {
-	d := note.DirPath()
-
 	var template []byte
-	if b, err := ioutil.ReadFile(filepath.Join(d, ".template.md")); err == nil && len(b) > 0 {
+	if p, ok := note.TemplatePath(); ok {
+		b, err := ioutil.ReadFile(p)
+		if err != nil {
+			return errors.Wrapf(err, "Cannot read template file %q", p)
+		}
 		template = b
 	}
 
@@ -87,13 +104,14 @@ func (note *Note) Create() error {
 	fmt.Fprintf(&b, "- Tags: %s\n", strings.Join(note.Tags, ", "))
 	fmt.Fprintf(&b, "- Created: %s\n", note.Created.Format(time.RFC3339))
 
-	if template != nil {
+	if len(template) > 0 {
 		b.Write(template)
 	} else {
 		// When template is not inserted, it's better to separate metadata and body with empty line
 		b.WriteRune('\n')
 	}
 
+	d := note.DirPath()
 	if err := os.MkdirAll(d, 0755); err != nil {
 		return errors.Wrapf(err, "Could not create category directory '%s'", d)
 	}
