@@ -78,13 +78,10 @@ func TestSortByModified(t *testing.T) {
 	now := time.Now()
 	panicIfErr(os.Chtimes(filepath.Join(cfg.HomePath, "a", "2.md"), now, now))
 
-	notes := []*Note{}
-	panicIfErr(
-		WalkNotes("", cfg, func(_ string, note *Note) error {
-			notes = append(notes, note)
-			return nil
-		}),
-	)
+	cats, err := CollectCategories(cfg)
+	panicIfErr(err)
+	notes, err := cats.Notes(cfg)
+	panicIfErr(err)
 
 	if err := sortByModified(notes); err != nil {
 		t.Fatal(err)

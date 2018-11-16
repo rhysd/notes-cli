@@ -7,8 +7,6 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io"
-	"io/ioutil"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -162,36 +160,7 @@ func (cmd *ListCmd) printOnelineNotes(notes []*Note) error {
 	return cmd.writeTable(colors, data)
 }
 
-func (cmd *ListCmd) doCategories(cats []string, tagRegex *regexp.Regexp) error {
-	notes := []*Note{}
-	for _, cat := range cats {
-		dir := filepath.Join(cmd.Config.HomePath, cat)
-		fs, err := ioutil.ReadDir(dir)
-		if err != nil {
-			return errors.Wrapf(err, "Cannot read category directory for '%s'", cat)
-		}
-		for _, f := range fs {
-			n := f.Name()
-			if f.IsDir() || !strings.HasSuffix(n, ".md") || strings.HasPrefix(n, ".") {
-				continue
-			}
-			note, err := LoadNote(filepath.Join(dir, n), cmd.Config)
-			if err != nil {
-				return err
-			}
-			if tagRegex == nil {
-				notes = append(notes, note)
-				continue
-			}
-			for _, tag := range note.Tags {
-				if tagRegex.MatchString(tag) {
-					notes = append(notes, note)
-					break
-				}
-			}
-		}
-	}
-
+func (cmd *ListCmd) printNotes(notes []*Note) error {
 	switch strings.ToLower(cmd.SortBy) {
 	case "filename":
 		sortByFilename(notes)
@@ -227,10 +196,11 @@ func (cmd *ListCmd) doCategories(cats []string, tagRegex *regexp.Regexp) error {
 	var b bytes.Buffer
 	for _, note := range notes {
 		if cmd.Relative {
-			b.WriteString(note.RelFilePath() + "\n")
+			b.WriteString(note.RelFilePath())
 		} else {
-			b.WriteString(note.FilePath() + "\n")
+			b.WriteString(note.FilePath())
 		}
+		b.WriteRune('\n')
 	}
 	_, err := cmd.Out.Write(b.Bytes())
 	return err
@@ -238,43 +208,57 @@ func (cmd *ListCmd) doCategories(cats []string, tagRegex *regexp.Regexp) error {
 
 // Do runs `notes list` command and returns an error if occurs
 func (cmd *ListCmd) Do() error {
-	fs, err := ioutil.ReadDir(cmd.Config.HomePath)
+	cats, err := CollectCategories(cmd.Config)
 	if err != nil {
-		return errors.Wrap(err, "Cannot read note-cli home")
+		return err
 	}
 
-	var tagRegex *regexp.Regexp
+	var catReg *regexp.Regexp
+	if cmd.Category != "" {
+		if catReg, err = regexp.Compile(cmd.Category); err != nil {
+			return errors.Wrap(err, "Regular expression for filtering categories is invalid")
+		}
+	}
+
+	numNotes := 0
+	for n, c := range cats {
+		if catReg != nil && !catReg.MatchString(n) {
+			delete(cats, n)
+			continue
+		}
+		numNotes += len(c.NotePaths)
+	}
+
+	var tagReg *regexp.Regexp
 	if cmd.Tag != "" {
-		if tagRegex, err = regexp.Compile(cmd.Tag); err != nil {
+		if tagReg, err = regexp.Compile(cmd.Tag); err != nil {
 			return errors.Wrap(err, "Regular expression for filtering tags is invalid")
 		}
 	}
 
-	if cmd.Category == "" {
-		cs := make([]string, 0, len(fs))
-		for _, f := range fs {
-			if n := f.Name(); f.IsDir() && !strings.HasPrefix(n, ".") {
-				cs = append(cs, n)
+	notes := make([]*Note, 0, numNotes)
+	for _, cat := range cats {
+		for _, p := range cat.NotePaths {
+			note, err := LoadNote(p, cmd.Config)
+			if err != nil {
+				return err
 			}
-		}
-		return cmd.doCategories(cs, tagRegex)
-	}
-
-	r, err := regexp.Compile(cmd.Category)
-	if err != nil {
-		return errors.Wrap(err, "Regular expression for filtering categories is invalid")
-	}
-
-	cs := make([]string, 0, len(fs))
-	for _, f := range fs {
-		if !f.IsDir() {
-			continue
-		}
-		n := f.Name()
-		if r.MatchString(n) {
-			cs = append(cs, f.Name())
+			if tagReg == nil {
+				notes = append(notes, note)
+				continue
+			}
+			for _, tag := range note.Tags {
+				if tagReg.MatchString(tag) {
+					notes = append(notes, note)
+					break
+				}
+			}
+			// When no tag is matched to tag regex, the note is ignored
 		}
 	}
 
-	return cmd.doCategories(cs, tagRegex)
+	if len(notes) == 0 {
+		return nil
+	}
+	return cmd.printNotes(notes)
 }

@@ -248,8 +248,8 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 			}
 		} else if strings.HasPrefix(line, "- Category: ") {
 			note.Category = strings.TrimSpace(line[12:])
-			if c := filepath.Base(filepath.Dir(path)); c != note.Category {
-				return nil, errors.Errorf("Category does not match between file path and file content, in path '%s' v.s. in file '%s'", c, note.Category)
+			if rel, err := filepath.Rel(cfg.HomePath, filepath.Dir(path)); err != nil || rel != note.Category {
+				return nil, errors.Errorf("Category does not match between file path and file content, in path '%s' v.s. in file '%s'", rel, note.Category)
 			}
 		} else if strings.HasPrefix(line, "- Tags:") {
 			tags := strings.Split(strings.TrimSpace(line[7:]), ",")
@@ -284,62 +284,4 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 	}
 
 	return note, nil
-}
-
-// WalkNotes walks all notes with given predicate. If given category string is an empty, it traverses
-// notes of all categories. Otherwise, it only traverses notes of the specified categories. When the
-// category does not exist, this function returns an error. When given predicate returns an error or
-// when loading a note fails, this function stops traversing and immediately returns the error
-func WalkNotes(cat string, cfg *Config, pred func(path string, note *Note) error) error {
-	fs, err := ioutil.ReadDir(cfg.HomePath)
-	if err != nil {
-		return errors.Wrap(err, "Cannot read home")
-	}
-
-	cats := make([]string, 0, len(fs))
-	for _, f := range fs {
-		n := f.Name()
-		if f.IsDir() && n != ".git" {
-			cats = append(cats, n)
-		}
-	}
-
-	if cat != "" {
-		found := false
-		for _, c := range cats {
-			if c == cat {
-				cats = []string{cat}
-				found = true
-				break
-			}
-		}
-		if !found {
-			return errors.Errorf("Category '%s' does not exist. All categories are %s", cat, strings.Join(cats, ", "))
-		}
-	}
-
-	for _, c := range cats {
-		dir := filepath.Join(cfg.HomePath, c)
-		es, err := ioutil.ReadDir(dir)
-		if err != nil {
-			return errors.Wrapf(err, "Cannot read directory for category '%s'", c)
-		}
-
-		for _, e := range es {
-			f := e.Name()
-			if e.IsDir() || !strings.HasSuffix(f, ".md") {
-				continue
-			}
-			p := filepath.Join(dir, f)
-			n, err := LoadNote(p, cfg)
-			if err != nil {
-				return err
-			}
-			if err := pred(p, n); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
 }

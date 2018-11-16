@@ -27,7 +27,7 @@ func TestCategoriesCmd(t *testing.T) {
 	}
 
 	have := buf.String()
-	want := "a\nb\nc\nd\n"
+	want := "a\nb\nc\n"
 	if have != want {
 		t.Fatal("wanted:", want, "but have", have)
 	}
@@ -46,7 +46,7 @@ func TestCategoriesCmdError(t *testing.T) {
 	if err == nil {
 		t.Fatal("Error did not occur")
 	}
-	if !strings.Contains(err.Error(), "Cannot read notes-cli home") {
+	if !strings.Contains(err.Error(), "Cannot read home") {
 		t.Fatal("Unexpected error:", err)
 	}
 }
