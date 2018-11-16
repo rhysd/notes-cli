@@ -45,6 +45,7 @@ func (cmd *NewCmd) fallbackInput(note *Note) error {
 	if err != nil {
 		return errors.Wrap(err, "Cannot open note file")
 	}
+	defer f.Close()
 	if _, err := f.Write(b); err != nil {
 		return errors.Wrap(err, "Cannot write to note file")
 	}
