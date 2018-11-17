@@ -538,7 +538,7 @@ func TestLoadNoteFail(t *testing.T) {
 		},
 		{
 			file: "category-mismatch.md",
-			msg:  "Category does not match between file path and file content",
+			msg:  "Category does not match to file path",
 		},
 	} {
 		t.Run(tc.file, func(t *testing.T) {

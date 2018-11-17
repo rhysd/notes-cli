@@ -248,8 +248,11 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 			}
 		} else if strings.HasPrefix(line, "- Category: ") {
 			note.Category = strings.TrimSpace(line[12:])
-			if rel, err := filepath.Rel(cfg.HomePath, filepath.Dir(path)); err != nil || rel != note.Category {
-				return nil, errors.Errorf("Category does not match between file path and file content, in path '%s' v.s. in file '%s'", rel, note.Category)
+			parent := filepath.Dir(path)
+			rel, err := filepath.Rel(cfg.HomePath, parent)
+			name := filepath.ToSlash(rel)
+			if err != nil || filepath.ToSlash(rel) != note.Category {
+				return nil, errors.Errorf("Category does not match to file path. Category is '%s' but it should be '%s' from its file path", note.Category, name)
 			}
 		} else if strings.HasPrefix(line, "- Tags:") {
 			tags := strings.Split(strings.TrimSpace(line[7:]), ",")
