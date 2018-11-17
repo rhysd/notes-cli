@@ -106,3 +106,21 @@ func TestTagsInvalidCategory(t *testing.T) {
 		t.Fatal("Unexpected error:", err)
 	}
 }
+
+func TestTagsLoadNoteError(t *testing.T) {
+	cwd, err := os.Getwd()
+	panicIfErr(err)
+
+	cfg := &Config{
+		HomePath: filepath.Join(cwd, "testdata", "list", "fail"),
+	}
+
+	cmd := TagsCmd{Config: cfg}
+	err = cmd.Do()
+	if err == nil {
+		t.Fatal("Error did not occur")
+	}
+	if !strings.Contains(err.Error(), "Cannot parse created date time as RFC3339") {
+		t.Fatal("Unexpected error:", err)
+	}
+}
