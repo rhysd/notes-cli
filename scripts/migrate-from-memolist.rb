@@ -28,7 +28,7 @@ def read_memo(path)
   fail_read path unless lines.shift =~ /^\s{0,3}(?:-+\s*){3,}$/
   body = lines.join.strip
   if categories.length == 1
-    category = categories.first
+    category = categories.first.downcase
   else
     category = "imported"
     tags += categories
