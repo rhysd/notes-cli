@@ -475,9 +475,9 @@ func TestListCmd(t *testing.T) {
 				Oneline: true,
 			},
 			want: `
-			cat/ノート.md             cat             タグ1,x     これはタイトル
 			カテゴリ/ノート.md        カテゴリ        tag3,タグ1  これはタイトル
 			カテゴリ/ネスト/ノート.md カテゴリ/ネスト タグ1,タグ2 これはタイトル
+			cat/ノート.md             cat             タグ1,x     これはタイトル
 			`,
 		},
 		{
@@ -492,7 +492,7 @@ func TestListCmd(t *testing.T) {
 			HOME/カテゴリ/ネスト/ノート.md
 			Category: カテゴリ/ネスト
 			Tags:     タグ1, タグ2
-			Created:  2018-10-30T11:17:45+09:00
+			Created:  2018-11-02T11:17:45+09:00
 			
 			これはタイトル
 			==============
