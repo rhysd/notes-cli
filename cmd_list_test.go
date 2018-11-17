@@ -486,11 +486,14 @@ func TestListCmd(t *testing.T) {
 			}
 
 			have := buf.String()
-			ss := strings.Split(strings.TrimPrefix(tc.want, "\n"), "\n")
-			for i, s := range ss {
-				ss[i] = strings.Replace(filepath.FromSlash(strings.TrimLeft(s, "\t")), "HOME", cfg.HomePath, 1)
+			lines := strings.Split(strings.TrimPrefix(tc.want, "\n"), "\n")
+			for i, s := range lines {
+				// Convert only first field as file path
+				ss := strings.Split(s, " ")
+				ss[0] = strings.Replace(filepath.FromSlash(strings.TrimLeft(ss[0], "\t")), "HOME", cfg.HomePath, 1)
+				lines[i] = strings.Join(ss, " ")
 			}
-			want := strings.Join(ss, "\n")
+			want := strings.Join(lines, "\n")
 
 			if want != have {
 				ls := strings.Split(want, "\n")
