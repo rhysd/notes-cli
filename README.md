@@ -16,6 +16,36 @@ This tool is intended to be used nicely with other commands such as `grep` (or [
 
 
 
+## Table of Contents
+
+* [Installation](#installation)
+* [Usage](#usage)
+  + [Basic Usage](#basic-usage)
+  + [Create a new note](#create-a-new-note)
+  + [Open notes you created flexibly](#open-notes-you-created-flexibly)
+  + [Check notes you created as list](#check-notes-you-created-as-list)
+  + [Note Templates](#note-templates)
+  + [Save notes to Git repository](#save-notes-to-git-repository)
+  + [Extend `notes` command by adding new subcommands](#extend-notes-command-by-adding-new-subcommands)
+  + [Shell Completions](#shell-completions)
+  + [Setup `man` manual](#setup-man-manual)
+  + [Update itself](#update-itself)
+  + [Use from Go program](#use-from-go-program)
+* [FAQ](#faq)
+  + [Can I specify `/path/to/dir` as home?](#can-i-specify-pathtodir-as-home)
+  + [How can I grep notes?](#how-can-i-grep-notes)
+  + [How can I filter notes interactively and open it with my editor?](#how-can-i-filter-notes-interactively-and-open-it-with-my-editor)
+  + [Can I open the latest note without selecting it from list?](#can-i-open-the-latest-note-without-selecting-it-from-list)
+  + [How can I remove some notes?](#how-can-i-remove-some-notes)
+  + [I don't want to show the metadata in note. Can I hide them?](#i-dont-want-to-show-the-metadata-in-note-can-i-hide-them)
+  + [Can I hide metadata by default?](#can-i-hide-metadata-by-default)
+  + [How image resources are managed?](#how-image-resources-are-managed)
+  + [How can I migrate from memolist.vim?](#how-can-i-migrate-from-memolistvim)
+  + [How can I integrate with Vim?](#how-can-i-integrate-with-vim)
+* [License](#license)
+
+
+
 ## Installation
 
 Download an archive for your OS from [release page](https://github.com/rhysd/notes-cli/releases).
@@ -68,18 +98,24 @@ creates a note file at `<HOME>/notes-cli/blog/how-to-handle-files.md` where `<HO
 [XDG Data directory][xdg-dirs] (on macOS, `~/.local/share/notes-cli`) by default and can be specified
 by `$NOTES_CLI_HOME` environment variable. The home directory is automatically created.
 
-Category is `blog`. Every note must belong to one category.
+Category is `blog`. Every note must belong to one category. Category can be nested with `/`. For example,
+if have multitple blogs Blog A and Blog B, you may want to categorize blog posts with categories like
+`blog/A`, `blog/B`.
 
-Tags are `golang` and `file`. Tags can be omitted.
+Tags are `golang` and `file`. Tags are lables to organize notes and to make search notes easier.
+Tags can be omitted.
+
+Category and file name cannot start with `.` not to make hidden files/directories.
 
 Directories structure under home is something like:
 
 ```
 <HOME>
 ├── category1
+│   ├── nested-category
+│   │   └── note3.md
 │   ├── note1.md
-│   ├── note2.md
-│   └── note3.md
+│   └── note2.md
 ├── category2
 │   ├── note4.md
 │   └── note5.md
@@ -446,16 +482,6 @@ $ rm $(notes list -c foo)
 
 Thanks to Git repository, this does not remove your notes completely until you run `notes save`
 next time.
-
-
-### Can I nest categories?
-
-Categories cannot be nested. Instead, you can define your own nested naming rule for categories.
-For example `blog-personal-public` can indicate blog entries which is personal and publicly posted.
-Other categories would be named like `blog-personal-private`, `blog-company-public`, ...
-It's up to you.
-
-This may be changed in the future.
 
 
 ### I don't want to show the metadata in note. Can I hide them?

@@ -2,6 +2,7 @@ package notes
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"io"
 	"sort"
 	"strings"
@@ -34,21 +35,39 @@ func (cmd *TagsCmd) Do() error {
 	saw := map[string]struct{}{}
 	tags := []string{}
 
-	// If cmd.Category is empty, it scans all notes in home
-	if err := WalkNotes(cmd.Category, cmd.Config, func(path string, note *Note) error {
-		for _, tag := range note.Tags {
-			if _, ok := saw[tag]; !ok {
-				tags = append(tags, tag)
-				saw[tag] = struct{}{}
+	cats, err := CollectCategories(cmd.Config)
+	if err != nil {
+		return err
+	}
+
+	if cmd.Category != "" {
+		// Even if category is specified, we fetch all categories since error message requires
+		// all category names for suggestion.
+		cat, ok := cats[cmd.Category]
+		if !ok {
+			ns := cats.Names()
+			return errors.Errorf("Category '%s' does not exist. All categories are %s", cmd.Category, strings.Join(ns, ", "))
+		}
+		cats = Categories{cmd.Category: cat}
+	}
+
+	for _, cat := range cats {
+		notes, err := cat.Notes(cmd.Config)
+		if err != nil {
+			return err
+		}
+		for _, n := range notes {
+			for _, tag := range n.Tags {
+				if _, ok := saw[tag]; !ok {
+					tags = append(tags, tag)
+					saw[tag] = struct{}{}
+				}
 			}
 		}
-		return nil
-	}); err != nil {
-		return err
 	}
 
 	sort.Strings(tags)
 
-	_, err := fmt.Fprintln(cmd.Out, strings.Join(tags, "\n"))
+	_, err = fmt.Fprintln(cmd.Out, strings.Join(tags, "\n"))
 	return err
 }

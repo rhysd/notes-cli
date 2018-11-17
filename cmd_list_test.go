@@ -26,87 +26,79 @@ func TestListCmd(t *testing.T) {
 	color.NoColor = true
 	defer func() { color.NoColor = old }()
 
-	cfg := testNewConfigForListCmd("normal")
-	format := func(s string) string {
-		ss := strings.Split(strings.TrimPrefix(s, "\n"), "\n")
-		for i, s := range ss {
-			ss[i] = strings.Replace(filepath.FromSlash(strings.TrimLeft(s, "\t")), "HOME", cfg.HomePath, 1)
-		}
-		return strings.Join(ss, "\n")
-	}
-
 	for _, tc := range []struct {
-		what string
-		cmd  *ListCmd
-		want string
+		what   string
+		cmd    *ListCmd
+		want   string
+		subdir string
 	}{
 		{
 			what: "default",
 			cmd:  &ListCmd{},
-			want: format(`
+			want: `
 			HOME/a/4.md
 			HOME/a/1.md
 			HOME/c/5.md
 			HOME/b/2.md
 			HOME/c/3.md
 			HOME/b/6.md
-			`),
+			`,
 		},
 		{
 			what: "sort by created",
 			cmd: &ListCmd{
 				SortBy: "created",
 			},
-			want: format(`
+			want: `
 			HOME/a/4.md
 			HOME/a/1.md
 			HOME/c/5.md
 			HOME/b/2.md
 			HOME/c/3.md
 			HOME/b/6.md
-			`),
+			`,
 		},
 		{
 			what: "sort by filename",
 			cmd: &ListCmd{
 				SortBy: "filename",
 			},
-			want: format(`
+			want: `
 			HOME/a/1.md
 			HOME/b/2.md
 			HOME/c/3.md
 			HOME/a/4.md
 			HOME/c/5.md
 			HOME/b/6.md
-			`),
+			`,
 		},
 		{
 			what: "sort by category",
 			cmd: &ListCmd{
 				SortBy: "category",
 			},
-			want: format(`
+			want: `
 			HOME/a/1.md
 			HOME/a/4.md
 			HOME/b/2.md
 			HOME/b/6.md
 			HOME/c/3.md
 			HOME/c/5.md
-			`),
+			`,
 		},
 		{
 			what: "relative paths",
 			cmd: &ListCmd{
 				Relative: true,
 			},
-			want: format(`
+			want: `
 			a/4.md
 			a/1.md
 			c/5.md
 			b/2.md
 			c/3.md
 			b/6.md
-			`),
+			`,
 		},
 		{
 			what: "relative paths sorted by file name",
@@ -114,28 +106,28 @@ func TestListCmd(t *testing.T) {
 				Relative: true,
 				SortBy:   "filename",
 			},
-			want: format(`
+			want: `
 			a/1.md
 			b/2.md
 			c/3.md
 			a/4.md
 			c/5.md
 			b/6.md
-			`),
+			`,
 		},
 		{
 			what: "oneline",
 			cmd: &ListCmd{
 				Oneline: true,
 			},
-			want: format(`
+			want: `
 			a/4.md a bar        this is title this is title this is title this is title this is title ...
 			a/1.md a foo,bar    this is title
 			c/5.md c a-bit-long this is title
 			b/2.md b foo        this is title
 			c/3.md c            this is title
 			b/6.md b future     text from future
-			`),
+			`,
 		},
 		{
 			what: "oneline sorted by category",
@@ -143,24 +135,24 @@ func TestListCmd(t *testing.T) {
 				Oneline: true,
 				SortBy:  "category",
 			},
-			want: format(`
+			want: `
 			a/1.md a foo,bar    this is title
 			a/4.md a bar        this is title this is title this is title this is title this is title ...
 			b/2.md b foo        this is title
 			b/6.md b future     text from future
 			c/3.md c            this is title
 			c/5.md c a-bit-long this is title
-			`),
+			`,
 		},
 		{
 			what: "filter by category",
 			cmd: &ListCmd{
 				Category: "a",
 			},
-			want: format(`
+			want: `
 			HOME/a/4.md
 			HOME/a/1.md
-			`),
+			`,
 		},
 		{
 			what: "filter by category with regex sorted by filename",
@@ -168,30 +160,30 @@ func TestListCmd(t *testing.T) {
 				Category: "^(b|c)$",
 				SortBy:   "filename",
 			},
-			want: format(`
+			want: `
 			HOME/b/2.md
 			HOME/c/3.md
 			HOME/c/5.md
 			HOME/b/6.md
-			`),
+			`,
 		},
 		{
 			what: "filter by unknown category",
 			cmd: &ListCmd{
 				Category: "unknown-category-who-know",
 			},
-			want: format(`
-			`),
+			want: `
+			`,
 		},
 		{
 			what: "filter by tag",
 			cmd: &ListCmd{
 				Tag: "foo",
 			},
-			want: format(`
+			want: `
 			HOME/a/1.md
 			HOME/b/2.md
-			`),
+			`,
 		},
 		{
 			what: "filter by tag with regex sorted by filename",
@@ -199,19 +191,19 @@ func TestListCmd(t *testing.T) {
 				Tag:    "^(foo|future)$",
 				SortBy: "filename",
 			},
-			want: format(`
+			want: `
 			HOME/a/1.md
 			HOME/b/2.md
 			HOME/b/6.md
-			`),
+			`,
 		},
 		{
 			what: "filter by unknown tag",
 			cmd: &ListCmd{
 				Tag: "unknown-category-who-know",
 			},
-			want: format(`
-			`),
+			want: `
+			`,
 		},
 		{
 			what: "filter by category and tag",
@@ -219,16 +211,16 @@ func TestListCmd(t *testing.T) {
 				Category: "a",
 				Tag:      "foo",
 			},
-			want: format(`
+			want: `
 			HOME/a/1.md
-			`),
+			`,
 		},
 		{
 			what: "full",
 			cmd: &ListCmd{
 				Full: true,
 			},
-			want: format(`
+			want: `
 			HOME/a/4.md
 			Category: a
 			Tags:     bar
@@ -244,7 +236,7 @@ func TestListCmd(t *testing.T) {
 			HOME/a/1.md
 			Category: a
 			Tags:     foo, bar
-			Created:  2018-10-30T11:37:45+09:00
+			Created:  2018-10-30T11:17:45+09:00
 			
 			this is title
 			=============
@@ -378,7 +370,7 @@ func TestListCmd(t *testing.T) {
 			consetetur. Eum repudiare laboramus conclusionemque et, veritus tractatos dignissim
 			duo ut. Ex sed quod admodum indoctu
 			
-			`),
+			`,
 		},
 		{
 			what: "full with filter",
@@ -387,11 +379,11 @@ func TestListCmd(t *testing.T) {
 				Category: "a",
 				Tag:      "foo",
 			},
-			want: format(`
+			want: `
 			HOME/a/1.md
 			Category: a
 			Tags:     foo, bar
-			Created:  2018-10-30T11:37:45+09:00
+			Created:  2018-10-30T11:17:45+09:00
 			
 			this is title
 			=============
@@ -400,10 +392,91 @@ func TestListCmd(t *testing.T) {
 			is
 			test
 			
-			`),
+			`,
+		},
+		{
+			what:   "nested categories",
+			subdir: "nested",
+			cmd:    &ListCmd{},
+			want: `
+			HOME/b/f/1.md
+			HOME/b/2.md
+			HOME/a/d/e/3.md
+			HOME/a/d/4.md
+			HOME/a/5.md
+			HOME/c/6.md
+			`,
+		},
+		{
+			what:   "sort nested categories",
+			subdir: "nested",
+			cmd: &ListCmd{
+				SortBy: "category",
+			},
+			want: `
+			HOME/a/5.md
+			HOME/a/d/4.md
+			HOME/a/d/e/3.md
+			HOME/b/2.md
+			HOME/b/f/1.md
+			HOME/c/6.md
+			`,
+		},
+		{
+			what:   "nested categories filtered by category",
+			subdir: "nested",
+			cmd: &ListCmd{
+				Category: "/d",
+			},
+			want: `
+			HOME/a/d/e/3.md
+			HOME/a/d/4.md
+			`,
+		},
+		{
+			what:   "nested categories online log",
+			subdir: "nested",
+			cmd: &ListCmd{
+				Category: "/d",
+				Oneline:  true,
+			},
+			want: `
+			a/d/e/3.md a/d/e a,piyo this is title
+			a/d/4.md   a/d   d,bar  this is title
+			`,
+		},
+		{
+			what:   "nested categories full log",
+			subdir: "nested",
+			cmd: &ListCmd{
+				Category: "/d",
+				Tag:      "piyo",
+				Full:     true,
+			},
+			want: `
+			HOME/a/d/e/3.md
+			Category: a/d/e
+			Tags:     a, piyo
+			Created:  2018-11-03T11:17:45+09:00
+			
+			this is title
+			=============
+			
+			this
+			is
+			test
+			
+			`,
 		},
 	} {
-		t.Run(tc.what, func(t *testing.T) {
+		subdir := tc.subdir
+		if subdir == "" {
+			subdir = "normal"
+		}
+
+		t.Run(subdir+"_"+tc.what, func(t *testing.T) {
+			cfg := testNewConfigForListCmd(subdir)
+
 			var buf bytes.Buffer
 			tc.cmd.Config = cfg
 			tc.cmd.Out = &buf
@@ -413,8 +486,17 @@ func TestListCmd(t *testing.T) {
 			}
 
 			have := buf.String()
-			if tc.want != have {
-				ls := strings.Split(tc.want, "\n")
+			lines := strings.Split(strings.TrimPrefix(tc.want, "\n"), "\n")
+			for i, s := range lines {
+				// Convert only first field as file path
+				ss := strings.Split(s, " ")
+				ss[0] = strings.Replace(filepath.FromSlash(strings.TrimLeft(ss[0], "\t")), "HOME", cfg.HomePath, 1)
+				lines[i] = strings.Join(ss, " ")
+			}
+			want := strings.Join(lines, "\n")
+
+			if want != have {
+				ls := strings.Split(want, "\n")
 				hint := ""
 				for i, l := range strings.Split(have, "\n") {
 					if l != ls[i] {
@@ -422,7 +504,7 @@ func TestListCmd(t *testing.T) {
 						break
 					}
 				}
-				t.Fatalf("have:\n%s\n\n%s", have, hint)
+				t.Fatalf("have:\n'%s'\n\n%s", have, hint)
 			}
 		})
 	}
@@ -512,7 +594,7 @@ func TestListNoHome(t *testing.T) {
 	if err == nil {
 		t.Fatal("Error did not occur")
 	}
-	if !strings.Contains(err.Error(), "Cannot read note-cli home") {
+	if !strings.Contains(err.Error(), "Cannot read home") {
 		t.Fatal("Unexpected error:", err)
 	}
 }
@@ -701,5 +783,23 @@ func TestListCmdEditOption(t *testing.T) {
 
 	if !reflect.DeepEqual(want, have) {
 		t.Fatal("Args passed to editor is not expected:", have, "wanted", want)
+	}
+}
+
+func TestListNoNotePrintNothing(t *testing.T) {
+	cfg := testNewConfigForListCmd("no-note")
+	var buf bytes.Buffer
+
+	cmd := &ListCmd{
+		Config: cfg,
+		Out:    &buf,
+	}
+
+	if err := cmd.Do(); err != nil {
+		t.Fatal(err)
+	}
+
+	if buf.Len() != 0 {
+		t.Fatal("Some output:", buf.String())
 	}
 }

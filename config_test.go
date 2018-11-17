@@ -160,3 +160,20 @@ func TestNewConfigGitNotFound(t *testing.T) {
 		t.Fatal("git path should be empty:", c.GitPath)
 	}
 }
+
+func TestNewConfigCannotCreateHome(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("This test cannot be run on Windows")
+	}
+
+	g := testNewConfigEnvGuard()
+	defer func() { panicIfErr(g.Restore()) }()
+
+	panicIfErr(os.Setenv("NOTES_CLI_HOME", filepath.FromSlash("/invalid-dir-for-notes-cli-test")))
+
+	_, err := NewConfig()
+	if err == nil {
+		t.Fatal("Error did not occur")
+	}
+
+}

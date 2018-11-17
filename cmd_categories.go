@@ -2,10 +2,8 @@ package notes
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io"
-	"io/ioutil"
 	"sort"
 	"strings"
 )
@@ -30,23 +28,18 @@ func (cmd *CategoriesCmd) matchesCmdline(cmdline string) bool {
 
 // Do runs `notes categories` command and returns an error if occurs
 func (cmd *CategoriesCmd) Do() error {
-	fs, err := ioutil.ReadDir(cmd.Config.HomePath)
+	cats, err := CollectCategories(cmd.Config)
 	if err != nil {
-		return errors.Wrap(err, "Cannot read notes-cli home")
+		return err
 	}
 
-	cats := []string{}
-
-	for _, f := range fs {
-		n := f.Name()
-		if !f.IsDir() || strings.HasPrefix(n, ".") {
-			continue
-		}
-		cats = append(cats, n)
+	names := make([]string, 0, len(cats))
+	for c := range cats {
+		names = append(names, c)
 	}
 
-	sort.Strings(cats)
+	sort.Strings(names)
 
-	_, err = fmt.Fprintln(cmd.Out, strings.Join(cats, "\n"))
+	_, err = fmt.Fprintln(cmd.Out, strings.Join(names, "\n"))
 	return err
 }
