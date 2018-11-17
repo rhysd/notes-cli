@@ -21,7 +21,7 @@ func noteTestdataConfig() *Config {
 	return &Config{GitPath: "git", HomePath: home}
 }
 
-func TestNewNote(t *testing.T) {
+func TestNewNoteOK(t *testing.T) {
 	cfg := &Config{GitPath: "git", HomePath: "."}
 
 	n, err := NewNote("cat", "foo,bar", "foo.md", "this is title", cfg)
@@ -86,7 +86,7 @@ func TestNewNoteError(t *testing.T) {
 		{
 			cat:  "foo|bar",
 			file: "",
-			want: "Invalid category as directory name",
+			want: "Invalid category part 'foo|bar' as directory name",
 		},
 	} {
 		t.Run(tc.want, func(t *testing.T) {

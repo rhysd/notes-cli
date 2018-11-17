@@ -44,32 +44,33 @@ type Note struct {
 
 // DirPath returns the absolute category directory path of the note
 func (note *Note) DirPath() string {
-	return filepath.Join(note.Config.HomePath, note.Category)
+	return filepath.Join(note.Config.HomePath, filepath.FromSlash(note.Category))
 }
 
 // FilePath returns the absolute file path of the note
 func (note *Note) FilePath() string {
-	return filepath.Join(note.Config.HomePath, note.Category, note.File)
+	return filepath.Join(note.Config.HomePath, filepath.FromSlash(note.Category), note.File)
 }
 
 // RelFilePath returns the relative file path of the note from home directory
 func (note *Note) RelFilePath() string {
-	return filepath.Join(note.Category, note.File)
+	return filepath.Join(filepath.FromSlash(note.Category), note.File)
 }
 
 // TemplatePath resolves a path to template file of the note. If no template is found, it returns
 // false as second return value
 func (note *Note) TemplatePath() (string, bool) {
-	d := note.DirPath()
-	p := filepath.Join(d, ".template.md")
-	if _, err := os.Stat(p); err == nil {
-		return p, true
+	p := note.DirPath()
+	for {
+		f := filepath.Join(p, ".template.md")
+		if s, err := os.Stat(f); err == nil && !s.IsDir() {
+			return f, true
+		}
+		if p == note.Config.HomePath {
+			return "", false
+		}
+		p = filepath.Dir(p)
 	}
-	p = filepath.Join(filepath.Dir(d), ".template.md")
-	if _, err := os.Stat(p); err == nil {
-		return p, true
-	}
-	return "", false
 }
 
 // Create creates a file of the note. When title is empty, file name omitting file extension is used
@@ -197,9 +198,12 @@ func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 // NewNote creates a new note instance with given parameters and configuration. Category and file name
 // cannot be empty. If given file name lacks file extension, it automatically adds ".md" to file name.
 func NewNote(cat, tags, file, title string, cfg *Config) (*Note, error) {
-	if err := validateDirname(cat); err != nil {
-		return nil, errors.Wrap(err, "Invalid category as directory name")
+	for _, part := range strings.Split(cat, "/") {
+		if err := validateDirname(part); err != nil {
+			return nil, errors.Wrapf(err, "Invalid category part '%s' as directory name", part)
+		}
 	}
+
 	if file == "" || strings.HasPrefix(file, ".") {
 		return nil, errors.New("File name cannot be empty and cannot start with '.'")
 	}
@@ -252,7 +256,7 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 			rel, err := filepath.Rel(cfg.HomePath, parent)
 			name := filepath.ToSlash(rel)
 			if err != nil || filepath.ToSlash(rel) != note.Category {
-				return nil, errors.Errorf("Category does not match to file path. Category is '%s' but it should be '%s' from its file path", note.Category, name)
+				return nil, errors.Errorf("Category does not match to file path. Category is '%s' but it should be '%s' from its file path. File path is '%s'", note.Category, name, path)
 			}
 		} else if strings.HasPrefix(line, "- Tags:") {
 			tags := strings.Split(strings.TrimSpace(line[7:]), ",")
