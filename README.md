@@ -19,29 +19,9 @@ This tool is intended to be used nicely with other commands such as `grep` (or [
 ## Table of Contents
 
 * [Installation](#installation)
+* [Basic Usage](#basic-usage)
 * [Usage](#usage)
-  + [Basic Usage](#basic-usage)
-  + [Create a new note](#create-a-new-note)
-  + [Open notes you created flexibly](#open-notes-you-created-flexibly)
-  + [Check notes you created as list](#check-notes-you-created-as-list)
-  + [Note Templates](#note-templates)
-  + [Save notes to Git repository](#save-notes-to-git-repository)
-  + [Extend `notes` command by adding new subcommands](#extend-notes-command-by-adding-new-subcommands)
-  + [Shell Completions](#shell-completions)
-  + [Setup `man` manual](#setup-man-manual)
-  + [Update itself](#update-itself)
-  + [Use from Go program](#use-from-go-program)
 * [FAQ](#faq)
-  + [Can I specify `/path/to/dir` as home?](#can-i-specify-pathtodir-as-home)
-  + [How can I grep notes?](#how-can-i-grep-notes)
-  + [How can I filter notes interactively and open it with my editor?](#how-can-i-filter-notes-interactively-and-open-it-with-my-editor)
-  + [Can I open the latest note without selecting it from list?](#can-i-open-the-latest-note-without-selecting-it-from-list)
-  + [How can I remove some notes?](#how-can-i-remove-some-notes)
-  + [I don't want to show the metadata in note. Can I hide them?](#i-dont-want-to-show-the-metadata-in-note-can-i-hide-them)
-  + [Can I hide metadata by default?](#can-i-hide-metadata-by-default)
-  + [How image resources are managed?](#how-image-resources-are-managed)
-  + [How can I migrate from memolist.vim?](#how-can-i-migrate-from-memolistvim)
-  + [How can I integrate with Vim?](#how-can-i-integrate-with-vim)
 * [License](#license)
 
 
@@ -73,9 +53,7 @@ To uninstall, please remove `notes` (or `notes.exe` on Windows) executable.
 
 
 
-## Usage
-
-### Basic Usage
+## Basic Usage
 
 `notes` provides some subcommands to manage your markdown notes.
 
@@ -85,6 +63,11 @@ To uninstall, please remove `notes` (or `notes.exe` on Windows) executable.
 - Check existing notes on terminal with `notes ls -o` (`-o` means showing one line information for
   each note).
 
+
+
+## Usage
+
+This section shows detailed usages for each operation.
 
 ### Create a new note
 
