@@ -12,24 +12,48 @@ func TestTagsCmd(t *testing.T) {
 	cwd, err := os.Getwd()
 	panicIfErr(err)
 
-	cfg := &Config{
-		HomePath: filepath.Join(cwd, "testdata", "list", "normal"),
-	}
-
 	for _, tc := range []struct {
-		cat  string
-		want string
+		what   string
+		cat    string
+		want   string
+		subdir string
 	}{
 		{
-			cat:  "",
-			want: "a-bit-long\nbar\nfoo\nfuture\n",
+			what:   "flat and all categories",
+			cat:    "",
+			want:   "a-bit-long\nbar\nfoo\nfuture\n",
+			subdir: "normal",
 		},
 		{
-			cat:  "a",
-			want: "bar\nfoo\n",
+			what:   "flat and specific category",
+			cat:    "a",
+			want:   "bar\nfoo\n",
+			subdir: "normal",
+		},
+		{
+			what:   "nested and all categories",
+			cat:    "",
+			want:   "a\nb\nbar\nc\nd\nfoo\npiyo\n",
+			subdir: "nested",
+		},
+		{
+			what:   "nested and specific category",
+			cat:    "b",
+			want:   "b\nfoo\n",
+			subdir: "nested",
+		},
+		{
+			what:   "nested and specific nested category",
+			cat:    "a/d/e",
+			want:   "a\npiyo\n",
+			subdir: "nested",
 		},
 	} {
 		t.Run(tc.cat, func(t *testing.T) {
+			cfg := &Config{
+				HomePath: filepath.Join(cwd, "testdata", "list", tc.subdir),
+			}
+
 			var buf bytes.Buffer
 			cmd := TagsCmd{
 				Category: tc.cat,

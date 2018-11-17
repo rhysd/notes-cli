@@ -20,7 +20,7 @@ func testNewConfigForNewCmd(subdir string) *Config {
 	}
 }
 
-func TestNewCmdNewNote(t *testing.T) {
+func TestNewCmdNewNoteInlineFallbackInput(t *testing.T) {
 	cfg := testNewConfigForNewCmd("empty")
 	fake := fakeio.Stdout().Stdin("this\nis\ntest").CloseStdin()
 	defer fake.Restore()
@@ -87,86 +87,100 @@ func TestNewCmdNewNote(t *testing.T) {
 	if stdout != p {
 		t.Error("Output is not path to the file:", stdout)
 	}
-
-	// Second note
-
-	cmd = &NewCmd{
-		Config:   cfg,
-		Category: "cat",
-		Filename: "test2",
-		Tags:     "foo, bar",
-		NoInline: true,
-	}
-	if err := cmd.Do(); err != nil {
-		t.Fatal(err)
-	}
-
-	n, err = LoadNote(filepath.Join(cfg.HomePath, "cat", "test2.md"), cfg)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if n.Title != "test2" {
-		t.Fatal(n.Title)
-	}
-
-	// Check .git is still there and does not raise an error
-	if cfg.GitPath != "" {
-		dotgit := filepath.Join(cfg.HomePath, ".git")
-		if s, err := os.Stat(dotgit); err != nil || !s.IsDir() {
-			t.Fatal(".git directory was not created. `git init` did not run:", err)
-		}
-		defer os.RemoveAll(dotgit)
-	}
 }
 
 func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
-	fake := fakeio.Stdout()
-	defer fake.Restore()
 
 	cfg := testNewConfigForNewCmd("empty")
-
-	cmd := &NewCmd{
-		Config:   cfg,
-		Category: "cat",
-		Filename: "test3",
-		Tags:     "foo, bar",
-		NoInline: true,
-	}
-
-	if err := cmd.Do(); err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(filepath.Join(cfg.HomePath, "cat"))
 	defer os.RemoveAll(filepath.Join(cfg.HomePath, ".git"))
 
-	p := filepath.Join(cfg.HomePath, "cat", "test3.md")
-	n, err := LoadNote(p, cfg)
-	if err != nil {
-		t.Fatal(err)
-	}
+	for _, tc := range []struct {
+		cat   string
+		title string
+	}{
+		{
+			cat:   "cat",
+			title: "inline-1",
+		},
+		{
+			cat:   "cat",
+			title: "inline-2",
+		},
+		{
+			cat:   "cat",
+			title: "inline-3",
+		},
+		{
+			cat:   "cat2",
+			title: "inline-1",
+		},
+		{
+			cat:   "cat3",
+			title: "inline-1",
+		},
+		{
+			cat:   "nested/cat",
+			title: "inline-1",
+		},
+		{
+			cat:   "nested/cat",
+			title: "inline-2",
+		},
+		{
+			cat:   "nested/more/cat",
+			title: "inline-1",
+		},
+		{
+			cat:   "morenested/more/more/more/cat",
+			title: "inline-1",
+		},
+	} {
+		defer os.RemoveAll(filepath.Join(cfg.HomePath, strings.Split(tc.cat, "/")[0]))
+		t.Run(tc.cat+"_"+tc.title, func(t *testing.T) {
+			cmd := &NewCmd{
+				Config:   cfg,
+				Category: tc.cat,
+				Filename: tc.title + ".md",
+				Tags:     "foo, bar",
+				NoInline: true,
+			}
 
-	if n.Category != "cat" {
-		t.Error(n.Category)
-	}
+			fake := fakeio.Stdout()
+			defer fake.Restore()
 
-	if !reflect.DeepEqual(n.Tags, []string{"foo", "bar"}) {
-		t.Error("Tags are not correct", n.Tags)
-	}
+			if err := cmd.Do(); err != nil {
+				t.Fatal(err)
+			}
 
-	if n.Title != "test3" {
-		t.Error(n.Title)
-	}
+			p := filepath.Join(cfg.HomePath, filepath.FromSlash(tc.cat), tc.title+".md")
+			n, err := LoadNote(p, cfg)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	if n.Created.After(time.Now()) {
-		t.Error("Created date invalid", n.Created.Format(time.RFC3339))
-	}
+			if n.Category != tc.cat {
+				t.Error("Note category mismatch", n.Category)
+			}
 
-	stdout, err := fake.String()
-	panicIfErr(err)
-	stdout = strings.TrimSuffix(stdout, "\n")
-	if stdout != p {
-		t.Error("Output is not path to the file:", stdout)
+			if !reflect.DeepEqual(n.Tags, []string{"foo", "bar"}) {
+				t.Error("Tags are not correct", n.Tags)
+			}
+
+			if n.Title != tc.title {
+				t.Error(n.Title)
+			}
+
+			if n.Created.After(time.Now()) {
+				t.Error("Created date invalid", n.Created.Format(time.RFC3339))
+			}
+
+			stdout, err := fake.String()
+			panicIfErr(err)
+			stdout = strings.TrimSuffix(stdout, "\n")
+			if stdout != p {
+				t.Error("Output is not path to the file:", stdout)
+			}
+		})
 	}
 }
 
