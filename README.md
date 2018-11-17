@@ -63,6 +63,24 @@ To uninstall, please remove `notes` (or `notes.exe` on Windows) executable.
 - Check existing notes on terminal with `notes ls -o` (`-o` means showing one line information for
   each note).
 
+Directories structure under notes-cli home is something like:
+
+```
+<HOME>
+├── category1
+│   ├── nested-category
+│   │   └── note3.md
+│   ├── note1.md
+│   └── note2.md
+├── category2
+│   ├── note4.md
+│   └── note5.md
+└── category3
+    └── note6.md
+```
+
+You can see more practical example home directory at [example directory](./example/notes-cli).
+
 
 
 ## Usage
@@ -89,24 +107,6 @@ Tags are `golang` and `file`. Tags are lables to organize notes and to make sear
 Tags can be omitted.
 
 Category and file name cannot start with `.` not to make hidden files/directories.
-
-Directories structure under home is something like:
-
-```
-<HOME>
-├── category1
-│   ├── nested-category
-│   │   └── note3.md
-│   ├── note1.md
-│   └── note2.md
-├── category2
-│   ├── note4.md
-│   └── note5.md
-└── category3
-    └── note6.md
-```
-
-You can see more practical example home directory at [example directory](./example/notes-cli).
 
 If you set your favorite editor to `$NOTES_CLI_EDITOR` environment variable, it opens the newly
 created note file with it. You can seamlessly edit the file. (If it is not set, `$EDITOR` is also
