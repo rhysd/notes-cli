@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"github.com/fatih/color"
@@ -90,10 +91,6 @@ func (cmd *ListCmd) printNoteFull(note *Note) {
 }
 
 func (cmd *ListCmd) writeTable(colors []*color.Color, table [][]string) error {
-	if len(table) == 0 {
-		return nil
-	}
-
 	lenCols := len(colors)
 
 	maxLen := make([]int, lenCols)
@@ -108,6 +105,7 @@ func (cmd *ListCmd) writeTable(colors []*color.Color, table [][]string) error {
 		maxLen[i] = max
 	}
 
+	out := bufio.NewWriter(cmd.Out)
 	for _, data := range table {
 		for i := 0; i < lenCols; i++ {
 			last := i == lenCols-1
@@ -124,19 +122,17 @@ func (cmd *ListCmd) writeTable(colors []*color.Color, table [][]string) error {
 
 			s := d + pad + sep
 
-			var err error
+			// No need to check errors returned from Fprint since the error will be caughted
+			// at out.Flush() call.
 			if c == nil {
-				_, err = fmt.Fprint(cmd.Out, s)
+				fmt.Fprint(out, s)
 			} else {
-				_, err = c.Fprint(cmd.Out, s)
-			}
-			if err != nil {
-				return err
+				c.Fprint(out, s)
 			}
 		}
 	}
 
-	return nil
+	return out.Flush()
 }
 
 func (cmd *ListCmd) printOnelineNotes(notes []*Note) error {
