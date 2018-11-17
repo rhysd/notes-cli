@@ -134,6 +134,10 @@ func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
 			cat:   "morenested/more/more/more/cat",
 			title: "inline-1",
 		},
+		{
+			cat:   "カテゴリ",
+			title: "ノート",
+		},
 	} {
 		defer os.RemoveAll(filepath.Join(cfg.HomePath, strings.Split(tc.cat, "/")[0]))
 		t.Run(tc.cat+"_"+tc.title, func(t *testing.T) {

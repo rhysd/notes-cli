@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/fatih/color"
+	"github.com/mattn/go-runewidth"
 	"github.com/pkg/errors"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io"
@@ -72,7 +73,7 @@ func (cmd *ListCmd) printNoteFull(note *Note) {
 	yellow.Fprint(cmd.Out, "Created:  ")
 	fmt.Fprintln(cmd.Out, note.Created.Format(time.RFC3339))
 	if note.Title != "" {
-		bold.Fprintf(cmd.Out, "\n%s\n%s\n\n", note.Title, strings.Repeat("=", len(note.Title)))
+		bold.Fprintf(cmd.Out, "\n%s\n%s\n\n", note.Title, strings.Repeat("=", runewidth.StringWidth(note.Title)))
 	}
 
 	body, err := note.ReadBodyN(200)
@@ -93,26 +94,34 @@ func (cmd *ListCmd) printNoteFull(note *Note) {
 func (cmd *ListCmd) writeTable(colors []*color.Color, table [][]string) error {
 	lenCols := len(colors)
 
+	textWidth := make([][]int, len(table))
+	for i := range textWidth {
+		textWidth[i] = make([]int, lenCols)
+	}
+
 	maxLen := make([]int, lenCols)
 	for i := 0; i < lenCols; i++ {
-		max := len(table[0][i])
-		for _, d := range table[1:] {
-			l := len(d[i])
+		max := runewidth.StringWidth(table[0][i])
+		textWidth[0][i] = max
+		for j, d := range table[1:] {
+			l := runewidth.StringWidth(d[i])
 			if l > max {
 				max = l
 			}
+			textWidth[j+1][i] = l
 		}
 		maxLen[i] = max
 	}
 
 	out := bufio.NewWriter(cmd.Out)
-	for _, data := range table {
-		for i := 0; i < lenCols; i++ {
-			last := i == lenCols-1
-			c := colors[i]
-			d := data[i]
-			max := maxLen[i]
-			pad := strings.Repeat(" ", max-len(d))
+	for i, data := range table {
+		for j := 0; j < lenCols; j++ {
+			last := j == lenCols-1
+			c := colors[j]
+			d := data[j]
+			max := maxLen[j]
+			width := textWidth[i][j]
+			pad := strings.Repeat(" ", max-width)
 
 			sep := " "
 			if last {

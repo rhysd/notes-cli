@@ -84,6 +84,7 @@ func CollectCategories(cfg *Config) (Categories, error) {
 				return err
 			}
 
+			path = normPathNFD(path)
 			name := info.Name()
 
 			if info.IsDir() {

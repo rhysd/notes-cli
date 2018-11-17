@@ -10,11 +10,14 @@ require (
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/mattn/go-colorable v0.0.9
 	github.com/mattn/go-isatty v0.0.4 // indirect
+	github.com/mattn/go-runewidth v0.0.3
 	github.com/pkg/errors v0.8.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rhysd/go-fakeio v0.0.0-20181103044911-f4b9186d1710
+	github.com/rhysd/go-fakeio v1.0.0
 	github.com/rhysd/go-github-selfupdate v1.1.0
 	github.com/rhysd/go-tmpenv v1.2.0
 	github.com/stretchr/testify v1.2.2 // indirect
+	golang.org/x/net v0.0.0-20181114220301-adae6a3d119a // indirect
+	golang.org/x/sys v0.0.0-20181116161606-93218def8b18 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )

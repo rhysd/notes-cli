@@ -12,7 +12,7 @@ guard :shell do
     case m[0]
     when /_test\.go$/
       parent = File.dirname m[0]
-      sources = Dir["#{parent}/*.go"].reject{|p| p.end_with? '_test.go'}
+      sources = Dir["#{parent}/*.go"].reject{|p| %w(_test.go _other.go).any?{|s| p.end_with? s } }
       sources << m[0] << "common_test.go"
       # Assume that https://github.com/rhysd/gotest is installed
       run "gotest #{sources.uniq.join ' '}"

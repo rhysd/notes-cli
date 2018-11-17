@@ -434,7 +434,7 @@ func TestListCmd(t *testing.T) {
 			`,
 		},
 		{
-			what:   "nested categories online log",
+			what:   "categories online log",
 			subdir: "nested",
 			cmd: &ListCmd{
 				Category: "/d",
@@ -446,7 +446,7 @@ func TestListCmd(t *testing.T) {
 			`,
 		},
 		{
-			what:   "nested categories full log",
+			what:   "categories full log",
 			subdir: "nested",
 			cmd: &ListCmd{
 				Category: "/d",
@@ -465,6 +465,39 @@ func TestListCmd(t *testing.T) {
 			this
 			is
 			test
+			
+			`,
+		},
+		{
+			what:   "oneline log",
+			subdir: "widechars",
+			cmd: &ListCmd{
+				Oneline: true,
+			},
+			want: `
+			cat/ノート.md             cat             タグ1,x     これはタイトル
+			カテゴリ/ノート.md        カテゴリ        tag3,タグ1  これはタイトル
+			カテゴリ/ネスト/ノート.md カテゴリ/ネスト タグ1,タグ2 これはタイトル
+			`,
+		},
+		{
+			what:   "full log with category and tag filtering",
+			subdir: "widechars",
+			cmd: &ListCmd{
+				Category: "カテゴリ",
+				Tag:      "タグ2",
+				Full:     true,
+			},
+			want: `
+			HOME/カテゴリ/ネスト/ノート.md
+			Category: カテゴリ/ネスト
+			Tags:     タグ1, タグ2
+			Created:  2018-10-30T11:17:45+09:00
+			
+			これはタイトル
+			==============
+			
+			これはマルチバイト文字のテストです
 			
 			`,
 		},
@@ -499,6 +532,9 @@ func TestListCmd(t *testing.T) {
 				ls := strings.Split(want, "\n")
 				hint := ""
 				for i, l := range strings.Split(have, "\n") {
+					if len(ls) <= i {
+						t.Fatalf("Having text is longer than wanted text at line %d: '%s'", i, l)
+					}
 					if l != ls[i] {
 						hint = fmt.Sprintf("first mismatch at line %d: want:%#v v.s. have:%#v", i+1, ls[i], l)
 						break

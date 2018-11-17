@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"github.com/mattn/go-runewidth"
 	"github.com/pkg/errors"
 	"io"
 	"io/ioutil"
@@ -93,7 +94,7 @@ func (note *Note) Create() error {
 		title = strings.TrimSuffix(note.File, filepath.Ext(note.File))
 	}
 	b.WriteString(title + "\n")
-	b.WriteString(strings.Repeat("=", len(title)) + "\n")
+	b.WriteString(strings.Repeat("=", runewidth.StringWidth(title)) + "\n")
 
 	if template != nil && bytes.HasPrefix(template, []byte("-->")) {
 		// User expects metadata to be commented out. Start to surround metadata with comment
@@ -198,6 +199,10 @@ func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 // NewNote creates a new note instance with given parameters and configuration. Category and file name
 // cannot be empty. If given file name lacks file extension, it automatically adds ".md" to file name.
 func NewNote(cat, tags, file, title string, cfg *Config) (*Note, error) {
+	cat = strings.TrimSpace(cat)
+	file = strings.TrimSpace(file)
+	title = strings.TrimSpace(title)
+
 	for _, part := range strings.Split(cat, "/") {
 		if err := validateDirname(part); err != nil {
 			return nil, errors.Wrapf(err, "Invalid category part '%s' as directory name", part)
@@ -226,6 +231,9 @@ func NewNote(cat, tags, file, title string, cfg *Config) (*Note, error) {
 // does not exist or when the file does note contain mandatory metadata ('Category', 'Tags' and 'Created'),
 // this function returns an error
 func LoadNote(path string, cfg *Config) (*Note, error) {
+	// This is necessary for macOS, where path contains NFD format
+	path = normPathNFD(path)
+
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot open note file")
@@ -248,7 +256,7 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 				}
 				titleFound = true
 			} else {
-				note.Title = line
+				note.Title = strings.TrimSpace(line)
 			}
 		} else if strings.HasPrefix(line, "- Category: ") {
 			note.Category = strings.TrimSpace(line[12:])
@@ -259,7 +267,7 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 				return nil, errors.Errorf("Category does not match to file path. Category is '%s' but it should be '%s' from its file path. File path is '%s'", note.Category, name, path)
 			}
 		} else if strings.HasPrefix(line, "- Tags:") {
-			tags := strings.Split(strings.TrimSpace(line[7:]), ",")
+			tags := strings.Split(line[7:], ",")
 			note.Tags = make([]string, 0, len(tags))
 			for _, t := range tags {
 				t = strings.TrimSpace(t)
