@@ -41,7 +41,7 @@ func TestSortNotes(t *testing.T) {
 		{
 			what: "created",
 			sort: func(n []*Note) { sortByCreated(n) },
-			want: []string{"1.md", "3.md", "2.md", "0.md", "4.md"},
+			want: []string{"4.md", "0.md", "2.md", "3.md", "1.md"},
 		},
 		{
 			what: "filename",

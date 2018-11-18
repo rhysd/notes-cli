@@ -212,7 +212,7 @@ func TestParseExternalCommand(t *testing.T) {
 				t.Fatal("Output to stderr is unexpected:", output)
 			}
 
-			want := fmt.Sprintln(tc.args)
+			want := fmt.Sprintln(append([]string{os.Args[0]}, tc.args...))
 			if !strings.Contains(output, want) {
 				t.Fatal("Passed arguments to external command is unexpected. Wanted", want, "in output but have output", output)
 			}

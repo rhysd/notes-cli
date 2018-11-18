@@ -36,12 +36,12 @@ func TestListCmd(t *testing.T) {
 			what: "default",
 			cmd:  &ListCmd{},
 			want: `
-			HOME/a/4.md
-			HOME/a/1.md
-			HOME/c/5.md
-			HOME/b/2.md
-			HOME/c/3.md
 			HOME/b/6.md
+			HOME/c/3.md
+			HOME/b/2.md
+			HOME/c/5.md
+			HOME/a/1.md
+			HOME/a/4.md
 			`,
 		},
 		{
@@ -50,12 +50,12 @@ func TestListCmd(t *testing.T) {
 				SortBy: "created",
 			},
 			want: `
-			HOME/a/4.md
-			HOME/a/1.md
-			HOME/c/5.md
-			HOME/b/2.md
-			HOME/c/3.md
 			HOME/b/6.md
+			HOME/c/3.md
+			HOME/b/2.md
+			HOME/c/5.md
+			HOME/a/1.md
+			HOME/a/4.md
 			`,
 		},
 		{
@@ -92,12 +92,12 @@ func TestListCmd(t *testing.T) {
 				Relative: true,
 			},
 			want: `
-			a/4.md
-			a/1.md
-			c/5.md
-			b/2.md
-			c/3.md
 			b/6.md
+			c/3.md
+			b/2.md
+			c/5.md
+			a/1.md
+			a/4.md
 			`,
 		},
 		{
@@ -121,12 +121,12 @@ func TestListCmd(t *testing.T) {
 				Oneline: true,
 			},
 			want: `
-			a/4.md a bar        this is title this is title this is title this is title this is title ...
-			a/1.md a foo,bar    this is title
-			c/5.md c a-bit-long this is title
-			b/2.md b foo        this is title
-			c/3.md c            this is title
 			b/6.md b future     text from future
+			c/3.md c            this is title
+			b/2.md b foo        this is title
+			c/5.md c a-bit-long this is title
+			a/1.md a foo,bar    this is title
+			a/4.md a bar        this is title this is title this is title this is title this is title ...
 			`,
 		},
 		{
@@ -150,8 +150,8 @@ func TestListCmd(t *testing.T) {
 				Category: "a",
 			},
 			want: `
-			HOME/a/4.md
 			HOME/a/1.md
+			HOME/a/4.md
 			`,
 		},
 		{
@@ -181,8 +181,8 @@ func TestListCmd(t *testing.T) {
 				Tag: "foo",
 			},
 			want: `
-			HOME/a/1.md
 			HOME/b/2.md
+			HOME/a/1.md
 			`,
 		},
 		{
@@ -221,29 +221,75 @@ func TestListCmd(t *testing.T) {
 				Full: true,
 			},
 			want: `
-			HOME/a/4.md
-			Category: a
-			Tags:     bar
-			Created:  2017-10-30T11:37:45+09:00
+			HOME/b/6.md
+			Category: b
+			Tags:     future
+			Created:  2118-10-30T11:37:45+09:00
 			
-			this is title this is title this is title this is title this is title this is title this is title this is title
-			===============================================================================================================
+			text from future
+			================
 			
-			this
-			is
-			old text
+			Lorem ipsum dolor sit amet, his no stet volumus sententiae. Usu id postea animal
+			consetetur. Eum repudiare laboramus conclusionemque et, veritus tractatos dignissim
+			duo ut. Ex sed quod admodum indoctu
 			
-			HOME/a/1.md
-			Category: a
-			Tags:     foo, bar
-			Created:  2018-10-30T11:17:45+09:00
+			HOME/c/3.md
+			Category: c
+			Tags:     
+			Created:  2018-12-30T11:37:45+09:00
 			
 			this is title
 			=============
 			
 			this
 			is
-			test
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			this
+			is
+			newer
+			
+			HOME/b/2.md
+			Category: b
+			Tags:     foo
+			Created:  2018-11-01T11:37:45+09:00
+			
+			this is title
+			=============
+			
+			Lorem ipsum dolor sit amet, his no stet volumus sententiae. Usu id postea animal consetetur. Eum repudiare laboramus conclusionemque et, veritus tractatos dignissim duo ut. Ex sed quod admodum indoctu
 			
 			HOME/c/5.md
 			Category: c
@@ -300,75 +346,29 @@ func TestListCmd(t *testing.T) {
 			test
 			this
 			
-			HOME/b/2.md
-			Category: b
-			Tags:     foo
-			Created:  2018-11-01T11:37:45+09:00
-			
-			this is title
-			=============
-			
-			Lorem ipsum dolor sit amet, his no stet volumus sententiae. Usu id postea animal consetetur. Eum repudiare laboramus conclusionemque et, veritus tractatos dignissim duo ut. Ex sed quod admodum indoctu
-			
-			HOME/c/3.md
-			Category: c
-			Tags:     
-			Created:  2018-12-30T11:37:45+09:00
+			HOME/a/1.md
+			Category: a
+			Tags:     foo, bar
+			Created:  2018-10-30T11:17:45+09:00
 			
 			this is title
 			=============
 			
 			this
 			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
+			test
 			
-			HOME/b/6.md
-			Category: b
-			Tags:     future
-			Created:  2118-10-30T11:37:45+09:00
+			HOME/a/4.md
+			Category: a
+			Tags:     bar
+			Created:  2017-10-30T11:37:45+09:00
 			
-			text from future
-			================
+			this is title this is title this is title this is title this is title this is title this is title this is title
+			===============================================================================================================
 			
-			Lorem ipsum dolor sit amet, his no stet volumus sententiae. Usu id postea animal
-			consetetur. Eum repudiare laboramus conclusionemque et, veritus tractatos dignissim
-			duo ut. Ex sed quod admodum indoctu
+			this
+			is
+			old text
 			
 			`,
 		},
@@ -399,12 +399,12 @@ func TestListCmd(t *testing.T) {
 			subdir: "nested",
 			cmd:    &ListCmd{},
 			want: `
-			HOME/b/f/1.md
-			HOME/b/2.md
-			HOME/a/d/e/3.md
-			HOME/a/d/4.md
-			HOME/a/5.md
 			HOME/c/6.md
+			HOME/a/5.md
+			HOME/a/d/4.md
+			HOME/a/d/e/3.md
+			HOME/b/2.md
+			HOME/b/f/1.md
 			`,
 		},
 		{
@@ -423,14 +423,14 @@ func TestListCmd(t *testing.T) {
 			`,
 		},
 		{
-			what:   "nested categories filtered by category",
+			what:   "categories filtered by category",
 			subdir: "nested",
 			cmd: &ListCmd{
 				Category: "/d",
 			},
 			want: `
-			HOME/a/d/e/3.md
 			HOME/a/d/4.md
+			HOME/a/d/e/3.md
 			`,
 		},
 		{
@@ -441,8 +441,8 @@ func TestListCmd(t *testing.T) {
 				Oneline:  true,
 			},
 			want: `
-			a/d/e/3.md a/d/e a,piyo this is title
 			a/d/4.md   a/d   d,bar  this is title
+			a/d/e/3.md a/d/e a,piyo this is title
 			`,
 		},
 		{
@@ -475,9 +475,9 @@ func TestListCmd(t *testing.T) {
 				Oneline: true,
 			},
 			want: `
-			カテゴリ/ノート.md        カテゴリ        tag3,タグ1  これはタイトル
-			カテゴリ/ネスト/ノート.md カテゴリ/ネスト タグ1,タグ2 これはタイトル
 			cat/ノート.md             cat             タグ1,x     これはタイトル
+			カテゴリ/ネスト/ノート.md カテゴリ/ネスト タグ1,タグ2 これはタイトル
+			カテゴリ/ノート.md        カテゴリ        tag3,タグ1  これはタイトル
 			`,
 		},
 		{
@@ -562,7 +562,7 @@ func TestListNotesVariousHomes(t *testing.T) {
 		},
 		{
 			home: "hide-metadata",
-			want: "a/1.md\na/2.md\n",
+			want: "a/2.md\na/1.md\n",
 		},
 		{
 			home: "with-dot-dirs",
@@ -806,12 +806,12 @@ func TestListCmdEditOption(t *testing.T) {
 	have := strings.Split(strings.TrimRight(stdout, "\n"), " ")
 	want := []string{}
 	for _, p := range []string{
-		"a/4.md",
-		"a/1.md",
-		"c/5.md",
-		"b/2.md",
-		"c/3.md",
 		"b/6.md",
+		"c/3.md",
+		"b/2.md",
+		"c/5.md",
+		"a/1.md",
+		"a/4.md",
 	} {
 		p = filepath.Join(cfg.HomePath, filepath.FromSlash(p))
 		want = append(want, p)

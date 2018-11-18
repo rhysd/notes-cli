@@ -17,7 +17,7 @@ func (a byCreated) Swap(i, j int) {
 	a[i], a[j] = a[j], a[i]
 }
 func (a byCreated) Less(i, j int) bool {
-	return a[i].Created.Before(a[j].Created)
+	return a[i].Created.After(a[j].Created)
 }
 
 func sortByCreated(n []*Note) {
