@@ -1,3 +1,19 @@
+<a name="v1.4.0"></a>
+# [v1.4.0](https://github.com/rhysd/notes-cli/releases/tag/v1.4.0) - 18 Nov 2018
+
+- **New:** Now category can be nested with `/` like `blog/myown` or `blog/dev.to`.
+- **New:** Allow to create an external subcommands like `git`. `notes-foo` in `$PATH` is called on `notes foo` with passing arguments and path to `notes` executable.
+- **New:** Allow to put `.template.md` at root of notes-cli home directory tree. It is always used as template for creating a new note if category-specific `.template.md` is not found.
+- **Improve:** When a template is starting with `-->` (closing comment), `notes` considers it is hiding metadata and automatically insert corresponding `<!--` before metadata
+- **New:** (API) `Category` and `Categories` types are added and `CollectCategories()` factory function is added
+- **Fix:** Category or file name or tags which contain wide characters such as CJK are now correctly aligned
+- **Fix:** Sort order at `--sort created` was opposite. Now it is in descending order hence `head -1` can take the latest note
+- **Fix:** Close file after inline input is written to created note at `notes new`
+- **Improve:** (Doc) Tweak README sections structure and add TOC since it gets bigger.
+
+[Changes][v1.4.0]
+
+
 <a name="v1.3.0"></a>
 # [v1.3.0](https://github.com/rhysd/notes-cli/releases/tag/v1.3.0) - 14 Nov 2018
 
@@ -88,6 +104,7 @@ https://github.com/rhysd/notes-cli/blob/master/README.md
 [Changes][v1.0.0]
 
 
+[v1.4.0]: https://github.com/rhysd/notes-cli/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/rhysd/notes-cli/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/rhysd/notes-cli/compare/v1.1.2...v1.2.0
 [v1.1.2]: https://github.com/rhysd/notes-cli/compare/v1.1.1...v1.1.2
