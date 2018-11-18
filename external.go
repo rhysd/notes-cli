@@ -19,11 +19,14 @@ type ExternalCmd struct {
 	ExePath string
 	// Args is arguments passed to external subcommand. Arguments specified to `notes` are forwarded
 	Args []string
+	// NotesPath is an executable path of the `notes` command. This is passed to the first argument of external subcommand
+	NotesPath string
 }
 
-// Do invokes executable command with exec. If it did not exit successfully this function returns an error
+// Do invokes external subcommand with exec. If it did not exit successfully this function returns an error
 func (cmd *ExternalCmd) Do() error {
-	c := exec.Command(cmd.ExePath, cmd.Args...)
+	args := append([]string{cmd.NotesPath}, cmd.Args...)
+	c := exec.Command(cmd.ExePath, args...)
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
 	c.Stdin = os.Stdin
@@ -48,8 +51,14 @@ func NewExternalCmd(fromErr error, args []string) (*ExternalCmd, bool) {
 		return nil, false
 	}
 
+	notes, err := os.Executable()
+	if err != nil {
+		return nil, false
+	}
+
 	return &ExternalCmd{
-		ExePath: exe,
-		Args:    args,
+		ExePath:   exe,
+		Args:      args,
+		NotesPath: notes,
 	}, true
 }

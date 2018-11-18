@@ -333,20 +333,29 @@ Yes. Like [Git](https://git-scm.com/), `notes` command tries to run external sub
 specifies unknown subcommand. For example, when entering `notes foo`, `notes` command notices that
 it is not a built-in subcommand. Then it attempts to execute `notes-foo` with the same arguments.
 
-Let's say following script is put in your `$PATH` as `notes-hello`.
+Following arguments are passed to underlying external subcommand:
+
+```
+{full path to notes} {global options...} {subcommand} {local options...}
+```
+
+For example, let's say following script is put in your `$PATH` as `notes-hello`.
 
 ```sh
 #!/bin/sh
 echo "Hello! $*"
 ```
 
-And hit `notes hello`. It outputs `Hello! hello` since given argument `hello` is simply passed to
-executed underlying subcommand.
-So, when hit `notes --no-color hello --foo`, it outputs `Hello! --no-color hello --foo`. By forwarding
-all arguments, subcommand can refer global options specified before subcommand.
+And hit `notes hello`. It outputs `Hello! /path/to/bin/notes hello` since given argument `hello` is
+simply passed to executed underlying subcommand with full path of `notes`.
+So, when hit `notes --no-color hello --foo`, it outputs `Hello! /path/to/bin/notes --no-color hello --foo`.
+By forwarding all arguments, subcommand can refer global options specified before subcommand.
 
 This external subcommand support is useful when you want to extend `notes` functionality to fit your
-usage. For example, you can create your own command to upload your blog notes to your blog services.
+usage. For example:
+
+- You can create your own command to upload your blog notes to your blog services.
+- You can create your own alias command like `ls -o -s modified` -> `lsmod`.
 
 
 ### Shell Completions

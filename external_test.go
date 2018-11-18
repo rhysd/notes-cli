@@ -42,6 +42,9 @@ func TestNewExternalCmdOK(t *testing.T) {
 		if !reflect.DeepEqual(args, c.Args) {
 			t.Fatal("Passed args are unexpected:", c.Args)
 		}
+		if !strings.HasSuffix(c.NotesPath, os.Args[0]) {
+			t.Fatal("`notes` full path is unexpected:", c.NotesPath, "wanted full path of", os.Args[0])
+		}
 	}
 }
 
@@ -103,7 +106,8 @@ func TestRunExternalCommandOK(t *testing.T) {
 		t.Fatal("Output to stderr is unexpected:", out)
 	}
 
-	want := fmt.Sprintln(args)
+	// First argument is a executable path of `notes`. Ignore it by strings.HasSuffix()
+	want := fmt.Sprintln(append([]string{os.Args[0]}, args...))
 	if !strings.Contains(out, want) {
 		t.Fatal("Passed arguments to external command is unexpected. Wanted", want, "in output but have output", out)
 	}
