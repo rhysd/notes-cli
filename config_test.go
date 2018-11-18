@@ -115,7 +115,7 @@ func TestNewConfigCustomizeHome(t *testing.T) {
 	} {
 		t.Run(tc.key, func(t *testing.T) {
 			if runtime.GOOS != "windows" && tc.key == "APPLOCALDATA" {
-				t.Skip("APPLOCALDATA is refered only on Windows")
+				t.Skip("APPLOCALDATA is referred only on Windows")
 			}
 
 			g := testNewConfigEnvGuard()

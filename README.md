@@ -100,10 +100,10 @@ creates a note file at `<HOME>/notes-cli/blog/how-to-handle-files.md` where `<HO
 by `$NOTES_CLI_HOME` environment variable. The home directory is automatically created.
 
 Category is `blog`. Every note must belong to one category. Category can be nested with `/`. For example,
-if have multitple blogs Blog A and Blog B, you may want to categorize blog posts with categories like
+if have multiple blogs Blog A and Blog B, you may want to categorize blog posts with categories like
 `blog/A`, `blog/B`.
 
-Tags are `golang` and `file`. Tags are lables to organize notes and to make search notes easier.
+Tags are `golang` and `file`. Tags are labels to organize notes and to make search notes easier.
 Tags can be omitted.
 
 Category and file name cannot start with `.` not to make hidden files/directories.
@@ -142,7 +142,7 @@ you also need to adjust directory structure manually (move the note file to new 
 For more details, please check `notes new --help`.
 
 
-### Open notes you created flexibly
+###  Flexibly open notes you created
 
 Let's say to open some notes you created.
 
@@ -235,11 +235,11 @@ It shows
 - Full path to the note file
 - Metadata `Category`, `Tags` and `Created`
 - Title of note
-- Body of note (upto 200 bytes)
+- Body of note (up to 200 bytes)
 
 with colors.
 
-When there are many notes, it outputs many lines. In the acse, a pager tool like `less` is useful
+When there are many notes, it outputs many lines. In the case, a pager tool like `less` is useful
 to see the output per page. `-A` global option is short of `--always-color`.
 
 ```
@@ -537,6 +537,15 @@ If you want to differentiate images directory from other category directories, p
 like `HOME/.images` since category directories cannot have `.` prefix as their names.
 
 
+### Is it possible to use `--color-always` by default?
+
+Please use shell's alias feature as follows:
+
+```sh
+alias notes='notes --color-always'
+```
+
+
 ### How can I migrate from [memolist.vim](https://github.com/glidenote/memolist.vim)?
 
 Please try [migration script](./scripts/migrate-from-memolist.rb).
@@ -612,7 +621,7 @@ endfunction
 command! -nargs=* NotesLastMod call <SID>notes_last_mod(<q-args>)
 ```
 
-- `:NotesGrep [args] /pat/`: It searches notes by `:vimgrep` with givein `/pat/`. Thanks to `:vimgrep`,
+- `:NotesGrep [args] /pat/`: It searches notes by `:vimgrep` with given `/pat/`. Thanks to `:vimgrep`,
   the search result is stored to a quickfix list. You can easily check matches and open the file from
   the list by open quickfix window with `:copen`.
 - `:NotesNew [args]`: It creates a new note and opens it with a new buffer. `args` is the same as
