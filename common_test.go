@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,7 +11,15 @@ import (
 
 // Precondition for tests
 func init() {
-	for _, env := range []string{"NOTES_CLI_HOME", "NOTES_CLI_GIT", "NOTES_CLI_EDITOR", "EDITOR", "XDG_DATA_HOME"} {
+	for _, env := range []string{
+		"NOTES_CLI_HOME",
+		"NOTES_CLI_GIT",
+		"NOTES_CLI_EDITOR",
+		"NOTES_CLI_PAGER",
+		"EDITOR",
+		"XDG_DATA_HOME",
+		"PAGER",
+	} {
 		os.Unsetenv(env)
 	}
 }
@@ -42,4 +51,11 @@ func testExternalCommandBinaryDir(name string, t *testing.T) string {
 		panicIfErr(err)
 	}
 	return filepath.Dir(exe)
+}
+
+type alwaysErrorWriter struct {
+}
+
+func (w alwaysErrorWriter) Write(p []byte) (int, error) {
+	return 0, errors.New("Write error for test")
 }
