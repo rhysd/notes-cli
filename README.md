@@ -194,8 +194,8 @@ $ notes ls | xargs ag -l documentation | xargs -o vim
 ```
 
 `notes ls` accepts `--sort` option and changes the order of list. By default, the order is created
-date time of note. By ordering with modified time of note, you can instantly open last-modified note
-as follows since first line is a path to the note most recently modified.
+date time of note in descending order. By ordering with modified time of note, you can instantly
+open last-modified note as follows since first line is a path to the note most recently modified.
 
 ```
 $ note ls --sort modified | head -1 | xargs -o vim
@@ -239,8 +239,12 @@ It shows
 
 with colors.
 
+When output is larger and whole output cannot be shown in screen at once, `list` does paging for the
+output using `less` command (if available). This behavior can be customized by `$NOTES_CLI_PAGER`.
+
 When there are many notes, it outputs many lines. In the case, a pager tool like `less` is useful
-to see the output per page. `-A` global option is short of `--always-color`.
+You can also use `less` with pipe explicitly to see the output per page. `-A` global option is short
+of `--always-color`.
 
 ```
 $ notes -A ls --full | less -R
@@ -260,7 +264,8 @@ blog/how-to-handle-files.md blog golang,file How to handle files in Go
 - Third field indicates comma-separated tags of the note. When note has no tag, it leaves as blank.
 - Rest is a title of the note
 
-This is useful for checking many notes at a glance.
+This is useful for checking many notes at a glance. When output is larger, `less` is used for paging
+the output if available.
 
 For more details, please see `notes list --help`.
 
@@ -325,6 +330,26 @@ By default, it only adds and commits your notes to the repository. But if you se
 the repository, it automatically pushes the notes to the remote.
 
 For more details, please see `notes save --help`.
+
+
+### Configure behavior with environment variables
+
+As described above, some behavior can be configurable with environment variables. Here is a table of
+all environment variables affecting behavior of `notes`. Variables starting with `$NOTES_` are dedicated
+for `notes` command. Others are general environment variables affecting `notes` behavior.
+
+| Name                | Default                                    | Description                                                                |
+|---------------------|--------------------------------------------|----------------------------------------------------------------------------|
+| `$NOTES_CLI_HOME`   | `notes-cli` under [XDG data dir][xdg-dirs] | Home directory of `notes`. All notes are stored in sub directories         |
+| `$NOTES_CLI_EDITOR` | None                                       | Your favorite editor command. It can contain options like `"vim -g"`       |
+| `$NOTES_CLI_GIT`    | `"git"`                                    | Git command path. It is used for saving notes as Git repository            |
+| `$NOTES_CLI_PAGER`  | `"less -R -F -X"`                          | Pager command for paging long output from `notes list`                     |
+| `$XDG_DATA_HOME`    | None                                       | When `$NOTES_CLI_HOME` is not set, it is used for home                     |
+| `$APPLOCALDATA`     | None                                       | Even if `$XDG_DATA_HOME` is not set, it is used for home on Windows        |
+| `$EDITOR`           | None                                       | When `$NOTES_CLI_EDITOR` is not set, it is referred to pick editor command |
+| `$PAGER`            | None                                       | When `$NOTES_CLI_PAGER` is not set, it is referred to pick pager command   |
+
+You can see the configurations by `notes config` command.
 
 
 ### Extend `notes` command by adding new subcommands

@@ -6,6 +6,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/kballard/go-shellquote"
 	"github.com/rhysd/go-fakeio"
+	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -837,5 +839,72 @@ func TestListNoNotePrintNothing(t *testing.T) {
 
 	if buf.Len() != 0 {
 		t.Fatal("Some output:", buf.String())
+	}
+}
+
+func TestListPagingWithPager(t *testing.T) {
+	if _, err := exec.LookPath("cat"); err != nil {
+		t.Skip("`cat` command is necessary to run this test")
+	}
+
+	var buf bytes.Buffer
+
+	cfg := testNewConfigForListCmd("normal")
+	cfg.PagerCmd = "cat"
+	cmd := &ListCmd{
+		Config: cfg,
+		Out:    &buf,
+	}
+
+	if err := cmd.Do(); err != nil {
+		t.Fatal(err)
+	}
+
+	lines := strings.Split(strings.Trim(buf.String(), "\n"), "\n")
+	for _, l := range lines {
+		if _, err := os.Stat(l); err != nil {
+			t.Fatal(l, "does not exist:", err)
+		}
+	}
+}
+
+func TestListPagingError(t *testing.T) {
+	for _, tc := range []struct {
+		cmd  string
+		want string
+		out  io.Writer
+	}{
+		{
+			cmd:  "'foo",
+			want: "Cannot parsing",
+		},
+		{
+			cmd:  "/path/to/bin/unknown",
+			want: "Cannot start pager command",
+		},
+		{
+			cmd:  "echo",
+			want: "Pager command did not run successfully: Write error for test",
+			out:  alwaysErrorWriter{},
+		},
+	} {
+		t.Run(tc.cmd, func(t *testing.T) {
+			cfg := testNewConfigForListCmd("normal")
+			cfg.PagerCmd = tc.cmd
+
+			out := tc.out
+			if out == nil {
+				out = ioutil.Discard
+			}
+
+			cmd := &ListCmd{
+				Config: cfg,
+				Out:    out,
+			}
+
+			if err := cmd.Do(); err == nil || !strings.Contains(err.Error(), tc.want) {
+				t.Fatal("Error unexpected", err)
+			}
+		})
 	}
 }

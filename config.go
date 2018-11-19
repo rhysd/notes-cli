@@ -24,6 +24,8 @@ type Config struct {
 	// this value will be empty. When empty, some functionality which requires an editor to open note doesn't
 	// work
 	EditorCmd string
+	// PagerCmd is a command for paging output from 'list' subcommand. If $NOTES_CLI_PAGER is set, it is used.
+	PagerCmd string
 }
 
 func homePath() (string, error) {
@@ -64,10 +66,24 @@ func gitPath() string {
 }
 
 func editorCmd() string {
-	for _, key := range []string{"NOTES_CLI_EDITOR", "EDITOR"} {
-		if env := os.Getenv(key); env != "" {
-			return env
-		}
+	if env := os.Getenv("NOTES_CLI_EDITOR"); env != "" {
+		return env
+	}
+	if env := os.Getenv("EDITOR"); env != "" {
+		return env
+	}
+	return ""
+}
+
+func pagerCmd() string {
+	if env := os.Getenv("NOTES_CLI_PAGER"); env != "" {
+		return env
+	}
+	if env := os.Getenv("PAGER"); env != "" {
+		return env
+	}
+	if _, err := exec.LookPath("less"); err == nil {
+		return "less -R -F -X"
 	}
 	return ""
 }
@@ -86,5 +102,5 @@ func NewConfig() (*Config, error) {
 		return nil, errors.Wrapf(err, "Could not create home '%s'", h)
 	}
 
-	return &Config{h, gitPath(), editorCmd()}, nil
+	return &Config{h, gitPath(), editorCmd(), pagerCmd()}, nil
 }

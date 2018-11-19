@@ -17,7 +17,9 @@ func testNewConfigEnvGuard() *tmpenv.Envguard {
 		"APPLOCALDATA",
 		"NOTES_CLI_GIT",
 		"NOTES_CLI_EDITOR",
+		"NOTES_CLI_PAGER",
 		"EDITOR",
+		"PAGER",
 	)
 	panicIfErr(err)
 	return g
@@ -25,6 +27,7 @@ func testNewConfigEnvGuard() *tmpenv.Envguard {
 
 func TestNewDefaultConfig(t *testing.T) {
 	g := testNewConfigEnvGuard()
+	g.Unsetenv("PATH") // Also unset $PATH to simulate git and less are not installed
 	defer func() { panicIfErr(g.Restore()) }()
 
 	c, err := NewConfig()
@@ -41,17 +44,36 @@ func TestNewDefaultConfig(t *testing.T) {
 	if !stat.IsDir() {
 		t.Fatal("Directory was not created for home:", stat)
 	}
-	if _, err := exec.LookPath("git"); err == nil {
-		if c.GitPath == "" {
-			t.Fatal("Git path was not detected")
-		}
-	} else {
-		if c.GitPath != "" {
-			t.Fatal("Git path should not be detected:", c.GitPath)
-		}
+	if c.GitPath != "" {
+		t.Fatal("Git path should not be detected:", c.GitPath)
 	}
 	if c.EditorCmd != "" {
 		t.Fatal("Editor path should be empty by default:", c.EditorCmd)
+	}
+}
+
+func TestNewDefaultConfigWithGitAndLess(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("`git` is not available", err)
+	}
+	if _, err := exec.LookPath("less"); err != nil {
+		t.Skip("`less` is not available", err)
+	}
+
+	g := testNewConfigEnvGuard()
+	defer func() { panicIfErr(g.Restore()) }()
+
+	c, err := NewConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if c.GitPath == "" {
+		t.Fatal("Git path should not be empty")
+	}
+
+	if c.PagerCmd != "less -R -F -X" {
+		t.Fatal("`less -R -F -X` should be set as default", c.PagerCmd)
 	}
 }
 
@@ -64,6 +86,7 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 	qls := shellquote.Join(ls) // On Windows, it may contain 'Program Files'
 	os.Setenv("NOTES_CLI_GIT", ls)
 	os.Setenv("NOTES_CLI_EDITOR", qls)
+	os.Setenv("NOTES_CLI_PAGER", qls)
 
 	c, err := NewConfig()
 	if err != nil {
@@ -78,8 +101,14 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 		t.Fatal("Editor is unexpected:", c.EditorCmd, "wanted:", qls)
 	}
 
+	if c.PagerCmd != qls {
+		t.Fatal("Pager is unexpected:", c.PagerCmd, "wanted:", qls)
+	}
+
 	os.Unsetenv("NOTES_CLI_EDITOR")
 	os.Setenv("EDITOR", qls)
+	os.Unsetenv("NOTES_CLI_PAGER")
+	os.Setenv("PAGER", qls)
 
 	c, err = NewConfig()
 	if err != nil {
@@ -88,6 +117,9 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 
 	if c.EditorCmd != qls {
 		t.Fatal("Editor is unexpected:", c.EditorCmd, "wanted:", qls)
+	}
+	if c.PagerCmd != qls {
+		t.Fatal("Pager is unexpected:", c.PagerCmd, "wanted:", qls)
 	}
 }
 

@@ -24,6 +24,7 @@ var (
 // Out field represents where this command should output.
 type ListCmd struct {
 	cli, cliAlias *kingpin.CmdClause
+	out           io.Writer
 	Config        *Config
 	// Full is a flag equivalent to --full
 	Full bool
@@ -65,15 +66,15 @@ func (cmd *ListCmd) matchesCmdline(cmdline string) bool {
 }
 
 func (cmd *ListCmd) printNoteFull(note *Note) {
-	green.Fprintln(cmd.Out, note.FilePath())
-	yellow.Fprint(cmd.Out, "Category: ")
-	fmt.Fprintln(cmd.Out, note.Category)
-	yellow.Fprint(cmd.Out, "Tags:     ")
-	fmt.Fprintln(cmd.Out, strings.Join(note.Tags, ", "))
-	yellow.Fprint(cmd.Out, "Created:  ")
-	fmt.Fprintln(cmd.Out, note.Created.Format(time.RFC3339))
+	green.Fprintln(cmd.out, note.FilePath())
+	yellow.Fprint(cmd.out, "Category: ")
+	fmt.Fprintln(cmd.out, note.Category)
+	yellow.Fprint(cmd.out, "Tags:     ")
+	fmt.Fprintln(cmd.out, strings.Join(note.Tags, ", "))
+	yellow.Fprint(cmd.out, "Created:  ")
+	fmt.Fprintln(cmd.out, note.Created.Format(time.RFC3339))
 	if note.Title != "" {
-		bold.Fprintf(cmd.Out, "\n%s\n%s\n\n", note.Title, strings.Repeat("=", runewidth.StringWidth(note.Title)))
+		bold.Fprintf(cmd.out, "\n%s\n%s\n\n", note.Title, strings.Repeat("=", runewidth.StringWidth(note.Title)))
 	}
 
 	body, err := note.ReadBodyN(200)
@@ -81,13 +82,13 @@ func (cmd *ListCmd) printNoteFull(note *Note) {
 		return
 	}
 
-	fmt.Fprint(cmd.Out, body)
+	fmt.Fprint(cmd.out, body)
 
 	// Adjust end of body. Ensure it ends with \n\n
 	if !strings.HasSuffix(body, "\n") {
-		fmt.Fprint(cmd.Out, "\n\n")
+		fmt.Fprint(cmd.out, "\n\n")
 	} else if !strings.HasSuffix(body, "\n\n") {
-		fmt.Fprintln(cmd.Out)
+		fmt.Fprintln(cmd.out)
 	}
 }
 
@@ -113,7 +114,7 @@ func (cmd *ListCmd) writeTable(colors []*color.Color, table [][]string) error {
 		maxLen[i] = max
 	}
 
-	out := bufio.NewWriter(cmd.Out)
+	out := bufio.NewWriter(cmd.out)
 	for i, data := range table {
 		for j := 0; j < lenCols; j++ {
 			last := j == lenCols-1
@@ -207,7 +208,7 @@ func (cmd *ListCmd) printNotes(notes []*Note) error {
 		}
 		b.WriteRune('\n')
 	}
-	_, err := cmd.Out.Write(b.Bytes())
+	_, err := cmd.out.Write(b.Bytes())
 	return err
 }
 
@@ -265,5 +266,22 @@ func (cmd *ListCmd) Do() error {
 	if len(notes) == 0 {
 		return nil
 	}
-	return cmd.printNotes(notes)
+
+	if cmd.Config.PagerCmd == "" {
+		cmd.out = cmd.Out
+		return cmd.printNotes(notes)
+	}
+
+	pager, err := StartPagerWriter(cmd.Config.PagerCmd, cmd.Out)
+	if err != nil {
+		return err
+	}
+
+	cmd.out = pager
+	if err := cmd.printNotes(notes); err != nil {
+		return err
+	}
+
+	pager.Wait()
+	return errors.Wrap(pager.Err, "Pager command did not run successfully")
 }
