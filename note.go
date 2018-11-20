@@ -142,7 +142,7 @@ func (note *Note) Open() error {
 }
 
 // ReadBodyN reads body of note until maxBytes bytes and returns it as string
-func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
+func (note *Note) ReadBodyN(maxBytes int) (string, error) {
 	path := note.FilePath()
 	f, err := os.Open(path)
 	if err != nil {
@@ -184,13 +184,23 @@ func (note *Note) ReadBodyN(maxBytes int64) (string, error) {
 		}
 	}
 
-	len := int64(buf.Len())
+	len := buf.Len()
 	if len > maxBytes {
-		return string(buf.Bytes()[:maxBytes]), nil
+		return string(buf.Bytes())[:maxBytes], nil
 	}
 
-	if _, err := io.CopyN(&buf, r, maxBytes-len); err != nil && err != io.EOF {
-		return "", err
+	// io.Copy is not available since we need to consider wide characters. Otherwise,
+	// last wide character may be split at middle of code unit.
+	for len < maxBytes-len {
+		c, size, err := r.ReadRune()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return "", err
+		}
+		buf.WriteRune(c)
+		len += size
 	}
 
 	return buf.String(), nil
