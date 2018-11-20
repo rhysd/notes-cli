@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/mattn/go-runewidth"
 	"github.com/pkg/errors"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -141,8 +140,8 @@ func (note *Note) Open() error {
 	return openEditor(note.Config, note.FilePath())
 }
 
-// ReadBodyN reads body of note until maxBytes bytes and returns it as string
-func (note *Note) ReadBodyN(maxBytes int) (string, error) {
+// ReadBodyLines reads body of note until maxLines lines and returns it as string
+func (note *Note) ReadBodyLines(maxLines int) (string, error) {
 	path := note.FilePath()
 	f, err := os.Open(path)
 	if err != nil {
@@ -184,23 +183,12 @@ func (note *Note) ReadBodyN(maxBytes int) (string, error) {
 		}
 	}
 
-	len := buf.Len()
-	if len > maxBytes {
-		return string(buf.Bytes())[:maxBytes], nil
-	}
-
-	// io.Copy is not available since we need to consider wide characters. Otherwise,
-	// last wide character may be split at middle of code unit.
-	for len < maxBytes-len {
-		c, size, err := r.ReadRune()
-		if err == io.EOF {
+	for numLines := 1; numLines < maxLines; numLines++ {
+		b, err := r.ReadBytes('\n')
+		if err != nil {
 			break
 		}
-		if err != nil {
-			return "", err
-		}
-		buf.WriteRune(c)
-		len += size
+		buf.Write(b)
 	}
 
 	return buf.String(), nil

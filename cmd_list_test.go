@@ -233,7 +233,13 @@ func TestListCmd(t *testing.T) {
 			
 			Lorem ipsum dolor sit amet, his no stet volumus sententiae. Usu id postea animal
 			consetetur. Eum repudiare laboramus conclusionemque et, veritus tractatos dignissim
-			duo ut. Ex sed quod admodum indoctu
+			duo ut. Ex sed quod admodum indoctum. No torquatos temporibus vis, mel tota causae
+			quaestio ex, habeo laoreet adipiscing mea at.
+			
+			Quem necessitatibus quo et, eu ius ceteros efficiendi, ocurreret moderatius elaboraret
+			no quo. Est at facilisis gubergren. Ius ea similique intellegam, quo ne soluta inermis.
+			Et brute fastidii cum, sea in ferri delectus, his fastidii nominati vituperatoribus te.
+			Nam ad nisl quot omittantur, graeco scripta inciderint at pro.
 			
 			HOME/c/3.md
 			Category: c
@@ -253,35 +259,6 @@ func TestListCmd(t *testing.T) {
 			is
 			newer
 			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
-			this
-			is
-			newer
 			
 			HOME/b/2.md
 			Category: b
@@ -291,7 +268,9 @@ func TestListCmd(t *testing.T) {
 			this is title
 			=============
 			
-			Lorem ipsum dolor sit amet, his no stet volumus sententiae. Usu id postea animal consetetur. Eum repudiare laboramus conclusionemque et, veritus tractatos dignissim duo ut. Ex sed quod admodum indoctu
+			Lorem ipsum dolor sit amet, his no stet volumus sententiae. Usu id postea animal consetetur. Eum repudiare laboramus conclusionemque et, veritus tractatos dignissim duo ut. Ex sed quod admodum indoctum. No torquatos temporibus vis, mel tota causae quaestio ex, habeo laoreet adipiscing mea at.
+
+			Quem necessitatibus quo et, eu ius ceteros efficiendi, ocurreret moderatius elaboraret no quo. Est at facilisis gubergren. Ius ea similique intellegam, quo ne soluta inermis. Et brute fastidii cum, sea in ferri delectus, his fastidii nominati vituperatoribus te. Nam ad nisl quot omittantur, graeco scripta inciderint at pro.
 			
 			HOME/c/5.md
 			Category: c
@@ -301,42 +280,6 @@ func TestListCmd(t *testing.T) {
 			this is title
 			=============
 			
-			this
-			is
-			test
-			this
-			is
-			test
-			this
-			is
-			test
-			this
-			is
-			test
-			this
-			is
-			test
-			this
-			is
-			test
-			this
-			is
-			test
-			this
-			is
-			test
-			this
-			is
-			test
-			this
-			is
-			test
-			this
-			is
-			test
-			this
-			is
-			test
 			this
 			is
 			test

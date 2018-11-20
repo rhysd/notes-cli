@@ -45,7 +45,7 @@ type ListCmd struct {
 }
 
 func (cmd *ListCmd) defineListCLI(c *kingpin.CmdClause) {
-	c.Flag("full", "Show list of full information of note (full path, metadata, title, body) instead of file path").Short('f').BoolVar(&cmd.Full)
+	c.Flag("full", "Show list of full information of note (full path, metadata, title, body (up to 10 lines)) instead of file path").Short('f').BoolVar(&cmd.Full)
 	c.Flag("category", "Filter list by category name with regular expression").Short('c').StringVar(&cmd.Category)
 	c.Flag("tag", "Filter list by tag name with regular expression").Short('t').StringVar(&cmd.Tag)
 	c.Flag("relative", "Show relative paths from $NOTES_CLI_HOME directory").Short('r').BoolVar(&cmd.Relative)
@@ -77,7 +77,7 @@ func (cmd *ListCmd) printNoteFull(note *Note) {
 		bold.Fprintf(cmd.out, "\n%s\n%s\n\n", note.Title, strings.Repeat("=", runewidth.StringWidth(note.Title)))
 	}
 
-	body, err := note.ReadBodyN(200)
+	body, err := note.ReadBodyLines(10)
 	if err != nil || len(body) == 0 {
 		return
 	}

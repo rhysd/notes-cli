@@ -380,7 +380,7 @@ func TestNoteReadBodyN(t *testing.T) {
 		},
 		{
 			note: must(NewNote("read-body", "", "long", "this is title", cfg)),
-			want: "Lorem ipsum dolor si",
+			want: "Lorem ipsum dolor sit amet, his no stet volumus sententiae.\nUsu id postea animal consetetur.\nEum repudiare laboramus conclusionemque et, veritus tractatos dignissim duo ut.\nEx sed quod admodum indoctum.\n",
 		},
 		{
 			note: must(NewNote("read-body", "", "newlines-before-body", "this is title", cfg)),
@@ -392,7 +392,7 @@ func TestNoteReadBodyN(t *testing.T) {
 		},
 		{
 			note: must(NewNote("read-body", "", "ignore-horizontal-rules", "this is title", cfg)),
-			want: "text\n\n---\n^ not igno",
+			want: "text\n\n---\n^ not ignored\n",
 		},
 		{
 			note: must(NewNote("hide-metadata", "", "1.md", "this is title", cfg)),
@@ -404,7 +404,7 @@ func TestNoteReadBodyN(t *testing.T) {
 		},
 	} {
 		t.Run(tc.note.File, func(t *testing.T) {
-			have, err := tc.note.ReadBodyN(20)
+			have, err := tc.note.ReadBodyLines(4)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -421,7 +421,7 @@ func TestNoteReadBodyNFailure(t *testing.T) {
 		t.Run(file, func(t *testing.T) {
 			n, err := NewNote("fail", "", file, "this is title", cfg)
 			panicIfErr(err)
-			_, err = n.ReadBodyN(20)
+			_, err = n.ReadBodyLines(20)
 			if err == nil {
 				t.Fatal("Error did not occur")
 			}

@@ -235,7 +235,7 @@ It shows
 - Full path to the note file
 - Metadata `Category`, `Tags` and `Created`
 - Title of note
-- Body of note (up to 200 bytes)
+- Body of note (up to 10 lines)
 
 with colors.
 
