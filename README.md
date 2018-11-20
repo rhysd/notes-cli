@@ -42,7 +42,7 @@ Before starting to use, you can try it with examples.
 ```sh
 $ git clone https://github.com/rhysd/notes-cli.git
 $ cd notes-cli/
-$ export NOTES_CLI_HOME=$(pwd)/example/notes-cli
+$ export NOTES_CLI_HOME="$(pwd)/example/notes-cli"
 $ export NOTES_CLI_EDITOR=vim # Set your favorite editor
 $ notes list --full
 $ notes new test my-local-trial
@@ -85,7 +85,20 @@ You can see more practical example home directory at [example directory](./examp
 
 ## Usage
 
-This section shows detailed usages for each operation.
+This section describes detailed usages for each operation.
+
+* [Create a new note](#create-a-new-note)
+* [Flexibly open notes you created](#flexibly-open-notes-you-created)
+* [Check notes you created as list](#check-notes-you-created-as-list)
+* [Note Templates](#note-templates)
+* [Save notes to Git repository](#save-notes-to-git-repository)
+* [Configure behavior with environment variables](#configure-behavior-with-environment-variables)
+* [Extend `notes` command by adding new subcommands](#extend-notes-command-by-adding-new-subcommands)
+* [Shell Completions](#shell-completions)
+* [Setup `man` manual](#setup-man-manual)
+* [Update itself](#update-itself)
+* [Use from Go program](#use-from-go-program)
+
 
 ### Create a new note
 

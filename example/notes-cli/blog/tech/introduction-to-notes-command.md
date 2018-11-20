@@ -1,6 +1,6 @@
 introduction-to-notes-command
 =============================
-- Category: blog
+- Category: blog/tech
 - Tags: notes
 - Created: 2018-11-04T03:45:52+09:00
 
