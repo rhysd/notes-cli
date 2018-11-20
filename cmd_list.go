@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -92,78 +93,37 @@ func (cmd *ListCmd) printNoteFull(note *Note) {
 	}
 }
 
-func (cmd *ListCmd) writeTable(colors []*color.Color, table [][]string) error {
-	lenCols := len(colors)
+func (cmd *ListCmd) printOnelineNotes(notes []*Note) error {
+	tw := make([][2]int, len(notes))
+	max := [2]int{}
 
-	textWidth := make([][]int, len(table))
-	for i := range textWidth {
-		textWidth[i] = make([]int, lenCols)
-	}
-
-	maxLen := make([]int, lenCols)
-	for i := 0; i < lenCols; i++ {
-		max := runewidth.StringWidth(table[0][i])
-		textWidth[0][i] = max
-		for j, d := range table[1:] {
-			l := runewidth.StringWidth(d[i])
-			if l > max {
-				max = l
+	for i, note := range notes {
+		tw[i][0] = runewidth.StringWidth(note.Category+note.File) + 1 // + 1 for separator
+		tw[i][1] = runewidth.StringWidth(strings.Join(note.Tags, ","))
+		for j := 0; j < 2; j++ {
+			if tw[i][j] > max[j] {
+				max[j] = tw[i][j]
 			}
-			textWidth[j+1][i] = l
 		}
-		maxLen[i] = max
 	}
 
 	out := bufio.NewWriter(cmd.out)
-	for i, data := range table {
-		for j := 0; j < lenCols; j++ {
-			last := j == lenCols-1
-			c := colors[j]
-			d := data[j]
-			max := maxLen[j]
-			width := textWidth[i][j]
-			pad := strings.Repeat(" ", max-width)
+	for i, note := range notes {
+		pad := strings.Repeat(" ", max[0]-tw[i][0]+1) // +1 for separator
+		green.Fprint(out, filepath.FromSlash(note.Category))
+		out.WriteRune(filepath.Separator)
+		yellow.Fprint(out, note.File)
+		out.WriteString(pad)
 
-			sep := " "
-			if last {
-				pad = ""
-				sep = "\n"
-			}
+		pad = strings.Repeat(" ", max[1]-tw[i][1]+1) // +1 for separator
+		bold.Fprint(out, strings.Join(note.Tags, ","))
+		out.WriteString(pad)
 
-			s := d + pad + sep
-
-			// No need to check errors returned from Fprint since the error will be caughted
-			// at out.Flush() call.
-			if c == nil {
-				fmt.Fprint(out, s)
-			} else {
-				c.Fprint(out, s)
-			}
-		}
+		out.WriteString(note.Title)
+		out.WriteRune('\n')
 	}
 
 	return out.Flush()
-}
-
-func (cmd *ListCmd) printOnelineNotes(notes []*Note) error {
-	colors := []*color.Color{bold, yellow, green, nil}
-	data := make([][]string, 0, len(notes))
-
-	for _, note := range notes {
-		title := note.Title
-		if len(title) > 73 {
-			title = title[:70] + "..."
-		}
-
-		data = append(data, []string{
-			note.RelFilePath(),
-			note.Category,
-			strings.Join(note.Tags, ","),
-			title,
-		})
-	}
-
-	return cmd.writeTable(colors, data)
 }
 
 func (cmd *ListCmd) printNotes(notes []*Note) error {

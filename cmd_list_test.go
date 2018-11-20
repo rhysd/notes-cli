@@ -123,12 +123,12 @@ func TestListCmd(t *testing.T) {
 				Oneline: true,
 			},
 			want: `
-			b/6.md b future     text from future
-			c/3.md c            this is title
-			b/2.md b foo        this is title
-			c/5.md c a-bit-long this is title
-			a/1.md a foo,bar    this is title
-			a/4.md a bar        this is title this is title this is title this is title this is title ...
+			b/6.md future     text from future
+			c/3.md            this is title
+			b/2.md foo        this is title
+			c/5.md a-bit-long this is title
+			a/1.md foo,bar    this is title
+			a/4.md bar        this is title this is title this is title this is title this is title this is title this is title this is title
 			`,
 		},
 		{
@@ -138,12 +138,12 @@ func TestListCmd(t *testing.T) {
 				SortBy:  "category",
 			},
 			want: `
-			a/1.md a foo,bar    this is title
-			a/4.md a bar        this is title this is title this is title this is title this is title ...
-			b/2.md b foo        this is title
-			b/6.md b future     text from future
-			c/3.md c            this is title
-			c/5.md c a-bit-long this is title
+			a/1.md foo,bar    this is title
+			a/4.md bar        this is title this is title this is title this is title this is title this is title this is title this is title
+			b/2.md foo        this is title
+			b/6.md future     text from future
+			c/3.md            this is title
+			c/5.md a-bit-long this is title
 			`,
 		},
 		{
@@ -379,15 +379,15 @@ func TestListCmd(t *testing.T) {
 			`,
 		},
 		{
-			what:   "categories online log",
+			what:   "categories oneline log",
 			subdir: "nested",
 			cmd: &ListCmd{
 				Category: "/d",
 				Oneline:  true,
 			},
 			want: `
-			a/d/4.md   a/d   d,bar  this is title
-			a/d/e/3.md a/d/e a,piyo this is title
+			a/d/4.md   d,bar  this is title
+			a/d/e/3.md a,piyo this is title
 			`,
 		},
 		{
@@ -420,9 +420,9 @@ func TestListCmd(t *testing.T) {
 				Oneline: true,
 			},
 			want: `
-			cat/ノート.md             cat             タグ1,x     これはタイトル
-			カテゴリ/ネスト/ノート.md カテゴリ/ネスト タグ1,タグ2 これはタイトル
-			カテゴリ/ノート.md        カテゴリ        tag3,タグ1  これはタイトル
+			cat/ノート.md             タグ1,x     これはタイトル
+			カテゴリ/ネスト/ノート.md タグ1,タグ2 これはタイトル
+			カテゴリ/ノート.md        tag3,タグ1  これはタイトル
 			`,
 		},
 		{
@@ -679,7 +679,7 @@ func TestListNoteEmptyBody(t *testing.T) {
 				Oneline: true,
 			},
 			want: `
-			a<SEP>1.md a foo,bar empty body
+			a<SEP>1.md foo,bar empty body
 			`,
 		},
 		{
