@@ -28,10 +28,10 @@ func Example() {
 		panic(err)
 	}
 	// Output:
-	// blog/daily/dialy-2018-11-20.md             blog/daily             dialy-2018-11-20
-	// blog/daily/dialy-2018-11-19.md             blog/daily             dialy-2018-11-18
-	// memo/tasks.md                              memo                   My tasks
-	// memo/notes-urls.md                         memo       notes       URLs for notes
-	// blog/tech/introduction-to-notes-command.md blog/tech  notes       introduction-to-notes-command
-	// blog/tech/how-to-handle-files.md           blog/tech  golang,file How to hanle files in Go
+	// blog/daily/dialy-2018-11-20.md                         dialy-2018-11-20
+	// blog/daily/dialy-2018-11-18.md             notes       dialy-2018-11-18
+	// memo/tasks.md                                          My tasks
+	// memo/notes-urls.md                         notes       URLs for notes
+	// blog/tech/introduction-to-notes-command.md notes       introduction-to-notes-command
+	// blog/tech/how-to-handle-files.md           golang,file How to hanle files in Go
 }

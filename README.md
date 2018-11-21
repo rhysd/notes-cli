@@ -269,13 +269,13 @@ When you want to see the all notes quickly, `--oneline` (or `-o`) may be more us
 For example,
 
 ```
-blog/how-to-handle-files.md blog golang,file How to handle files in Go
+blog/how-to-handle-files.md golang,file How to handle files in Go
 ```
 
-- First field indicates a relative path of note file from home directory.
-- Second field indicates a category of the note.
-- Third field indicates comma-separated tags of the note. When note has no tag, it leaves as blank.
-- Rest is a title of the note
+- 1st field indicates a relative path of note file from home directory with different colors.
+  The first part of the path is the category in green, and the second part is the file name in yellow.
+- 2nd field indicates comma-separated tags of the note. When note has no tag, it leaves as blank.
+- 3rd field is the title of note
 
 This is useful for checking many notes at a glance. When output is larger, `less` is used for paging
 the output if available.
