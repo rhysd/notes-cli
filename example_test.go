@@ -1,8 +1,9 @@
 // +build !windows
 
-package notes
+package notes_test
 
 import (
+	"github.com/rhysd/notes-cli"
 	"os"
 	"path/filepath"
 )
@@ -13,11 +14,11 @@ func Example() {
 		panic(err)
 	}
 
-	cfg := &Config{
+	cfg := &notes.Config{
 		HomePath: filepath.Join(cwd, "example", "notes-cli"),
 	}
 
-	cmd := ListCmd{
+	cmd := notes.ListCmd{
 		Config:  cfg,
 		Oneline: true,
 		Out:     os.Stdout,
