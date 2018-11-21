@@ -78,19 +78,25 @@ func (cmd *ListCmd) printNoteFull(note *Note) {
 		bold.Fprintf(cmd.out, "\n%s\n%s\n\n", note.Title, strings.Repeat("=", runewidth.StringWidth(note.Title)))
 	}
 
-	body, err := note.ReadBodyLines(10)
+	body, size, err := note.ReadBodyLines(10)
 	if err != nil || len(body) == 0 {
 		return
 	}
 
 	fmt.Fprint(cmd.out, body)
 
-	// Adjust end of body. Ensure it ends with \n\n
+	// Ensure body ends with newline
 	if !strings.HasSuffix(body, "\n") {
-		fmt.Fprint(cmd.out, "\n\n")
-	} else if !strings.HasSuffix(body, "\n\n") {
 		fmt.Fprintln(cmd.out)
 	}
+
+	// Body text was truncated. To indicate it, add ellipsis at the end
+	if size == 10 {
+		fmt.Fprintln(cmd.out, "...")
+	}
+
+	// Finally separate each note with blank line
+	fmt.Fprintln(cmd.out)
 }
 
 func (cmd *ListCmd) printOnelineNotes(notes []*Note) error {

@@ -241,6 +241,8 @@ func TestListCmd(t *testing.T) {
 			Et brute fastidii cum, sea in ferri delectus, his fastidii nominati vituperatoribus te.
 			Nam ad nisl quot omittantur, graeco scripta inciderint at pro.
 			
+			...
+			
 			HOME/c/3.md
 			Category: c
 			Tags:     
@@ -259,6 +261,7 @@ func TestListCmd(t *testing.T) {
 			is
 			newer
 			this
+			...
 			
 			HOME/b/2.md
 			Category: b
@@ -290,6 +293,7 @@ func TestListCmd(t *testing.T) {
 			is
 			test
 			this
+			...
 			
 			HOME/a/1.md
 			Category: a

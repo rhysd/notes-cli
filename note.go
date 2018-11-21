@@ -140,12 +140,12 @@ func (note *Note) Open() error {
 	return openEditor(note.Config, note.FilePath())
 }
 
-// ReadBodyLines reads body of note until maxLines lines and returns it as string
-func (note *Note) ReadBodyLines(maxLines int) (string, error) {
+// ReadBodyLines reads body of note until maxLines lines and returns it as string and number of lines as int
+func (note *Note) ReadBodyLines(maxLines int) (string, int, error) {
 	path := note.FilePath()
 	f, err := os.Open(path)
 	if err != nil {
-		return "", errors.Wrap(err, "Cannot open note file")
+		return "", 0, errors.Wrap(err, "Cannot open note file")
 	}
 	defer f.Close()
 
@@ -165,11 +165,12 @@ func (note *Note) ReadBodyLines(maxLines int) (string, error) {
 			break
 		}
 		if err != nil {
-			return "", errors.Wrapf(err, "Cannot read metadata of note file. Some metadata may be missing in '%s'", note.RelFilePath())
+			return "", 0, errors.Wrapf(err, "Cannot read metadata of note file. Some metadata may be missing in '%s'", note.RelFilePath())
 		}
 	}
 
 	var buf bytes.Buffer
+	var readLines int
 
 	// Skip empty lines
 	for {
@@ -179,6 +180,7 @@ func (note *Note) ReadBodyLines(maxLines int) (string, error) {
 		}
 		if len(b) > 1 && !reHorizontalRule.Match(b) && !bytes.Equal(b, closingComment) {
 			buf.Write(b)
+			readLines++
 			break
 		}
 	}
@@ -188,10 +190,11 @@ func (note *Note) ReadBodyLines(maxLines int) (string, error) {
 		if err != nil {
 			break
 		}
+		readLines++
 		buf.Write(b)
 	}
 
-	return buf.String(), nil
+	return buf.String(), readLines, nil
 }
 
 // NewNote creates a new note instance with given parameters and configuration. Category and file name

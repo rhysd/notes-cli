@@ -404,12 +404,19 @@ func TestNoteReadBodyN(t *testing.T) {
 		},
 	} {
 		t.Run(tc.note.File, func(t *testing.T) {
-			have, err := tc.note.ReadBodyLines(4)
+			have, size, err := tc.note.ReadBodyLines(4)
 			if err != nil {
 				t.Fatal(err)
 			}
+			if size > 4 {
+				t.Fatal("Returned size is over max size (=4):", size)
+			}
 			if have != tc.want {
 				t.Fatalf("have:\n%s\nwant:\n%s\nread string is unexpected", have, tc.want)
+			}
+			c := strings.Count(have, "\n")
+			if size != c {
+				t.Fatal("Returned size is", size, "but having", c, "newlines in body")
 			}
 		})
 	}
@@ -421,7 +428,7 @@ func TestNoteReadBodyNFailure(t *testing.T) {
 		t.Run(file, func(t *testing.T) {
 			n, err := NewNote("fail", "", file, "this is title", cfg)
 			panicIfErr(err)
-			_, err = n.ReadBodyLines(20)
+			_, _, err = n.ReadBodyLines(20)
 			if err == nil {
 				t.Fatal("Error did not occur")
 			}
