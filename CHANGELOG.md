@@ -1,3 +1,16 @@
+<a name="v1.5.0"></a>
+# [v1.5.0](https://github.com/rhysd/notes-cli/releases/tag/v1.5.0) - 25 Nov 2018
+
+- **New:** Do paging `list` command's long output using pager command. Default pager command is `less` and it can be customizable via `$NOTES_CLI_PAGER`
+- **Improve:** Change layout of `list --oneline`. Category only field was removed and now category is unified with relative path. First field is not changed and category can be retrieved from the relative path. So this should not be breaking change
+- **Improve:** Truncate note body lines in `list --full` by number of lines, not bytes
+- **Improve:** Add `...` to the end of truncated note body in `list --full`
+- **Improve:** Improve help description and error message
+- **New:** Add `--no-edit` to `new` command for an editor plugin
+
+[Changes][v1.5.0]
+
+
 <a name="v1.4.0"></a>
 # [v1.4.0](https://github.com/rhysd/notes-cli/releases/tag/v1.4.0) - 18 Nov 2018
 
@@ -6,7 +19,7 @@
 - **New:** Allow to put `.template.md` at root of notes-cli home directory tree. It is always used as template for creating a new note if category-specific `.template.md` is not found.
 - **Improve:** When a template is starting with `-->` (closing comment), `notes` considers it is hiding metadata and automatically insert corresponding `<!--` before metadata
 - **New:** (API) `Category` and `Categories` types are added and `CollectCategories()` factory function is added
-- **Fix:** Category or file name or tags which contain wide characters such as CJK are now correctly aligned
+- **Fix:** Category or file name or tags which contain wide characters such as CJK are now correctly aligned. NFD file paths on macOS are now correctly normalized also.
 - **Fix:** Sort order at `--sort created` was opposite. Now it is in descending order hence `head -1` can take the latest note
 - **Fix:** Close file after inline input is written to created note at `notes new`
 - **Improve:** (Doc) Tweak README sections structure and add TOC since it gets bigger.
@@ -104,6 +117,7 @@ https://github.com/rhysd/notes-cli/blob/master/README.md
 [Changes][v1.0.0]
 
 
+[v1.5.0]: https://github.com/rhysd/notes-cli/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/rhysd/notes-cli/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/rhysd/notes-cli/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/rhysd/notes-cli/compare/v1.1.2...v1.2.0
