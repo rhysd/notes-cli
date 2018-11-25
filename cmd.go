@@ -21,11 +21,22 @@ type Cmd interface {
 
 // Version is version string of notes command. It conforms semantic versioning
 var Version = "1.4.0"
+var description = `Simple note taking tool for command line with your favorite editor.
+
+You can manage (create/open/list) notes via this tool on terminal. notes also
+optionally can save your notes thanks to Git to avoid losing your notes.
+
+notes is intended to be used nicely with other commands such as grep (or ag, rg),
+rm, filtering tools such as fzf or peco and editors which can be started from
+command line.
+
+notes is developed at https://github.com/rhysd/notes-cli. If you're seeing a bug or having a feature request,
+please create a new issue. Pull requests are more than welcome.`
 
 // ParseCmd parses given arguments as command line options and returns corresponding subcommand instance.
 // When no subcommand matches or argus contains invalid argument, it returns an error
 func ParseCmd(args []string) (Cmd, error) {
-	cli := kingpin.New("notes", "Simple note taking tool for command line with your favorite editor")
+	cli := kingpin.New("notes", description)
 	noColor := cli.Flag("no-color", "Disable color output").Bool()
 	colorAlways := cli.Flag("color-always", "Enable color output always").Short('A').Bool()
 
