@@ -7,6 +7,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 // Config represents user configuration of notes command
@@ -29,7 +30,15 @@ type Config struct {
 }
 
 func homePath() (string, error) {
+	u, err := user.Current()
+	if err != nil {
+		return "", errors.Wrap(err, "Cannot locate home directory. Please set $NOTES_CLI_HOME")
+	}
+
 	if env := os.Getenv("NOTES_CLI_HOME"); env != "" {
+		if strings.HasPrefix(env, "~"+string(filepath.Separator)) {
+			env = filepath.Join(u.HomeDir, env[2:])
+		}
 		return filepath.Clean(env), nil
 	}
 
@@ -43,10 +52,6 @@ func homePath() (string, error) {
 		}
 	}
 
-	u, err := user.Current()
-	if err != nil {
-		return "", errors.Wrap(err, "Cannot locate home directory. Please set $NOTES_CLI_HOME")
-	}
 	return filepath.Join(u.HomeDir, ".local", "share", "notes-cli"), nil
 }
 

@@ -5,8 +5,10 @@ import (
 	"github.com/rhysd/go-tmpenv"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -208,4 +210,27 @@ func TestNewConfigCannotCreateHome(t *testing.T) {
 		t.Fatal("Error did not occur")
 	}
 
+}
+
+func TestNewConfigExpandTilde(t *testing.T) {
+	u, err := user.Current()
+	panicIfErr(err)
+	cwd, err := os.Getwd()
+	panicIfErr(err)
+	if !strings.HasPrefix(cwd, u.HomeDir) {
+		t.Skip("because test is not running under home directory")
+	}
+
+	g := testNewConfigEnvGuard()
+	defer func() { panicIfErr(g.Restore()) }()
+
+	panicIfErr(os.Setenv("NOTES_CLI_HOME", filepath.Join("~", strings.TrimPrefix(cwd, u.HomeDir))))
+	c, err := NewConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if c.HomePath != cwd {
+		t.Fatal("'~' was not expanded collectly. Wanted", cwd, "but got", c.HomePath)
+	}
 }
