@@ -20,6 +20,8 @@ type NewCmd struct {
 	Tags string
 	// NoInline is a flag equivalent to --no-inline-input
 	NoInline bool
+	// NoEdit is a flag equivalent to --no-edit
+	NoEdit bool
 }
 
 func (cmd *NewCmd) defineCLI(app *kingpin.Application) {
@@ -27,7 +29,8 @@ func (cmd *NewCmd) defineCLI(app *kingpin.Application) {
 	cmd.cli.Arg("category", "Category of note. Note must belong to one category").Required().StringVar(&cmd.Category)
 	cmd.cli.Arg("filename", "File name of note. It automatically adds '.md' file extension if omitted").Required().StringVar(&cmd.Filename)
 	cmd.cli.Arg("tags", "Comma-separated tags of note. Zero or more tags can be specified to note").StringVar(&cmd.Tags)
-	cmd.cli.Flag("no-inline-input", "Does not request inline input even if no editor is set to $NOTES_CLI_EDITOR").BoolVar(&cmd.NoInline)
+	cmd.cli.Flag("no-inline-input", "Does not request inline input even if no editor command is set to $NOTES_CLI_EDITOR").BoolVar(&cmd.NoInline)
+	cmd.cli.Flag("no-edit", "Does not open an editor even if an editor command is set to $NOTES_CLI_EDITOR").BoolVar(&cmd.NoEdit)
 }
 
 func (cmd *NewCmd) matchesCmdline(cmdline string) bool {
@@ -73,6 +76,12 @@ func (cmd *NewCmd) Do() error {
 		if err := git.Init(); err != nil {
 			return err
 		}
+	}
+
+	if cmd.NoEdit {
+		// Falling back into only showing the path to the note. Then users can open it by themselves.
+		fmt.Println(note.FilePath())
+		return nil
 	}
 
 	if err := note.Open(); err != nil {

@@ -139,52 +139,70 @@ func TestNewCmdNewNoteWithNoInlineInput(t *testing.T) {
 			title: "ノート",
 		},
 	} {
-		defer os.RemoveAll(filepath.Join(cfg.HomePath, strings.Split(tc.cat, "/")[0]))
-		t.Run(tc.cat+"_"+tc.title, func(t *testing.T) {
-			cmd := &NewCmd{
-				Config:   cfg,
-				Category: tc.cat,
-				Filename: tc.title + ".md",
-				Tags:     "foo, bar",
-				NoInline: true,
-			}
+		for _, c := range []struct {
+			opt string
+			cmd *NewCmd
+		}{
+			{
+				"noinline",
+				&NewCmd{
+					Config:   cfg,
+					Category: tc.cat,
+					Tags:     "foo, bar",
+					NoInline: true,
+				},
+			},
+			{
+				"noedit",
+				&NewCmd{
+					Config:   cfg,
+					Category: tc.cat,
+					Tags:     "foo, bar",
+					NoEdit:   true,
+				},
+			},
+		} {
+			title := tc.title + "-" + c.opt
+			c.cmd.Filename = title + ".md"
+			defer os.RemoveAll(filepath.Join(cfg.HomePath, strings.Split(tc.cat, "/")[0]))
+			t.Run(tc.cat+"_"+title, func(t *testing.T) {
+				fake := fakeio.Stdout()
+				defer fake.Restore()
 
-			fake := fakeio.Stdout()
-			defer fake.Restore()
+				if err := c.cmd.Do(); err != nil {
+					t.Fatal(err)
+				}
 
-			if err := cmd.Do(); err != nil {
-				t.Fatal(err)
-			}
+				p := filepath.Join(cfg.HomePath, filepath.FromSlash(tc.cat), title+".md")
+				n, err := LoadNote(p, cfg)
+				if err != nil {
+					t.Fatal(err)
+				}
 
-			p := filepath.Join(cfg.HomePath, filepath.FromSlash(tc.cat), tc.title+".md")
-			n, err := LoadNote(p, cfg)
-			if err != nil {
-				t.Fatal(err)
-			}
+				if n.Category != tc.cat {
+					t.Error("Note category mismatch", n.Category)
+				}
 
-			if n.Category != tc.cat {
-				t.Error("Note category mismatch", n.Category)
-			}
+				if !reflect.DeepEqual(n.Tags, []string{"foo", "bar"}) {
+					t.Error("Tags are not correct", n.Tags)
+				}
 
-			if !reflect.DeepEqual(n.Tags, []string{"foo", "bar"}) {
-				t.Error("Tags are not correct", n.Tags)
-			}
+				if n.Title != title {
+					t.Error(n.Title)
+				}
 
-			if n.Title != tc.title {
-				t.Error(n.Title)
-			}
+				if n.Created.After(time.Now()) {
+					t.Error("Created date invalid", n.Created.Format(time.RFC3339))
+				}
 
-			if n.Created.After(time.Now()) {
-				t.Error("Created date invalid", n.Created.Format(time.RFC3339))
-			}
-
-			stdout, err := fake.String()
-			panicIfErr(err)
-			stdout = strings.TrimSuffix(stdout, "\n")
-			if stdout != p {
-				t.Error("Output is not path to the file:", stdout)
-			}
-		})
+				stdout, err := fake.String()
+				panicIfErr(err)
+				stdout = strings.TrimSuffix(stdout, "\n")
+				if stdout != p {
+					t.Error("Output is not path to the file:", stdout)
+				}
+			})
+		}
 	}
 }
 
