@@ -3,12 +3,15 @@
 package notes_test
 
 import (
+	"github.com/fatih/color"
 	"github.com/rhysd/notes-cli"
 	"os"
 	"path/filepath"
 )
 
 func Example() {
+	color.NoColor = true
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		panic(err)

@@ -4,3 +4,5 @@
 /env.sh
 /testdata/external/notes-external-test/notes-external-test
 /testdata/external/notes-external-error/notes-external-error
+/package-lock.json
+/node_modules

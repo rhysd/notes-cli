@@ -20,7 +20,7 @@ type Cmd interface {
 }
 
 // Version is version string of notes command. It conforms semantic versioning
-var Version = "1.4.0"
+var Version = "1.5.0"
 var description = `Simple note taking tool for command line with your favorite editor.
 
 You can manage (create/open/list) notes via this tool on terminal. notes also
