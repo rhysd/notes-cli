@@ -49,8 +49,12 @@ $ notes new test my-local-trial
 $ git status # Check what file was created in home
 ```
 
-To uninstall, please remove `notes` (or `notes.exe` on Windows) executable.
+To uninstall:
 
+```sh
+$ rm -rf "$(notes config home)" # Remove all notes
+$ rm "$(which notes)" # Remove an executable
+```
 
 
 ## Basic Usage
@@ -78,6 +82,9 @@ Directories structure under notes-cli home is something like:
 └── category3
     └── note6.md
 ```
+
+where `<HOME>` is [XDG Data directory][xdg-dirs] (on macOS, `~/.local/share/notes-cli`) by default
+and can be specified by `$NOTES_CLI_HOME` environment variable. 
 
 You can see more practical example home directory at [example directory](./example/notes-cli).
 
@@ -108,9 +115,8 @@ For example,
 $ notes new blog how-to-handle-files golang,file
 ```
 
-creates a note file at `<HOME>/notes-cli/blog/how-to-handle-files.md` where `<HOME>` is
-[XDG Data directory][xdg-dirs] (on macOS, `~/.local/share/notes-cli`) by default and can be specified
-by `$NOTES_CLI_HOME` environment variable. The home directory is automatically created.
+creates a note file at `<HOME>/notes-cli/blog/how-to-handle-files.md`. The home directory is automatically
+created.
 
 Category is `blog`. Every note must belong to one category. Category can be nested with `/`. For example,
 if have multiple blogs Blog A and Blog B, you may want to categorize blog posts with categories like
