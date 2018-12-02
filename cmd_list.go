@@ -66,8 +66,7 @@ func (cmd *ListCmd) matchesCmdline(cmdline string) bool {
 	return cmd.cli.FullCommand() == cmdline || cmd.cliAlias.FullCommand() == cmdline
 }
 
-func (cmd *ListCmd) printNoteFull(note *Note) error {
-	out := bufio.NewWriter(cmd.out)
+func (cmd *ListCmd) printNoteFullTo(out *bufio.Writer, note *Note) {
 	green.Fprintln(out, note.FilePath())
 	yellow.Fprint(out, "Category: ")
 	fmt.Fprintln(out, note.Category)
@@ -80,11 +79,8 @@ func (cmd *ListCmd) printNoteFull(note *Note) error {
 	}
 
 	body, size, err := note.ReadBodyLines(10)
-	if err != nil {
-		return err
-	}
-	if len(body) == 0 {
-		return out.Flush()
+	if err != nil || len(body) == 0 {
+		return
 	}
 
 	fmt.Fprint(out, body)
@@ -101,7 +97,6 @@ func (cmd *ListCmd) printNoteFull(note *Note) error {
 
 	// Finally separate each note with blank line
 	fmt.Fprintln(out)
-	return out.Flush()
 }
 
 func (cmd *ListCmd) printOnelineNotes(notes []*Note) error {
@@ -152,12 +147,11 @@ func (cmd *ListCmd) printNotes(notes []*Note) error {
 	}
 
 	if cmd.Full {
+		out := bufio.NewWriter(cmd.out)
 		for _, note := range notes {
-			if err := cmd.printNoteFull(note); err != nil {
-				return err
-			}
+			cmd.printNoteFullTo(out, note)
 		}
-		return nil
+		return out.Flush()
 	}
 
 	if cmd.Oneline {
