@@ -57,7 +57,7 @@ func homePath() (string, error) {
 
 func gitPath() string {
 	c := "git"
-	if env := os.Getenv("NOTES_CLI_GIT"); env != "" {
+	if env, ok := os.LookupEnv("NOTES_CLI_GIT"); ok {
 		c = filepath.Clean(env)
 	}
 
@@ -71,20 +71,20 @@ func gitPath() string {
 }
 
 func editorCmd() string {
-	if env := os.Getenv("NOTES_CLI_EDITOR"); env != "" {
+	if env, ok := os.LookupEnv("NOTES_CLI_EDITOR"); ok {
 		return env
 	}
-	if env := os.Getenv("EDITOR"); env != "" {
+	if env, ok := os.LookupEnv("EDITOR"); ok {
 		return env
 	}
 	return ""
 }
 
 func pagerCmd() string {
-	if env := os.Getenv("NOTES_CLI_PAGER"); env != "" {
+	if env, ok := os.LookupEnv("NOTES_CLI_PAGER"); ok {
 		return env
 	}
-	if env := os.Getenv("PAGER"); env != "" {
+	if env, ok := os.LookupEnv("PAGER"); ok {
 		return env
 	}
 	if _, err := exec.LookPath("less"); err == nil {

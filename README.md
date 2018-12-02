@@ -356,6 +356,8 @@ For more details, please see `notes save --help`.
 As described above, some behavior can be configurable with environment variables. Here is a table of
 all environment variables affecting behavior of `notes`. Variables starting with `$NOTES_` are dedicated
 for `notes` command. Others are general environment variables affecting `notes` behavior.
+When you want to disable integration of Git, an editor or a pager, please set empty string to the
+corresponding environment variable like `export NOTES_CLI_PAGER=`.
 
 | Name                | Default                                    | Description                                                                |
 |---------------------|--------------------------------------------|----------------------------------------------------------------------------|

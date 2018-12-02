@@ -125,6 +125,32 @@ func TestNewConfigCustomizeBinaryPaths(t *testing.T) {
 	}
 }
 
+func TestNewConfigDisableBySettingEmpty(t *testing.T) {
+	g := testNewConfigEnvGuard()
+	defer func() { panicIfErr(g.Restore()) }()
+
+	os.Setenv("NOTES_CLI_PAGER", "")
+	os.Setenv("NOTES_CLI_GIT", "")
+	os.Setenv("NOTES_CLI_EDITOR", "")
+	os.Setenv("EDITOR", "vim")
+	os.Setenv("PAGER", "less")
+
+	c, err := NewConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if c.PagerCmd != "" {
+		t.Fatal("Pager was not disabled:", c.PagerCmd)
+	}
+	if c.EditorCmd != "" {
+		t.Fatal("Editor was not disabled:", c.EditorCmd)
+	}
+	if c.GitPath != "" {
+		t.Fatal("Git was not disabled:", c.GitPath)
+	}
+}
+
 func TestNewConfigCustomizeHome(t *testing.T) {
 	for _, tc := range []struct {
 		key  string
