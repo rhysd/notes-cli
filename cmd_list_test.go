@@ -830,7 +830,7 @@ func TestListPagingError(t *testing.T) {
 			want: "Cannot start pager command",
 		},
 		{
-			cmd:  "echo",
+			cmd:  "cat",
 			want: "Pager command did not run successfully: Write error for test",
 			out:  alwaysErrorWriter{},
 		},

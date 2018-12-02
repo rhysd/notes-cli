@@ -245,6 +245,9 @@ func (cmd *ListCmd) Do() error {
 
 	cmd.out = pager
 	if err := cmd.printNotes(notes); err != nil {
+		if pager.Err != nil {
+			err = errors.Wrap(err, "Pager command did not run successfully")
+		}
 		return err
 	}
 
