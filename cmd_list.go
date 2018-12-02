@@ -66,37 +66,42 @@ func (cmd *ListCmd) matchesCmdline(cmdline string) bool {
 	return cmd.cli.FullCommand() == cmdline || cmd.cliAlias.FullCommand() == cmdline
 }
 
-func (cmd *ListCmd) printNoteFull(note *Note) {
-	green.Fprintln(cmd.out, note.FilePath())
-	yellow.Fprint(cmd.out, "Category: ")
-	fmt.Fprintln(cmd.out, note.Category)
-	yellow.Fprint(cmd.out, "Tags:     ")
-	fmt.Fprintln(cmd.out, strings.Join(note.Tags, ", "))
-	yellow.Fprint(cmd.out, "Created:  ")
-	fmt.Fprintln(cmd.out, note.Created.Format(time.RFC3339))
+func (cmd *ListCmd) printNoteFull(note *Note) error {
+	out := bufio.NewWriter(cmd.out)
+	green.Fprintln(out, note.FilePath())
+	yellow.Fprint(out, "Category: ")
+	fmt.Fprintln(out, note.Category)
+	yellow.Fprint(out, "Tags:     ")
+	fmt.Fprintln(out, strings.Join(note.Tags, ", "))
+	yellow.Fprint(out, "Created:  ")
+	fmt.Fprintln(out, note.Created.Format(time.RFC3339))
 	if note.Title != "" {
-		bold.Fprintf(cmd.out, "\n%s\n%s\n\n", note.Title, strings.Repeat("=", runewidth.StringWidth(note.Title)))
+		bold.Fprintf(out, "\n%s\n%s\n\n", note.Title, strings.Repeat("=", runewidth.StringWidth(note.Title)))
 	}
 
 	body, size, err := note.ReadBodyLines(10)
-	if err != nil || len(body) == 0 {
-		return
+	if err != nil {
+		return err
+	}
+	if len(body) == 0 {
+		return out.Flush()
 	}
 
-	fmt.Fprint(cmd.out, body)
+	fmt.Fprint(out, body)
 
 	// Ensure body ends with newline
 	if !strings.HasSuffix(body, "\n") {
-		fmt.Fprintln(cmd.out)
+		fmt.Fprintln(out)
 	}
 
 	// Body text was truncated. To indicate it, add ellipsis at the end
 	if size == 10 {
-		fmt.Fprintln(cmd.out, "...")
+		fmt.Fprintln(out, "...")
 	}
 
 	// Finally separate each note with blank line
-	fmt.Fprintln(cmd.out)
+	fmt.Fprintln(out)
+	return out.Flush()
 }
 
 func (cmd *ListCmd) printOnelineNotes(notes []*Note) error {
@@ -148,7 +153,9 @@ func (cmd *ListCmd) printNotes(notes []*Note) error {
 
 	if cmd.Full {
 		for _, note := range notes {
-			cmd.printNoteFull(note)
+			if err := cmd.printNoteFull(note); err != nil {
+				return err
+			}
 		}
 		return nil
 	}

@@ -495,6 +495,40 @@ func TestListCmd(t *testing.T) {
 	}
 }
 
+func TestListWriteError(t *testing.T) {
+	cfg := testNewConfigForListCmd("normal")
+	for _, tc := range []struct {
+		what string
+		cmd  *ListCmd
+		want string
+	}{
+		{
+			what: "normal",
+			cmd:  &ListCmd{},
+		},
+		{
+			what: "oneline",
+			cmd: &ListCmd{
+				Oneline: true,
+			},
+		},
+		{
+			what: "full",
+			cmd: &ListCmd{
+				Full: true,
+			},
+		},
+	} {
+		t.Run(tc.what, func(t *testing.T) {
+			tc.cmd.Config = cfg
+			tc.cmd.Out = alwaysErrorWriter{}
+			if err := tc.cmd.Do(); err == nil || !strings.Contains(err.Error(), "Write error for test") {
+				t.Fatal("Unexpected error", err)
+			}
+		})
+	}
+}
+
 func TestListNotesVariousHomes(t *testing.T) {
 	cwd, err := os.Getwd()
 	if err != nil {
