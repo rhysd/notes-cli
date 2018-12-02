@@ -9,6 +9,7 @@ import (
 	"github.com/rhysd/go-fakeio"
 	"github.com/rhysd/go-tmpenv"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -20,6 +21,15 @@ func TestVersion(t *testing.T) {
 }
 
 func TestParseArgs(t *testing.T) {
+	// Set non-empty home path for the test case where no argument is given
+	cwd, err := os.Getwd()
+	panicIfErr(err)
+	envs, err := tmpenv.Setenvs(map[string]string{
+		"NOTES_CLI_HOME": filepath.Join(cwd, "testdata", "list", "normal"),
+	})
+	panicIfErr(err)
+	defer envs.Restore()
+
 	opts := []cmp.Option{
 		cmpopts.IgnoreUnexported(
 			CategoriesCmd{},
@@ -101,8 +111,18 @@ func TestParseArgs(t *testing.T) {
 				Dry: true,
 			},
 		},
+		{
+			args: []string{},
+			want: &ListCmd{
+				Oneline: true,
+			},
+		},
 	} {
-		t.Run(tc.args[0]+" command", func(t *testing.T) {
+		name := "empty"
+		if len(tc.args) > 0 {
+			name = tc.args[0]
+		}
+		t.Run(name+" command", func(t *testing.T) {
 			have, err := ParseCmd(tc.args)
 			if err != nil {
 				t.Fatal(err)

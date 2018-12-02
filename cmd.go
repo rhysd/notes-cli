@@ -51,6 +51,20 @@ func ParseCmd(args []string) (Cmd, error) {
 
 	colorStdout := colorable.NewColorableStdout()
 
+	// When `notes` command is run with no argument,
+	//   - if there is no note, show usage help
+	//   - if there is one or more notes, show the list with `list --oneline`
+	// ref: #2
+	if len(args) == 0 {
+		if cats, err := CollectCategories(c); err == nil && len(cats) > 0 {
+			return &ListCmd{
+				Config:  c,
+				Out:     colorStdout,
+				Oneline: true,
+			}, nil
+		}
+	}
+
 	cmds := []parsableCmd{
 		&NewCmd{Config: c},
 		&ListCmd{Config: c, Out: colorStdout},
