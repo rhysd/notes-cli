@@ -167,3 +167,14 @@ func TestCategoriesNotesError(t *testing.T) {
 		t.Fatal("Got unexpected", err)
 	}
 }
+
+func TestCategoriesNoNote(t *testing.T) {
+	cfg := configForCategoryTest("empty")
+	cats, err := CollectCategories(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(cats) > 0 {
+		t.Fatal("No note should mean no category:", cats)
+	}
+}
