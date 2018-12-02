@@ -166,14 +166,18 @@ func (cmd *ListCmd) printNotes(notes []*Note) error {
 	}
 
 	var b bytes.Buffer
-	for _, note := range notes {
-		if cmd.Relative {
+	if cmd.Relative {
+		for _, note := range notes {
 			b.WriteString(note.RelFilePath())
-		} else {
-			b.WriteString(note.FilePath())
+			b.WriteRune('\n')
 		}
-		b.WriteRune('\n')
+	} else {
+		for _, note := range notes {
+			b.WriteString(note.FilePath())
+			b.WriteRune('\n')
+		}
 	}
+
 	_, err := cmd.out.Write(b.Bytes())
 	return err
 }
