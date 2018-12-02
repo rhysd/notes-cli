@@ -1,3 +1,17 @@
+<a name="v1.5.1"></a>
+# [v1.5.1](https://github.com/rhysd/notes-cli/releases/tag/v1.5.1) - 02 Dec 2018
+
+Allow to disable Git, editor or pager by setting empty to the corresponding environment variable.
+
+For example, following will disable pager on `notes ls`
+
+```
+export NOTES_CLI_PAGER=
+```
+
+[Changes][v1.5.1]
+
+
 <a name="v1.5.0"></a>
 # [v1.5.0](https://github.com/rhysd/notes-cli/releases/tag/v1.5.0) - 25 Nov 2018
 
@@ -117,6 +131,7 @@ https://github.com/rhysd/notes-cli/blob/master/README.md
 [Changes][v1.0.0]
 
 
+[v1.5.1]: https://github.com/rhysd/notes-cli/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/rhysd/notes-cli/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/rhysd/notes-cli/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/rhysd/notes-cli/compare/v1.2.0...v1.3.0
