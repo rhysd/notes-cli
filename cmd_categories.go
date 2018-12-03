@@ -28,7 +28,7 @@ func (cmd *CategoriesCmd) matchesCmdline(cmdline string) bool {
 
 // Do runs `notes categories` command and returns an error if occurs
 func (cmd *CategoriesCmd) Do() error {
-	cats, err := CollectCategories(cmd.Config)
+	cats, err := CollectCategories(cmd.Config, 0)
 	if err != nil {
 		return err
 	}

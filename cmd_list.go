@@ -191,7 +191,7 @@ func (cmd *ListCmd) printNotes(notes []*Note) error {
 
 // Do runs `notes list` command and returns an error if occurs
 func (cmd *ListCmd) Do() error {
-	cats, err := CollectCategories(cmd.Config)
+	cats, err := CollectCategories(cmd.Config, 0)
 	if err != nil {
 		return err
 	}

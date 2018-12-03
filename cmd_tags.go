@@ -35,7 +35,7 @@ func (cmd *TagsCmd) Do() error {
 	saw := map[string]struct{}{}
 	tags := []string{}
 
-	cats, err := CollectCategories(cmd.Config)
+	cats, err := CollectCategories(cmd.Config, 0)
 	if err != nil {
 		return err
 	}
