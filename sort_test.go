@@ -78,7 +78,7 @@ func TestSortByModified(t *testing.T) {
 	now := time.Now()
 	panicIfErr(os.Chtimes(filepath.Join(cfg.HomePath, "a", "2.md"), now, now))
 
-	cats, err := CollectCategories(cfg)
+	cats, err := CollectCategories(cfg, 0)
 	panicIfErr(err)
 	notes, err := cats.Notes(cfg)
 	panicIfErr(err)

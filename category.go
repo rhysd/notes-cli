@@ -8,6 +8,16 @@ import (
 	"strings"
 )
 
+// CategoryCollectMode customizes the behavior of how to collect categories
+type CategoryCollectMode uint
+
+const (
+	// OnlyFirstCategory is a flag to stop collecting categories earlier. If this flag is included
+	// in mode parameter of CollectCategories(), it collects only first category and only first
+	// note and stops finding anymore.
+	OnlyFirstCategory CategoryCollectMode = 1 << iota
+)
+
 // Category represents a category directory which contains some notes
 type Category struct {
 	// Path is a path to the category directory
@@ -63,8 +73,9 @@ func (cats Categories) Notes(cfg *Config) ([]*Note, error) {
 	return notes, nil
 }
 
-// CollectCategories collects all categories under home
-func CollectCategories(cfg *Config) (Categories, error) {
+// CollectCategories collects all categories under home by default. The behavior of collecting categories
+// can be customized with mode parameter. Default mode value is 0 (nothing specified).
+func CollectCategories(cfg *Config, mode CategoryCollectMode) (Categories, error) {
 	cats := Categories(map[string]*Category{})
 
 	fs, err := ioutil.ReadDir(cfg.HomePath)
@@ -72,6 +83,7 @@ func CollectCategories(cfg *Config) (Categories, error) {
 		return nil, errors.Wrap(err, "Cannot read home")
 	}
 
+	stopWalking := false
 	for _, f := range fs {
 		name := f.Name()
 		if !f.IsDir() || strings.HasPrefix(name, ".") {
@@ -80,6 +92,10 @@ func CollectCategories(cfg *Config) (Categories, error) {
 
 		root := filepath.Join(cfg.HomePath, name)
 		if err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+			if stopWalking {
+				return filepath.SkipDir
+			}
+
 			if err != nil {
 				return err
 			}
@@ -104,9 +120,18 @@ func CollectCategories(cfg *Config) (Categories, error) {
 			rel := strings.TrimPrefix(filepath.Dir(path), cfg.HomePath)
 			cat := cats[strings.TrimPrefix(filepath.ToSlash(rel), "/")]
 			cat.NotePaths = append(cat.NotePaths, path)
+
+			if mode&OnlyFirstCategory != 0 {
+				stopWalking = true
+				return filepath.SkipDir
+			}
+
 			return nil
 		}); err != nil {
 			return nil, errors.Wrapf(err, "Cannot walk on directory for category %q", name)
+		}
+		if stopWalking {
+			break
 		}
 	}
 

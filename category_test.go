@@ -17,9 +17,31 @@ func configForCategoryTest(subdir string) *Config {
 	}
 }
 
+func TestCollectCategoriesOnlyFirstCategory(t *testing.T) {
+	cfg := configForCategoryTest("normal")
+	cats, err := CollectCategories(cfg, OnlyFirstCategory)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(cats) != 1 {
+		t.Fatal(len(cats), "categories found", cats)
+	}
+	var name string
+	var cat *Category
+	for name, cat = range cats {
+		break
+	}
+	if cat == nil || name == "" {
+		t.Fatal(name, cat)
+	}
+	if len(cat.NotePaths) != 1 {
+		t.Fatal("Only first note should be collected", cat.NotePaths)
+	}
+}
+
 func TestCollectCategoriesOK(t *testing.T) {
 	cfg := configForCategoryTest("normal")
-	cats, err := CollectCategories(cfg)
+	cats, err := CollectCategories(cfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -105,7 +127,7 @@ func TestCategoryNotesOK(t *testing.T) {
 
 func TestCategoriesNotesOK(t *testing.T) {
 	cfg := configForCategoryTest("normal")
-	cats, err := CollectCategories(cfg)
+	cats, err := CollectCategories(cfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -135,7 +157,7 @@ func TestCategoriesNotesOK(t *testing.T) {
 
 func TestCollectCategoriesNoHome(t *testing.T) {
 	cfg := &Config{HomePath: "/path/to/somewhere/unknown"}
-	_, err := CollectCategories(cfg)
+	_, err := CollectCategories(cfg, 0)
 	if err == nil || !strings.Contains(err.Error(), "Cannot read home") {
 		t.Fatal("Got unexpected", err)
 	}
@@ -159,7 +181,7 @@ func TestCategoryNotesError(t *testing.T) {
 
 func TestCategoriesNotesError(t *testing.T) {
 	cfg := configForCategoryTest("fail")
-	cats, err := CollectCategories(cfg)
+	cats, err := CollectCategories(cfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -170,7 +192,7 @@ func TestCategoriesNotesError(t *testing.T) {
 
 func TestCategoriesNoNote(t *testing.T) {
 	cfg := configForCategoryTest("empty")
-	cats, err := CollectCategories(cfg)
+	cats, err := CollectCategories(cfg, 0)
 	if err != nil {
 		t.Fatal(err)
 	}
