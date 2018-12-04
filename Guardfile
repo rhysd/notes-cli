@@ -16,10 +16,10 @@ guard :shell do
       sources << m[0] << "common_test.go"
       # Assume that https://github.com/rhysd/gotest is installed
       run "gotest #{sources.uniq.join ' '}"
-      run "golint #{m[0]}"
     else
       run 'go build ./cmd/notes'
-      run "golint #{m[0]}"
     end
+    run "golint #{m[0]}"
+    run 'go vet'
   end
 end

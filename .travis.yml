@@ -9,5 +9,6 @@ script:
     - go build ./cmd/notes && ./notes --help
     - go test -v -race -coverprofile=coverage.txt
     - golint ./...
+    - go vet ./...
 after_success:
   - bash <(curl -s https://codecov.io/bash)
