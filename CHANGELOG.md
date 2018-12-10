@@ -1,3 +1,13 @@
+<a name="v1.6.0"></a>
+# [v1.6.0](https://github.com/rhysd/notes-cli/releases/tag/v1.6.0) - 10 Dec 2018
+
+- **New:** `notes` with no argument now shows `notes ls -o` if any note exists
+- **Improve:** `list --full` output buffering
+- **Fix:** Broken pipe on using pager in some case
+
+[Changes][v1.6.0]
+
+
 <a name="v1.5.1"></a>
 # [v1.5.1](https://github.com/rhysd/notes-cli/releases/tag/v1.5.1) - 02 Dec 2018
 
@@ -131,6 +141,7 @@ https://github.com/rhysd/notes-cli/blob/master/README.md
 [Changes][v1.0.0]
 
 
+[v1.6.0]: https://github.com/rhysd/notes-cli/compare/v1.5.1...v1.6.0
 [v1.5.1]: https://github.com/rhysd/notes-cli/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/rhysd/notes-cli/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/rhysd/notes-cli/compare/v1.3.0...v1.4.0
