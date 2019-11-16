@@ -429,6 +429,15 @@ Please add following line to your `.bashrc`.
 $ eval "$(notes --completion-script-bash)"
 ```
 
+- For fish:
+
+Please add the completion script under `completions/fish/` to your completions directory.
+
+```
+$ git clone https://github.com/rhysd/notes-cli.git
+$ cp nodes-cli/completions/fish/notes.fish ~/.config/fish/completions/
+```
+
 
 ### Setup `man` manual
 
