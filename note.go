@@ -26,6 +26,19 @@ var (
 	closingComment   = []byte("-->\n")
 )
 
+type MismatchCategoryError struct {
+	cat, pathcat, path string
+}
+
+func (e *MismatchCategoryError) Error() string {
+	return fmt.Sprintf("Category does not match to file path. Category is '%s' but it should be '%s' from its file path. File path is '%s'", e.cat, e.pathcat, e.path)
+}
+
+func (e *MismatchCategoryError) Is(target error) bool {
+	_, ok := target.(*MismatchCategoryError)
+	return ok
+}
+
 // Note represents a note stored on filesystem or will be created
 type Note struct {
 	// Config is a configuration of notes command which was created by NewConfig()
@@ -261,12 +274,6 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 			}
 		} else if strings.HasPrefix(line, "- Category: ") {
 			note.Category = strings.TrimSpace(line[12:])
-			parent := filepath.Dir(path)
-			rel, err := filepath.Rel(cfg.HomePath, parent)
-			name := filepath.ToSlash(rel)
-			if err != nil || filepath.ToSlash(rel) != note.Category {
-				return nil, errors.Errorf("Category does not match to file path. Category is '%s' but it should be '%s' from its file path. File path is '%s'", note.Category, name, path)
-			}
 		} else if strings.HasPrefix(line, "- Tags:") {
 			tags := strings.Split(line[7:], ",")
 			note.Tags = make([]string, 0, len(tags))
@@ -297,6 +304,13 @@ func LoadNote(path string, cfg *Config) (*Note, error) {
 
 	if note.Category == "" || note.Tags == nil || note.Created.IsZero() {
 		return nil, errors.Errorf("Missing metadata in file '%s'. 'Category', 'Tags', 'Created' are mandatory", canonPath(path))
+	}
+
+	parent := filepath.Dir(path)
+	rel, err := filepath.Rel(cfg.HomePath, parent)
+	name := filepath.ToSlash(rel)
+	if err != nil || filepath.ToSlash(rel) != note.Category {
+		return note, &MismatchCategoryError{note.Category, name, path}
 	}
 
 	return note, nil
