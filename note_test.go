@@ -1,6 +1,7 @@
 package notes
 
 import (
+	"errors"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/kballard/go-shellquote"
@@ -543,10 +544,6 @@ func TestLoadNoteFail(t *testing.T) {
 			file: "timeformat-broken.md",
 			msg:  "Cannot parse created date time as RFC3339 format",
 		},
-		{
-			file: "category-mismatch.md",
-			msg:  "Category does not match to file path",
-		},
 	} {
 		t.Run(tc.file, func(t *testing.T) {
 			_, err := LoadNote(filepath.Join(cfg.HomePath, "fail", tc.file), cfg)
@@ -557,5 +554,16 @@ func TestLoadNoteFail(t *testing.T) {
 				t.Fatal("Unexpected error:", err)
 			}
 		})
+	}
+}
+
+func TestLoadNoteMismatchCategory(t *testing.T) {
+	cfg := noteTestdataConfig()
+	_, err := LoadNote(filepath.Join(cfg.HomePath, "fail", "category-mismatch.md"), cfg)
+	if err == nil {
+		t.Fatal("Error did not occur")
+	}
+	if !errors.Is(err, &MismatchCategoryError{}) {
+		t.Fatal("Unexpected error:", err)
 	}
 }
