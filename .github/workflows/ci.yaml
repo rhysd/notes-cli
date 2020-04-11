@@ -17,6 +17,8 @@ jobs:
       - run: go version
       - run: go build -v
       - run: go test -v -race -coverprofile=coverage.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
       - uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
