@@ -6,20 +6,19 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"runtime"
 	"strings"
 	"testing"
 )
 
-func testCheckOnCI() bool {
-	if _, ok := os.LookupEnv("GITHUB_ACTIONS"); ok {
-		return true
-	}
-	return false
+func onCI() bool {
+	_, ok := os.LookupEnv("GITHUB_ACTIONS")
+	return ok
 }
 
 func maySkipTestForSelfupdate(t *testing.T) {
-	if testCheckOnCI() && os.Getenv("GITHUB_TOKEN") == "" {
-		t.Skip("Skipping tests for selfupdate on CI without $GITHUB_TOKEN since GitHub API almost expires on CI without API token")
+	if onCI() && (os.Getenv("GITHUB_TOKEN") == "" || runtime.GOOS != "linux") {
+		t.Skip("Skipping tests for selfupdate on CI without $GITHUB_TOKEN since GitHub API almost expires on CI without API token. macOS is also skipped since they fail due to 'signal: killed' error")
 	}
 }
 
@@ -79,7 +78,7 @@ func TestSelfupdateCurrentIsLatest(t *testing.T) {
 func TestSelfupdateUpdateSuccessfully(t *testing.T) {
 	maySkipTestForSelfupdate(t)
 
-	if !testCheckOnCI() {
+	if !onCI() {
 		t.Skip("Run test for successful selfupdate only on CI since it's one-shot due to replacing test binary")
 	}
 
@@ -117,7 +116,7 @@ func TestSelfupdateUpdateSuccessfully(t *testing.T) {
 func TestSelfupdateUpdateError(t *testing.T) {
 	maySkipTestForSelfupdate(t)
 
-	if !testCheckOnCI() {
+	if !onCI() {
 		t.Skip("Run test for selfupdate failure only on CI since takes time")
 	}
 
