@@ -16,11 +16,9 @@ require (
 	github.com/pkg/errors v0.8.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rhysd/go-fakeio v1.0.0
-	github.com/rhysd/go-github-selfupdate v1.1.0
+	github.com/rhysd/go-github-selfupdate v1.2.2
 	github.com/rhysd/go-tmpenv v1.2.0
 	github.com/stretchr/testify v1.2.2 // indirect
-	golang.org/x/net v0.0.0-20181114220301-adae6a3d119a // indirect
-	golang.org/x/sys v0.0.0-20181116161606-93218def8b18 // indirect
 	golang.org/x/text v0.3.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )
