@@ -11,10 +11,7 @@ import (
 )
 
 func testCheckOnCI() bool {
-	if _, ok := os.LookupEnv("TRAVIS"); ok {
-		return true
-	}
-	if _, ok := os.LookupEnv("APPVEYOR"); ok {
+	if _, ok := os.LookupEnv("GITHUB_ACTIONS"); ok {
 		return true
 	}
 	return false

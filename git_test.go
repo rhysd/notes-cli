@@ -93,10 +93,7 @@ func TestGitInitAddCommit(t *testing.T) {
 func TestGitTrackingRemote(t *testing.T) {
 	// This test cannot be run on CI since they use detached HEAD for clone
 	wantErr := false
-	if _, ok := os.LookupEnv("TRAVIS"); ok {
-		wantErr = true
-	}
-	if _, ok := os.LookupEnv("APPVEYOR"); ok {
+	if _, ok := os.LookupEnv("GITHUB_ACTIONS"); ok {
 		wantErr = true
 	}
 
