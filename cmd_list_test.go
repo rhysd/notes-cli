@@ -489,7 +489,7 @@ func TestListCmd(t *testing.T) {
 						break
 					}
 				}
-				t.Fatalf("have:\n'%s'\n\n%s", have, hint)
+				t.Fatalf("have:\n%#v\n\n%#v\n\nwant:\n%#v", have, hint, want)
 			}
 		})
 	}
