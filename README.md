@@ -1,7 +1,6 @@
 A small CLI note taking tool with your favorite editor
 ======================================================
-[![Linux/Mac Build Status][travisci-badge]][travisci]
-[![Windows Build Status][appveyor-badge]][appveyor]
+[![CI][github-actions-badge]][github-actions]
 [![Coverage Report][codecov-badge]][codecov]
 [![Documentation][doc-badge]][doc]
 
@@ -700,11 +699,9 @@ command! -nargs=* NotesLastMod call <SID>notes_last_mod(<q-args>)
 [fzf]: https://github.com/junegunn/fzf
 [peco]: https://github.com/peco/peco
 [xdg-dirs]: https://wiki.archlinux.org/index.php/XDG_Base_Directory
-[appveyor-badge]: https://ci.appveyor.com/api/projects/status/5pbcku1buw8gnqu9/branch/master?svg=true
-[appveyor]: https://ci.appveyor.com/project/rhysd/notes-cli
-[travisci-badge]: https://travis-ci.org/rhysd/notes-cli.svg?branch=master
-[travisci]: https://travis-ci.org/rhysd/notes-cli
 [codecov-badge]: https://codecov.io/gh/rhysd/notes-cli/branch/master/graph/badge.svg
 [codecov]: https://codecov.io/gh/rhysd/notes-cli
 [doc-badge]: https://godoc.org/github.com/rhysd/notes-cli?status.svg
 [doc]: http://godoc.org/github.com/rhysd/notes-cli
+[github-actions-badge]: https://github.com/rhysd/notes-cli/workflows/CI/badge.svg?branch=master&event=push
+[github-actions]: https://github.com/rhysd/notes-cli/actions?query=workflow%3ACI
