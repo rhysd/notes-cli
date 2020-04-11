@@ -26,6 +26,7 @@ var (
 	closingComment   = []byte("-->\n")
 )
 
+// MismatchCategoryError represents an error caused when a user specifies mismatched category
 type MismatchCategoryError struct {
 	cat, pathcat, path string
 }
@@ -34,6 +35,7 @@ func (e *MismatchCategoryError) Error() string {
 	return fmt.Sprintf("Category does not match to file path. Category is '%s' but it should be '%s' from its file path. File path is '%s'", e.cat, e.pathcat, e.path)
 }
 
+// Is returns if given error is a MismatchCategoryError or not
 func (e *MismatchCategoryError) Is(target error) bool {
 	_, ok := target.(*MismatchCategoryError)
 	return ok
