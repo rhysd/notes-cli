@@ -1,3 +1,13 @@
+<a name="v1.6.2"></a>
+# [v1.6.2](https://github.com/rhysd/notes-cli/releases/tag/v1.6.2) - 11 Apr 2020
+
+- **New:** Add Fish shell completion
+- **New:** `MismatchCategoryError` was added as error type
+- **Improve:** Update dependencies
+
+[Changes][v1.6.2]
+
+
 <a name="v1.6.0"></a>
 # [v1.6.0](https://github.com/rhysd/notes-cli/releases/tag/v1.6.0) - 10 Dec 2018
 
@@ -104,9 +114,9 @@ By 2., you can add `<hr/>` after metadata to separate your list from metadata:
 ```markdown
 Shopping
 =======
-- **Category:** memo
-- **Tags:**
-- **Created:** 2018-11-6T20:36:00+09:00
+- Category: memo
+- Tags:
+- Created: 2018-11-6T20:36:00+09:00
 ----------
 
 - Milk
@@ -141,6 +151,7 @@ https://github.com/rhysd/notes-cli/blob/master/README.md
 [Changes][v1.0.0]
 
 
+[v1.6.2]: https://github.com/rhysd/notes-cli/compare/v1.6.0...v1.6.2
 [v1.6.0]: https://github.com/rhysd/notes-cli/compare/v1.5.1...v1.6.0
 [v1.5.1]: https://github.com/rhysd/notes-cli/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/rhysd/notes-cli/compare/v1.4.0...v1.5.0
