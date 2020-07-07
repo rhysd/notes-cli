@@ -36,6 +36,12 @@ Or you can install by building from source directly as follows. Go toolchain is 
 $ go get -u github.com/rhysd/notes-cli/cmd/notes
 ```
 
+If the build fails due to https://github.com/golang/go/issues/30515 then you may have to enable `module mode` as described in `go help env`
+
+```
+go env -w GO111MODULE=on
+```
+
 Before starting to use, you can try it with examples.
 
 ```sh
