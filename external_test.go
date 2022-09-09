@@ -3,14 +3,15 @@ package notes
 import (
 	"errors"
 	"fmt"
-	"github.com/rhysd/go-fakeio"
-	"github.com/rhysd/go-tmpenv"
 	"os"
 	"path/filepath"
 	"reflect"
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/rhysd/go-fakeio"
+	"github.com/rhysd/go-tmpenv"
 )
 
 func TestNewExternalCmdOK(t *testing.T) {
@@ -21,6 +22,9 @@ func TestNewExternalCmdOK(t *testing.T) {
 	defer tmp.Restore()
 
 	panicIfErr(os.Setenv("PATH", os.Getenv("PATH")+string(os.PathListSeparator)+bindir))
+
+	exe, err := os.Executable()
+	panicIfErr(err)
 
 	for _, name := range []string{
 		"foo", "foo-bar", "foo_bar", "-", "_", "-foo", "bar_",
@@ -42,8 +46,8 @@ func TestNewExternalCmdOK(t *testing.T) {
 		if !reflect.DeepEqual(args, c.Args) {
 			t.Fatal("Passed args are unexpected:", c.Args)
 		}
-		if !strings.HasSuffix(c.NotesPath, os.Args[0]) {
-			t.Fatal("`notes` full path is unexpected:", c.NotesPath, "wanted full path of", os.Args[0])
+		if !strings.HasSuffix(c.NotesPath, exe) {
+			t.Fatal("`notes` full path is unexpected:", c.NotesPath, "wanted full path of", exe)
 		}
 	}
 }
@@ -107,7 +111,9 @@ func TestRunExternalCommandOK(t *testing.T) {
 	}
 
 	// First argument is a executable path of `notes`. Ignore it by strings.HasSuffix()
-	want := fmt.Sprintln(append([]string{os.Args[0]}, args...))
+	exe, err := os.Executable()
+	panicIfErr(err)
+	want := fmt.Sprintln(append([]string{exe}, args...))
 	if !strings.Contains(out, want) {
 		t.Fatal("Passed arguments to external command is unexpected. Wanted", want, "in output but have output", out)
 	}
