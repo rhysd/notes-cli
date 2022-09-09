@@ -2,16 +2,17 @@ package notes
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
 	"github.com/blang/semver"
 	"github.com/fatih/color"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/rhysd/go-fakeio"
 	"github.com/rhysd/go-tmpenv"
-	"os"
-	"path/filepath"
-	"strings"
-	"testing"
 )
 
 func TestVersion(t *testing.T) {
@@ -186,6 +187,9 @@ func TestParseExternalCommand(t *testing.T) {
 
 	panicIfErr(os.Setenv("PATH", os.Getenv("PATH")+string(os.PathListSeparator)+bindir))
 
+	exe, err := os.Executable()
+	panicIfErr(err)
+
 	for _, tc := range []struct {
 		what string
 		args []string
@@ -232,7 +236,7 @@ func TestParseExternalCommand(t *testing.T) {
 				t.Fatal("Output to stderr is unexpected:", output)
 			}
 
-			want := fmt.Sprintln(append([]string{os.Args[0]}, tc.args...))
+			want := fmt.Sprintln(append([]string{exe}, tc.args...))
 			if !strings.Contains(output, want) {
 				t.Fatal("Passed arguments to external command is unexpected. Wanted", want, "in output but have output", output)
 			}

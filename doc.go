@@ -44,6 +44,5 @@ It consists structs which represent each subcommands.
 For usage of `notes` command, please read README of the repository.
 
 https://github.com/rhysd/notes-cli/blob/master/README.md
-
 */
 package notes
