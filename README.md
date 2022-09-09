@@ -33,21 +33,7 @@ It contains an executable. Please unzip the archive and put the executable in a 
 Or you can install by building from source directly as follows. Go toolchain is necessary.
 
 ```
-$ go get -u github.com/rhysd/notes-cli/cmd/notes
-```
-
-If the build fails due to https://github.com/golang/go/issues/30515 then you may have to enable `module mode` as described in `go help env`
-
-*Temporarily* enable it for this installation only:
-
-```
-GO111MODULE=on go get -u github.com/rhysd/notes-cli/cmd/notes
-```
-
-*Permanently* enable this in your goenv config (May conflict with other projects)
-
-```
-go env -w GO111MODULE=on
+$ go install github.com/rhysd/notes-cli/cmd/notes
 ```
 
 Before starting to use, you can try it with examples.
@@ -68,6 +54,7 @@ To uninstall:
 $ rm -rf "$(notes config home)" # Remove all notes
 $ rm "$(which notes)" # Remove an executable
 ```
+
 
 
 ## Basic Usage
