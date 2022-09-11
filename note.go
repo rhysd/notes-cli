@@ -4,14 +4,14 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/mattn/go-runewidth"
-	"github.com/pkg/errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/mattn/go-runewidth"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -93,7 +93,7 @@ func (note *Note) TemplatePath() (string, bool) {
 func (note *Note) Create() error {
 	var template []byte
 	if p, ok := note.TemplatePath(); ok {
-		b, err := ioutil.ReadFile(p)
+		b, err := os.ReadFile(p)
 		if err != nil {
 			return errors.Wrapf(err, "Cannot read template file %q", p)
 		}

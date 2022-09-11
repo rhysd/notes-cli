@@ -1,11 +1,11 @@
 package notes
 
 import (
-	"github.com/pkg/errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // CategoryCollectMode customizes the behavior of how to collect categories
@@ -78,7 +78,7 @@ func (cats Categories) Notes(cfg *Config) ([]*Note, error) {
 func CollectCategories(cfg *Config, mode CategoryCollectMode) (Categories, error) {
 	cats := Categories(map[string]*Category{})
 
-	fs, err := ioutil.ReadDir(cfg.HomePath)
+	fs, err := os.ReadDir(cfg.HomePath)
 	if err != nil {
 		return nil, errors.Wrap(err, "Cannot read home")
 	}

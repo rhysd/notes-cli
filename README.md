@@ -30,7 +30,7 @@ This tool is intended to be used nicely with other commands such as `grep` (or [
 Download an archive for your OS from [release page](https://github.com/rhysd/notes-cli/releases).
 It contains an executable. Please unzip the archive and put the executable in a directory in `$PATH`.
 
-Or you can install by building from source directly as follows. Go toolchain is necessary.
+Or you can install by building from source directly as follows. Go toolchain 1.16 or later is necessary.
 
 ```
 $ go install github.com/rhysd/notes-cli/cmd/notes

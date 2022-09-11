@@ -2,10 +2,7 @@ package notes
 
 import (
 	"errors"
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/kballard/go-shellquote"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -13,6 +10,10 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/kballard/go-shellquote"
 )
 
 func noteTestdataConfig() *Config {
@@ -285,7 +286,7 @@ func TestCreateNoteFile(t *testing.T) {
 			}
 			defer f.Close()
 
-			b, err := ioutil.ReadAll(f)
+			b, err := io.ReadAll(f)
 			if err != nil {
 				t.Fatal(err)
 			}

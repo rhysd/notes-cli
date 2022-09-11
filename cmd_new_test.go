@@ -1,14 +1,15 @@
 package notes
 
 import (
-	"github.com/rhysd/go-fakeio"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/rhysd/go-fakeio"
 )
 
 func testNewConfigForNewCmd(subdir string) *Config {
@@ -65,7 +66,7 @@ func TestNewCmdNewNoteInlineFallbackInput(t *testing.T) {
 	}
 	defer f.Close()
 
-	b, err := ioutil.ReadAll(f)
+	b, err := io.ReadAll(f)
 	panicIfErr(err)
 	s := string(b)
 

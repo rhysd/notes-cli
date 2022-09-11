@@ -2,10 +2,11 @@ package notes
 
 import (
 	"fmt"
+	"io"
+	"os"
+
 	"github.com/pkg/errors"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"io/ioutil"
-	"os"
 )
 
 // NewCmd represents `notes new` command. Each public fields represent options of the command
@@ -39,7 +40,7 @@ func (cmd *NewCmd) matchesCmdline(cmdline string) bool {
 
 func (cmd *NewCmd) fallbackInput(note *Note) error {
 	fmt.Fprintln(os.Stderr, "Input notes inline (Send EOF by Ctrl+D to stop):")
-	b, err := ioutil.ReadAll(os.Stdin)
+	b, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return errors.Wrap(err, "Cannot read from stdin")
 	}

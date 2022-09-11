@@ -2,14 +2,14 @@ package notes
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"os/exec"
 	"strings"
 	"testing"
 )
 
 func TestPagerCmdParseFail(t *testing.T) {
-	if _, err := StartPagerWriter("'foo", ioutil.Discard); err == nil || !strings.Contains(err.Error(), "Cannot parsing") {
+	if _, err := StartPagerWriter("'foo", io.Discard); err == nil || !strings.Contains(err.Error(), "Cannot parsing") {
 		t.Fatal("Unexpected error", err)
 	}
 }
@@ -17,7 +17,7 @@ func TestPagerCmdParseFail(t *testing.T) {
 func TestPagerStartErrorPropagation(t *testing.T) {
 	var errs []error
 
-	w, err := StartPagerWriter("/path/to/bin/unknown", ioutil.Discard)
+	w, err := StartPagerWriter("/path/to/bin/unknown", io.Discard)
 	errs = append(errs, err)
 	_, err = w.Write([]byte("hello"))
 	errs = append(errs, err)
@@ -80,7 +80,7 @@ func TestPagerRunGivenMultipleArguments(t *testing.T) {
 }
 
 func TestPagerCommandExitFailure(t *testing.T) {
-	w, err := StartPagerWriter("false", ioutil.Discard)
+	w, err := StartPagerWriter("false", io.Discard)
 	if err != nil {
 		t.Fatal(err)
 	}

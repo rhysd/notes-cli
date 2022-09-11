@@ -3,11 +3,7 @@ package notes
 import (
 	"bytes"
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/kballard/go-shellquote"
-	"github.com/rhysd/go-fakeio"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -15,6 +11,10 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/fatih/color"
+	"github.com/kballard/go-shellquote"
+	"github.com/rhysd/go-fakeio"
 )
 
 func testNewConfigForListCmd(subdir string) *Config {
@@ -875,7 +875,7 @@ func TestListPagingError(t *testing.T) {
 
 			out := tc.out
 			if out == nil {
-				out = ioutil.Discard
+				out = io.Discard
 			}
 
 			cmd := &ListCmd{
